@@ -1,13 +1,13 @@
-package api
+package comments
 
 import (
 	"encoding/json"
 	"forum/server"
-	"forum/server/posts"
+	"forum/server/comments"
 	"net/http"
 )
 
-func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
+func CreateCommentHandler(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
@@ -23,7 +23,7 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	newPost, err := posts.CreatePost(server.Db, params)
+	newComment, err := comments.CreateComment(server.Db, params)
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -31,5 +31,5 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content", "application/json")
-	json.NewEncoder(w).Encode(newPost)
+	json.NewEncoder(w).Encode(newComment)
 }

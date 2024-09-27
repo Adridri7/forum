@@ -4,82 +4,143 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Créer un Post</title>
+    <title>Forum Posts</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            margin: 50px;
+            background-color: #121212;
+            color: #e0e0e0;
+            font-family: 'Arial', sans-serif;
+            margin: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
-        form {
-            max-width: 500px;
-            margin: auto;
+        h1 {
+            color: #ffffff;
+            margin-bottom: 20px;
         }
 
-        label {
-            display: block;
-            margin-bottom: 8px;
-        }
-
-        input,
-        textarea {
+        #posts-container {
             width: 100%;
-            padding: 10px;
-            margin-bottom: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
+            max-width: 800px;
         }
 
-        button {
-            background-color: #5cb85c;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            cursor: pointer;
+        .post {
+            background-color: #1e1e1e;
+            border: 1px solid #333;
             border-radius: 5px;
+            padding: 15px;
+            margin: 10px 0;
+            transition: transform 0.3s;
+        }
+
+        .post:hover {
+            transform: scale(1.02);
+        }
+
+        .post h2 {
+            margin: 0 0 10px;
+            color: #b3b3b3;
+        }
+
+        .post p {
+            margin: 5px 0;
+            line-height: 1.5;
+        }
+
+        .post strong {
+            color: #b3b3b3;
+        }
+
+        .like-dislike,
+        .delete-post {
+            display: inline-block;
+            margin-top: 10px;
+            background-color: #3f51b5;
+            color: #ffffff;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: center;
+            transition: background-color 0.3s;
+        }
+
+        .like-dislike:hover,
+        .delete-post:hover {
+            background-color: #303f9f;
         }
     </style>
 </head>
 
 <body>
-    <h1>Créer un nouveau Post</h1>
-    <form id="create-post-form">
-
-        <label for="user_uuid">User UUID:</label>
-        <input type="text" id="user_uuid" name="user_uuid" required>
-
-        <label for="content">Contenu:</label>
-        <textarea id="content" name="content" required></textarea>
-
-        <label for="categories">Catégorie:</label>
-        <input type="text" id="categories" name="categories" required>
-
-        <button type="button" onclick="createPost()">Créer le Post</button>
-    </form>
+    <h1>Posts</h1>
+    <div id="posts-container">
+        <!-- Les posts seront affichés ici -->
+    </div>
 
     <script>
-        async function createPost() {
-            const form = document.getElementById("create-post-form");
-            const formData = new FormData(form);
+        // Appeler l'API et afficher les posts
+        async function fetchPosts() {
+            try {
+                const response = await fetch("http://localhost:8080/api/post/fetchAllPost");
+                if (!response.ok) {
+                    throw new Error("Erreur lors de la récupération des posts");
+                }
 
-            const data = {};
-            formData.forEach((value, key) => (data[key] = value));
-
-            const response = await fetch("http://localhost:8080/api/createPost", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(data)
-            });
-
-            if (response.ok) {
-                alert("Post créé avec succès!");
-            } else {
-                const error = await response.json();
-                alert("Erreur lors de la création du post: " + error.message);
+                const posts = await response.json();
+                const postsContainer = document.getElementById("posts-container");
+                postsContainer.innerHTML = ""; // Effacer le contenu précédent
+                posts.forEach(post => {
+                    const postDiv = document.createElement("div");
+                    postDiv.className = "post";
+                    postDiv.innerHTML = `
+                        <h2>Post UUID: ${post.post_uuid}</h2>
+                        <p><strong>User UUID:</strong> ${post.user_uuid}</p>
+                        <p><strong>Content:</strong> ${post.content}</p>
+                        <p><strong>Category:</strong> ${post.categories}</p>
+                        <p><strong>Likes:</strong> ${post.likes}</p>
+                        <p><strong>Dislikes:</strong> ${post.dislikes}</p>
+                        <p><strong>Created At:</strong> ${new Date(post.created_at).toLocaleString()}</p>
+                        <button class="like-dislike">Like</button>
+                        <button class="like-dislike">Dislike</button>
+                        <button class="delete-post" onclick="deletePost('${post.post_uuid}')">Supprimer</button>
+                    `;
+                    postsContainer.appendChild(postDiv);
+                });
+            } catch (error) {
+                console.error(error);
             }
         }
+
+        // Fonction pour supprimer un post
+        async function deletePost(post_uuid) {
+            const confirmDelete = confirm("Êtes-vous sûr de vouloir supprimer ce post ?");
+            if (!confirmDelete) return;
+
+            try {
+                const response = await fetch("http://localhost:8080/api/post/deletePost", {
+                    method: "DELETE",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ post_uuid: post_uuid }),
+                });
+
+                if (!response.ok) {
+                    throw new Error("Erreur lors de la suppression du post");
+                }
+
+                // Recharger les posts après suppression
+                fetchPosts();
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        // Charger les posts au chargement de la page
+        window.onload = fetchPosts;
     </script>
 </body>
 
