@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Créer un Post</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 50px;
+        }
+
+        form {
+            max-width: 500px;
+            margin: auto;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        button {
+            background-color: #5cb85c;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Créer un nouveau Post</h1>
+    <form id="create-post-form">
+
+        <label for="user_uuid">User UUID:</label>
+        <input type="text" id="user_uuid" name="user_uuid" required>
+
+        <label for="content">Contenu:</label>
+        <textarea id="content" name="content" required></textarea>
+
+        <label for="categories">Catégorie:</label>
+        <input type="text" id="categories" name="categories" required>
+
+        <button type="button" onclick="createPost()">Créer le Post</button>
+    </form>
+
+    <script>
+        async function createPost() {
+            const form = document.getElementById("create-post-form");
+            const formData = new FormData(form);
+
+            const data = {};
+            formData.forEach((value, key) => (data[key] = value));
+
+            const response = await fetch("http://localhost:8080/api/createPost", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(data)
+            });
+
+            if (response.ok) {
+                alert("Post créé avec succès!");
+            } else {
+                const error = await response.json();
+                alert("Erreur lors de la création du post: " + error.message);
+            }
+        }
+    </script>
+</body>
+
+</html>

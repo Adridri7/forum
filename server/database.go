@@ -8,7 +8,7 @@ import (
 )
 
 // Variable globale pour la base de données
-var db *sql.DB
+var Db *sql.DB
 
 // init() est appelé automatiquement avant le main() afin de vérifier la connexion à la db
 func init() {
@@ -21,13 +21,13 @@ func init() {
 	// Open database
 	// Magie on peut voir les tables avec les columns er rows
 
-	db, err = sql.Open("sqlite3", "./forumdatabase.db")
+	Db, err = sql.Open("sqlite3", "./forumdatabase.db")
 	if err != nil {
 		log.Fatalf("Erreur lors de l'ouverture de la base de données : %v", err)
 	}
 
 	// Vérifie la connexion
-	if err = db.Ping(); err != nil {
+	if err = Db.Ping(); err != nil {
 		log.Fatalf("Erreur lors de la connexion à la base de données : %v", err)
 	}
 

@@ -27,7 +27,7 @@ func RunQuery(query string, params ...interface{}) ([]map[string]interface{}, er
 	// params ex: "SELECT * FROM users"
 	//----------------------------------------------------------------------//
 
-	rows, err := db.Query(query, params...)
+	rows, err := Db.Query(query, params...)
 	if err != nil {
 		log.Printf("Erreur lors de l'exécution de la requête : %v", err)
 		return nil, err
