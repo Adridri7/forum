@@ -27,7 +27,7 @@ func CreatePost(db *sql.DB, params map[string]interface{}) (*Post, error) {
 
 	post_UUID, err := posts.GenerateUUID()
 	if err != nil {
-		return nil, fmt.Errorf("erreur lors de la génération du uuid: %v", err)
+		return nil, fmt.Errorf("erreur lors de la génération de uuid: %v", err)
 	}
 
 	user_UUID, user_UUIDOK := params["user_uuid"].(string)
