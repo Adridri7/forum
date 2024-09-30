@@ -303,3 +303,17 @@ body {
 #login-btn:hover {
     background-color: var(--accent-color);
 }
+
+.delete-button {
+    background-color: #ff4d4d;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 3px;
+    margin-left: 10px;
+}
+
+.delete-button:hover {
+    background-color: #ff1a1a;
+}

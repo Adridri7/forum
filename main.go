@@ -20,7 +20,7 @@ func main() {
 	// A faire pour tester : ajouter une route pour la page createPost.html
 	http.Handle("/", http.FileServer(http.Dir("./static/homePage")))
 
-	fmt.Println("Serveur démarré sur le port 8080...")
+	fmt.Println("Serveur démarré : http://localhost:8080/")
 	log.Fatal(http.ListenAndServe(":8080", nil))
 
 }

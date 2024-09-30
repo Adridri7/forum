@@ -64,6 +64,7 @@ async function fetchPosts() {
         if (posts.length === 0) {
             messagesList.innerHTML = '<p>No posts available.</p>';
         } else {
+            posts.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
             posts.forEach(post => {
                 DisplayMessages(post.post_uuid, post.user_uuid, post.content, post.created_at);
             });
@@ -75,15 +76,13 @@ async function fetchPosts() {
 }
 
 function DisplayMessages(id, username, content, timestamp) {
-
     const displayTimeStamp = timestamp ? new Date(timestamp).toLocaleString() : new Date().toLocaleString();
-
 
     const messagesList = document.getElementById('users-post');
 
     const messageItem = document.createElement('div');
     messageItem.classList.add('message-item');
-    messageItem.setAttribute('data-id', id);
+    messageItem.setAttribute('post_uuid', id);
 
     const messageHeader = document.createElement('div');
     messageHeader.classList.add('message-header');
@@ -96,8 +95,19 @@ function DisplayMessages(id, username, content, timestamp) {
     timeStampSpan.classList.add('timestamp');
     timeStampSpan.textContent = displayTimeStamp;
 
+    // Créer le bouton de suppression
+    const deleteButton = document.createElement('button');
+    deleteButton.classList.add('delete-button');
+    deleteButton.textContent = 'Delete';
+    // Ajouter l'événement de suppression
+    deleteButton.addEventListener('click', () => {
+        deletePost(id);
+    });
+
+    // Ajouter les éléments au header du message
     messageHeader.appendChild(userNameSpan);
     messageHeader.appendChild(timeStampSpan);
+    messageHeader.appendChild(deleteButton); // Ajout du bouton dans le header
 
     const messageContent = document.createElement('div');
     messageContent.classList.add('message-content');
@@ -108,6 +118,31 @@ function DisplayMessages(id, username, content, timestamp) {
 
     messagesList.appendChild(messageItem);
     messagesList.scrollTop = messagesList.scrollHeight;
+}
+
+
+async function deletePost(post_uuid) {
+    const confirmDelete = confirm("Êtes-vous sûr de vouloir supprimer ce post ?");
+    if (!confirmDelete) return;
+
+    try {
+        const response = await fetch("http://localhost:8080/api/post/deletePost", {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ post_uuid: post_uuid }),
+        });
+
+        if (!response.ok) {
+            throw new Error("Erreur lors de la suppression du post");
+        }
+
+        // Recharger les posts après suppression
+        fetchPosts();
+    } catch (error) {
+        console.error(error);
+    }
 }
 
 document.addEventListener("DOMContentLoaded", () => {
