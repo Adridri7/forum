@@ -148,3 +148,29 @@ async function deletePost(post_uuid) {
 document.addEventListener("DOMContentLoaded", () => {
     fetchPosts();
 });
+
+// static/app.js
+document.getElementById('searchButton').addEventListener('click', function () {
+    const query = document.getElementById('searchTerm').value;
+    if (!query) {
+        alert('Veuillez entrer un terme de recherche.');
+        return;
+    }
+
+    fetch(`/api/search?q=${encodeURIComponent(query)}&limit=10`)
+        .then(response => response.json())
+        .then(data => {
+            const container = document.getElementById('gifsContainer');
+            container.innerHTML = ''; // Vider les GIFs précédents
+
+            data.forEach(gif => {
+                const img = document.createElement('img');
+                img.src = gif.images.fixed_height.url;
+                img.alt = gif.id;
+                container.appendChild(img);
+            });
+        })
+        .catch(error => {
+            console.error('Erreur:', error);
+        });
+});
