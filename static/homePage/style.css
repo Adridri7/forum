@@ -191,6 +191,18 @@ body {
     background-color: var(--background-message-color);
     padding: 25px;
     border-bottom: 1px solid var(--border-color);
+    animation: fadeIn 0.85s forwards;
+    opacity: 0;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }
 
 .username {
@@ -234,7 +246,6 @@ body {
     background: none;
     border: none;
     cursor: pointer;
-    transition: transform 0.2s ease;
     font-size: 16px;
     width: 48px;
     height: 48px;

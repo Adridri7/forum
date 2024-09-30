@@ -1,8 +1,5 @@
 import { DisplayMessages } from "./displayMessage.js";
-
-document.addEventListener('DOMContentLoaded', () => {
-    fetchPosts();
-});
+import { initEventListeners } from "./comment.js";
 
 // Sélectionnez les éléments
 const toggleButton = document.getElementById('toggle-menu-btn');
@@ -55,7 +52,7 @@ toggleButton.addEventListener('click', () => {
 });
 
 let currentUser = ''
-async function fetchPosts() {
+export async function fetchPosts() {
     const messagesList = document.getElementById('users-post');
     messagesList.innerHTML = '<p>Loading...</p>';
     try {
@@ -79,6 +76,7 @@ async function fetchPosts() {
         messagesList.innerHTML = '<p>Error loading posts. Please try again.</p>';
         console.error(error);
     }
+    initEventListeners();
 }
 
 export async function deletePost(post_uuid) {
@@ -222,4 +220,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     addButton.addEventListener('click', NewPost);
 
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    fetchPosts();
 });
