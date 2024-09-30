@@ -70,15 +70,20 @@
             </header>
             <ul id="users-post">
                 <!-- ici va se trouver les posts -->
+                <div class="created-post" id="created-post">
+                    <div class="post">New Post</div>
+                    <div class="user-name">Rokat</div>
+                    <form class="message-input" id="message-form">
+                        <input type="text" id="message" placeholder="What's new ?">
+                    </form>
+                    <button id="post-btn">Post</button>
+                </div>
             </ul>
-            <!-- <form class="message-input">
-                <input type="text" id="message" placeholder="Type your message...">
-                <button id="send-btn" type="submit">Send</button>
-            </form> -->
+            <div class="modal-post" id="modal-post">
+            </div>
+            <button id="add-button">+</button>
         </div>
-        <button id="add-button">+</button>
-    </div>
-    <script src="app.js"></script>
+        <script src="app.js"></script>
 </body>
 
 </html>

@@ -1,3 +1,7 @@
+document.addEventListener('DOMContentLoaded', () => {
+    fetchPosts();
+});
+
 // Sélectionnez les éléments
 const toggleButton = document.getElementById('toggle-menu-btn');
 const sidebar = document.getElementById('sidebar');
@@ -145,6 +149,77 @@ async function deletePost(post_uuid) {
     }
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-    fetchPosts();
+document.addEventListener('DOMContentLoaded', () => {
+    const addButton = document.getElementById('add-button');
+    const modalPost = document.getElementById('modal-post');
+    const userPost = document.getElementById('users-post')
+
+    let isModal = false;
+
+    // Fonction pour afficher le modal
+    // Fonction pour afficher le modal
+    function NewPost() {
+        CreatedModal();
+        const newpost = document.getElementById('created-post');
+        newpost.style.display = 'flex';
+        modalPost.style.display = 'flex';
+        isModal = true;
+
+        // Ajouter un écouteur d'événement pour fermer le modal lorsqu'un clic se produit
+        document.addEventListener('click', closeModal);
+    }
+
+    function CreatedModal() {
+        const createdPost = document.createElement('div');
+        createdPost.classList.add('created-post');
+        createdPost.id = 'created-post';
+
+        const postHeader = document.createElement('div');
+        postHeader.classList.add('post');
+        postHeader.textContent = 'New Post';
+
+        const userName = document.createElement('div');
+        userName.classList.add('user-name');
+        userName.textContent = 'Rokat';
+
+        const form = document.createElement('form');
+        form.classList.add('message-input');
+        form.id = 'message-form';
+
+        const inputField = document.createElement('input');
+        inputField.type = 'text';
+        inputField.id = 'message';
+        inputField.placeholder = "What's new ?";
+
+        const postButton = document.createElement('button');
+        postButton.id = 'post-btn';
+        postButton.textContent = 'Post';
+
+        form.appendChild(inputField);
+        createdPost.appendChild(postHeader);
+        createdPost.appendChild(userName);
+        createdPost.appendChild(form);
+        createdPost.appendChild(postButton);
+
+        // Ajout du formulaire dans le modal
+        userPost.appendChild(createdPost);
+    }
+
+
+    // Fonction pour fermer le modal si on clique à l'extérieur de 'created-post'
+    function closeModal(event) {
+        const newpost = document.getElementById('created-post');
+        const modalpost = document.getElementById('modal-post');
+        // Vérifie si le clic a eu lieu en dehors de 'created-post'
+        if (!newpost.contains(event.target) && event.target !== addButton && isModal) {
+            newpost.style.display = 'none'; // Ferme le post
+            modalpost.style.display = 'none'; // Ferme aussi le fond modal
+            isModal = false;
+
+            document.removeEventListener('click', closeModal);
+        }
+    }
+
+    addButton.addEventListener('click', NewPost);
+
 });

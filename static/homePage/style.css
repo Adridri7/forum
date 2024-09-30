@@ -8,6 +8,7 @@
 :root {
     --background-color: #f1f1f1;
     --border-color: #9C9FA8;
+    --background-modal-color: #080707;
     --description-color: #696a6b;
     --text-color: #FFFFFF;
     --second-text-color: #000000;
@@ -168,36 +169,8 @@ body {
     display: none;
 }
 
-/* .message-input {
-    display: flex;
-    align-items: center;
-    padding: 20px;
-    width: 40%;
-    margin: 0;
-    flex-shrink: 0;
-    box-sizing: border-box;
-}
-
-.message-input input {
-    padding: 13px 10px;
-    flex: 1;
-    border: none;
-    border-radius: 20px;
-    margin-right: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-}
-
-.message-input button {
-    padding: 10px;
-    background-color: var(--primary-color);
-    color: var(--text-color);
-    border: none;
-    border-radius: 5px;
-    margin-left: 10px;
-    cursor: pointer;
-} */
-
 #users-post {
+    position: relative;
     background-color: transparent;
     scrollbar-width: none;
     flex-grow: 1;
@@ -227,11 +200,6 @@ body {
 
 .timestamp {
     color: var(--description-color);
-}
-
-.message-header {
-    display: flex;
-    gap: 15px;
 }
 
 .reaction-btn {
@@ -303,6 +271,90 @@ body {
 #login-btn:hover {
     background-color: var(--accent-color);
 }
+
+.modal-post {
+    display: none;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    z-index: 1;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.8);
+    /* Fond sombre transparent */
+}
+
+.created-post {
+    position: absolute;
+    background-color: var(--background-message-color);
+    margin-left: 2.5%;
+    top: 40%;
+    left: 0;
+    border-radius: 8px;
+    width: 95%;
+    height: 210px;
+    gap: 5px;
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    box-sizing: border-box;
+}
+
+
+.user-name {
+    align-self: flex-start;
+    padding-left: 20px;
+    font-size: 18px;
+}
+
+.message-input {
+    display: flex;
+    border-radius: 8px;
+    height: 70px;
+    padding-left: 20px;
+    width: 100%;
+    /* Adapte la largeur de la barre de message à celle de .created-post */
+    margin: 0;
+    flex-shrink: 0;
+    box-sizing: border-box;
+
+}
+
+.message-input input {
+    flex: 1;
+    background: none;
+    border: none;
+    outline: none;
+    font-size: 18px;
+}
+
+.post {
+    align-self: center;
+    font-size: 18px;
+    margin-top: 10px;
+}
+
+#post-btn {
+    align-self: flex-end;
+    margin-right: 20px;
+    margin-bottom: 10px;
+    font-size: 16px;
+    width: 70px;
+    height: 40px;
+    border: none;
+    color: #FFFFFF;
+    background-color: var(--primary-color);
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
 
 .delete-button {
     background-color: #ff4d4d;
