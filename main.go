@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	comments "forum/server/api/comment"
+	"forum/server/api/giphy"
 	"forum/server/api/post"
 	"log"
 	"net/http"
@@ -16,6 +17,8 @@ func main() {
 	http.HandleFunc("/api/post/deletePost", post.DeletePostHandler)
 
 	http.HandleFunc("/api/createComment", comments.CreateCommentHandler)
+
+	http.HandleFunc("/api/search", giphy.SearchGiphyHandler)
 
 	// A faire pour tester : ajouter une route pour la page createPost.html
 	http.Handle("/", http.FileServer(http.Dir("./static/homePage")))
