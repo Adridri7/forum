@@ -55,7 +55,7 @@ toggleButton.addEventListener('click', () => {
 
 async function fetchPosts() {
     const messagesList = document.getElementById('users-post');
-    messagesList.innerHTML = '<p>Loading...</p>'; // Show loading state
+    messagesList.innerHTML = '<p>Loading...</p>';
     try {
         const response = await fetch("http://localhost:8080/api/post/fetchAllPost");
         if (!response.ok) {
@@ -68,9 +68,8 @@ async function fetchPosts() {
         if (posts.length === 0) {
             messagesList.innerHTML = '<p>No posts available.</p>';
         } else {
-            posts.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
             posts.forEach(post => {
-                DisplayMessages(post.post_uuid, post.user_uuid, post.content, post.created_at);
+                DisplayMessages(post);
             });
         }
     } catch (error) {
@@ -79,43 +78,51 @@ async function fetchPosts() {
     }
 }
 
-function DisplayMessages(id, username, content, timestamp) {
-    const displayTimeStamp = timestamp ? new Date(timestamp).toLocaleString() : new Date().toLocaleString();
+function DisplayMessages(post) {
+    const displayTimeStamp = post.created_at ? new Date(post.created_at).toLocaleString() : new Date().toLocaleString();
 
     const messagesList = document.getElementById('users-post');
 
     const messageItem = document.createElement('div');
     messageItem.classList.add('message-item');
-    messageItem.setAttribute('post_uuid', id);
+    messageItem.setAttribute('post_uuid', post.post_uuid);
 
     const messageHeader = document.createElement('div');
     messageHeader.classList.add('message-header');
 
+    const userInfo = document.createElement('div');
+    userInfo.classList.add('user-info');
+
+    const profilePicture = document.createElement('img');
+    profilePicture.src = post.profile_picture || 'default-profile-picture.jpg';
+    profilePicture.alt = 'Profile Picture';
+    profilePicture.classList.add('profile-picture');
+
     const userNameSpan = document.createElement('span');
     userNameSpan.classList.add('username');
-    userNameSpan.textContent = username;
+    userNameSpan.textContent = post.username;
+
+    userInfo.appendChild(profilePicture);
+    userInfo.appendChild(userNameSpan);
 
     const timeStampSpan = document.createElement('span');
     timeStampSpan.classList.add('timestamp');
     timeStampSpan.textContent = displayTimeStamp;
 
-    // Créer le bouton de suppression
     const deleteButton = document.createElement('button');
     deleteButton.classList.add('delete-button');
     deleteButton.textContent = 'Delete';
-    // Ajouter l'événement de suppression
     deleteButton.addEventListener('click', () => {
-        deletePost(id);
+        deletePost(post.post_uuid);
     });
 
-    // Ajouter les éléments au header du message
-    messageHeader.appendChild(userNameSpan);
+    messageHeader.appendChild(userInfo);
     messageHeader.appendChild(timeStampSpan);
-    messageHeader.appendChild(deleteButton); // Ajout du bouton dans le header
+    messageHeader.appendChild(deleteButton);
 
     const messageContent = document.createElement('div');
     messageContent.classList.add('message-content');
-    messageContent.textContent = content;
+    messageContent.textContent = post.content;
 
     messageItem.appendChild(messageHeader);
     messageItem.appendChild(messageContent);

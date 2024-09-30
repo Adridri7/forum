@@ -10,13 +10,15 @@ import (
 )
 
 type Post struct {
-	Post_uuid  string    `json:"post_uuid"`
-	User_uuid  string    `json:"user_uuid"`
-	Content    string    `json:"content"`
-	Category   string    `json:"categories"`
-	Likes      int       `json:"likes"`
-	Dislikes   int       `json:"dislikes"`
-	Created_at time.Time `json:"created_at"`
+	Post_uuid      string    `json:"post_uuid"`
+	User_uuid      string    `json:"user_uuid"`
+	Username       string    `json:"username"`
+	ProfilePicture string    `json:"profile_picture"`
+	Content        string    `json:"content"`
+	Category       string    `json:"categories"`
+	Likes          int       `json:"likes"`
+	Dislikes       int       `json:"dislikes"`
+	Created_at     time.Time `json:"created_at"`
 }
 
 // CreatePost remplit le rôle de constructeur en initialisant et
@@ -60,21 +62,22 @@ func CreatePost(db *sql.DB, params map[string]interface{}) (*Post, error) {
 }
 
 func FetchPost(db *sql.DB, params map[string]interface{}) ([]Post, error) {
-
-	post_UUID, post_UUIDOK := params["post_uuid"].(string)
-	user_UUID, user_UUIDOK := params["user_uuid"].(string)
-
 	var fetchPostquery string
-
-	// Param car on souhaite récuperer de la data depuis la db
 	var param string
 
-	// Préparer les requetes SQL et fetch si user_uuid ou post_uuid
-	if post_UUIDOK {
-		fetchPostquery = `SELECT * FROM posts WHERE post_uuid = ?`
+	if post_UUID, ok := params["post_uuid"].(string); ok {
+		fetchPostquery = `
+			SELECT p.*, u.username, u.profile_picture 
+			FROM posts p
+			JOIN users u ON p.user_uuid = u.user_uuid
+			WHERE p.post_uuid = ?`
 		param = post_UUID
-	} else if user_UUIDOK {
-		fetchPostquery = `SELECT * FROM posts WHERE user_uuid = ?`
+	} else if user_UUID, ok := params["user_uuid"].(string); ok {
+		fetchPostquery = `
+			SELECT p.*, u.username, u.profile_picture 
+			FROM posts p
+			JOIN users u ON p.user_uuid = u.user_uuid
+			WHERE p.user_uuid = ?`
 		param = user_UUID
 	} else {
 		return nil, errors.New("informations manquantes")
@@ -87,25 +90,18 @@ func FetchPost(db *sql.DB, params map[string]interface{}) ([]Post, error) {
 
 	var posts []Post
 
-	// Lecture des résultats à partir du slice de maps
 	for _, row := range rows {
-
 		post := Post{
-			Post_uuid:  row["post_uuid"].(string),
-			User_uuid:  row["user_uuid"].(string),
-			Content:    row["content"].(string),
-			Category:   row["categories"].(string),
-			Likes:      int(row["likes"].(int64)),     // Conversion de int64 vers int
-			Dislikes:   int(row["dislikes"].(int64)),  // Conversion de int64 vers int
-			Created_at: row["created_at"].(time.Time), // Conversion en time.Time
+			Post_uuid:      row["post_uuid"].(string),
+			User_uuid:      row["user_uuid"].(string),
+			Username:       row["username"].(string),
+			ProfilePicture: row["profile_picture"].(string),
+			Content:        row["content"].(string),
+			Category:       row["categories"].(string),
+			Likes:          int(row["likes"].(int64)),
+			Dislikes:       int(row["dislikes"].(int64)),
+			Created_at:     row["created_at"].(time.Time),
 		}
-
-		/*
-			Si une colonne retournée par la base de données est NULL,
-			alors l'accès direct avec row["clé"].(type) va provoquer un panic.
-			Pour éviter cela, on s'assure que toutes les colonnes sont non-null
-			(NOT NULL) ou on ajoute des vérifications supplémentaires, par exemple :
-		*/
 
 		if val, ok := row["post_uuid"].(string); ok {
 			post.Post_uuid = val
@@ -114,30 +110,53 @@ func FetchPost(db *sql.DB, params map[string]interface{}) ([]Post, error) {
 	}
 
 	return posts, nil
-
 }
 
-// FetchAllPosts récupère tous les posts de la base de données
 func FetchAllPosts(db *sql.DB) ([]Post, error) {
+	fetchAllPostsQuery := `
+		SELECT p.*, u.username, u.profile_picture 
+		FROM posts p
+		JOIN users u ON p.user_uuid = u.user_uuid
+		ORDER BY p.created_at DESC`
 
-	results, err := server.RunQuery("SELECT post_uuid, user_uuid, content, categories, likes, dislikes, created_at FROM posts")
+	results, err := server.RunQuery(fetchAllPostsQuery)
 	if err != nil {
 		return nil, err
 	}
 
-	// Convertir les résultats en slice de Post
 	var posts []Post
 	for _, row := range results {
+		post := Post{}
 
-		post := Post{
-			Post_uuid:  row["post_uuid"].(string),
-			User_uuid:  row["user_uuid"].(string),
-			Content:    row["content"].(string),
-			Category:   row["categories"].(string),
-			Likes:      int(row["likes"].(int64)),
-			Dislikes:   int(row["dislikes"].(int64)),
-			Created_at: row["created_at"].(time.Time),
+		// Utiliser des assertions de type avec vérification de valeur nulle
+		if v, ok := row["post_uuid"]; ok && v != nil {
+			post.Post_uuid = v.(string)
 		}
+		if v, ok := row["user_uuid"]; ok && v != nil {
+			post.User_uuid = v.(string)
+		}
+		if v, ok := row["username"]; ok && v != nil {
+			post.Username = v.(string)
+		}
+		if v, ok := row["profile_picture"]; ok && v != nil {
+			post.ProfilePicture = v.(string)
+		}
+		if v, ok := row["content"]; ok && v != nil {
+			post.Content = v.(string)
+		}
+		if v, ok := row["categories"]; ok && v != nil {
+			post.Category = v.(string)
+		}
+		if v, ok := row["likes"]; ok && v != nil {
+			post.Likes = int(v.(int64))
+		}
+		if v, ok := row["dislikes"]; ok && v != nil {
+			post.Dislikes = int(v.(int64))
+		}
+		if v, ok := row["created_at"]; ok && v != nil {
+			post.Created_at = v.(time.Time)
+		}
+
 		posts = append(posts, post)
 	}
 
