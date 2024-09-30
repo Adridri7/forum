@@ -68,6 +68,7 @@ async function fetchPosts() {
         if (posts.length === 0) {
             messagesList.innerHTML = '<p>No posts available.</p>';
         } else {
+            currentUser = posts?.username || 'Anonymous';
             posts.forEach(post => {
                 DisplayMessages(post);
             });
@@ -192,7 +193,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let isModal = false;
 
     function NewPost() {
-        CreatedModal();
+        CreatedModal(currentUser); // Passez le nom d'utilisateur à la modal
         const newpost = document.getElementById('created-post');
         newpost.style.display = 'flex';
         modalPost.style.display = 'flex';
@@ -218,7 +219,7 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log('Cookie non trouvé.');
     }
 
-    function CreatedModal() {
+    function CreatedModal(username) {
         const createdPost = document.createElement('div');
         createdPost.classList.add('created-post');
         createdPost.id = 'created-post';
@@ -227,10 +228,9 @@ document.addEventListener('DOMContentLoaded', () => {
         postHeader.classList.add('post');
         postHeader.textContent = 'New Post';
 
-        const userName = document.createElement('div');
-        userName.classList.add('user-name');
-        userName.id = 'user-name'
-        userName.textContent = token;
+        const userNameSpan = document.createElement('div');
+        userNameSpan.classList.add('username');
+        userNameSpan.textContent = username; // Affichez le nom d'utilisateur ici
 
         const form = document.createElement('form');
         form.classList.add('message-input');
@@ -247,14 +247,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         form.appendChild(inputField);
         createdPost.appendChild(postHeader);
-        createdPost.appendChild(userName);
+        createdPost.appendChild(userNameSpan); // Ajoutez l'élément du nom d'utilisateur ici
         createdPost.appendChild(form);
         createdPost.appendChild(postButton);
 
         // Ajout du formulaire dans le modal
         userPost.appendChild(createdPost);
 
-        postButton.addEventListener('click', createPost)
+        postButton.addEventListener('click', createPost);
     }
 
 
