@@ -63,6 +63,7 @@ async function fetchPosts() {
         }
 
         const posts = await response.json();
+        console.log(posts)
         messagesList.innerHTML = '';
 
         if (posts.length === 0) {

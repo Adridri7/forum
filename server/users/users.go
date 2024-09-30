@@ -53,7 +53,12 @@ func FetchUserByEmail(email string) (User, error) {
 	var newUser User
 
 	for _, row := range rows {
-		newUser = NewUser(row["user_uuid"].(string), row["username"].(string), row["email"].(string), "", row["created_at"].(time.Time), row["role"].(string), row["profile_picture"].(string))
+		newUser = NewUser(row["user_uuid"].(string),
+			row["username"].(string),
+			row["email"].(string), "",
+			row["created_at"].(time.Time),
+			row["role"].(string),
+			row["profile_picture"].(string))
 	}
 	return newUser, nil
 }
