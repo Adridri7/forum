@@ -16,6 +16,8 @@ func main() {
 	http.HandleFunc("/api/post/deletePost", post.DeletePostHandler)
 
 	http.HandleFunc("/api/createComment", comments.CreateCommentHandler)
+	http.HandleFunc("/api/post/fetchComment", comments.FetchCommentHandler)
+	http.HandleFunc("/api/post/fetchAllComments", comments.FetchAllCommentsHandler)
 
 	// A faire pour tester : ajouter une route pour la page createPost.html
 	http.Handle("/", http.FileServer(http.Dir("./static/homePage")))
