@@ -143,3 +143,20 @@ func FetchComment(db *sql.DB, params map[string]interface{}) ([]Comment, error) 
 	return comments, nil
 
 }
+
+func DeleteComment(db *sql.DB, params map[string]interface{}) error {
+	comment_ID, comment_IDOK := params["comment_id"].(int)
+
+	if !comment_IDOK {
+		return errors.New("informations manquantes")
+	}
+
+	// Exécution de la requête de suppression
+	deleteCommentQuery := `DELETE FROM comments WHERE comment_id = ?`
+	_, err := server.RunQuery(deleteCommentQuery, comment_ID)
+	if err != nil {
+		return fmt.Errorf("erreur lors de la suppression du commentaire: %v", err)
+	}
+
+	return nil
+}
