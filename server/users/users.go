@@ -24,10 +24,12 @@ type User struct {
 	Email             string
 	EncryptedPassword string
 	CreatedAt         time.Time
+	role              string
+	profile_picture   string
 }
 
-func NewUser(uuid, username, email, encryptedPassword string, createdAt time.Time) User {
-	newUser := User{uuid, username, email, encryptedPassword, createdAt}
+func NewUser(uuid, username, email, encryptedPassword string, createdAt time.Time, role string, profile_picture string) User {
+	newUser := User{uuid, username, email, encryptedPassword, createdAt, role, profile_picture}
 	return newUser
 }
 
@@ -51,7 +53,7 @@ func FetchUserByEmail(email string) (User, error) {
 	var newUser User
 
 	for _, row := range rows {
-		newUser = NewUser(row["user_uuid"].(string), row["username"].(string), row["email"].(string), "", row["created_at"].(time.Time))
+		newUser = NewUser(row["user_uuid"].(string), row["username"].(string), row["email"].(string), "", row["created_at"].(time.Time), row["role"].(string), row["profile_picture"].(string))
 	}
 	return newUser, nil
 }
