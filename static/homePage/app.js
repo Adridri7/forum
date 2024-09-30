@@ -149,6 +149,34 @@ async function deletePost(post_uuid) {
     }
 }
 
+async function createPost(event) {
+    event.preventDefault();
+    const userName = document.getElementById('user-name').textContent;
+    const messageInput = document.getElementById("message");
+    const messageContent = messageInput.value;
+
+    const data = {
+        userName: userName,
+        content: messageContent,
+    };
+
+    const response = await fetch("http://localhost:8080/api/post/createPost", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(data)
+    });
+
+    if (response.ok) {
+        alert("Post créé avec succès!");
+        messageInput.value = '';
+    } else {
+        const error = await response.json();
+        alert("Erreur lors de la création du post: " + error.message);
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const addButton = document.getElementById('add-button');
     const modalPost = document.getElementById('modal-post');
@@ -156,8 +184,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let isModal = false;
 
-    // Fonction pour afficher le modal
-    // Fonction pour afficher le modal
     function NewPost() {
         CreatedModal();
         const newpost = document.getElementById('created-post');
@@ -167,6 +193,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Ajouter un écouteur d'événement pour fermer le modal lorsqu'un clic se produit
         document.addEventListener('click', closeModal);
+    }
+
+    // Fonction pour récupérer un cookie
+    function getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+
+        if (parts.length === 2) return parts.pop().split(';').shift();
+    }
+
+    const token = getCookie('token'); // Récupère le cookie
+
+    if (token) {
+        console.log('Token récupéré:', token);
+    } else {
+        console.log('Cookie non trouvé.');
     }
 
     function CreatedModal() {
@@ -180,7 +222,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const userName = document.createElement('div');
         userName.classList.add('user-name');
-        userName.textContent = 'Rokat';
+        userName.id = 'user-name'
+        userName.textContent = token;
 
         const form = document.createElement('form');
         form.classList.add('message-input');
@@ -203,6 +246,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Ajout du formulaire dans le modal
         userPost.appendChild(createdPost);
+
+        postButton.addEventListener('click', createPost)
     }
 
 
