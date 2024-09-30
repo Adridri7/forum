@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Créer un Post et un Commentaire</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 50px;
+        }
+
+        form {
+            max-width: 500px;
+            margin: auto;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        button {
+            background-color: #5cb85c;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .form-section {
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="form-section">
+        <h1>Créer un nouveau Post</h1>
+        <form id="create-post-form">
+            <label for="user_uuid">User UUID:</label>
+            <input type="text" id="user_uuid" name="user_uuid" required>
+
+            <label for="content">Contenu:</label>
+            <textarea id="content" name="content" required></textarea>
+
+            <label for="categories">Catégorie:</label>
+            <input type="text" id="categories" name="categories" required>
+
+            <button type="button" onclick="createPost()">Créer le Post</button>
+        </form>
+    </div>
+
+    <div class="form-section">
+        <h1>Ajouter un Commentaire</h1>
+        <form id="create-comment-form">
+
+            <label for="post_uuid">Post UUID:</label>
+            <input type="text" id="post_uuid" name="post_uuid" required>
+
+            <label for="comment_content">Contenu du commentaire:</label>
+            <textarea id="comment_content" name="content" required></textarea>
+
+            <button type="button" id="create-comment-button">Ajouter le Commentaire</button>
+        </form>
+    </div>
+
+    <script>
+        async function createPost() {
+            const form = document.getElementById("create-post-form");
+            const formData = new FormData(form);
+
+            const data = {};
+            formData.forEach((value, key) => (data[key] = value));
+
+            const response = await fetch("http://localhost:8080/api/post/createPost", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(data)
+            });
+
+            if (response.ok) {
+                alert("Post créé avec succès!");
+            } else {
+                const error = await response.json();
+                alert("Erreur lors de la création du post: " + error.message);
+            }
+        }
+
+        async function createComment() {
+            const form = document.getElementById("create-comment-form");
+            const formData = new FormData(form);
+
+            const data = {};
+            formData.forEach((value, key) => (data[key] = value));
+
+            console.log("Données envoyées:", data);
+
+            try {
+                const response = await fetch("http://localhost:8080/api/comment/createComment", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    alert("Commentaire ajouté avec succès!");
+                } else {
+                    const error = await response.json();
+                    alert("Erreur lors de l'ajout du commentaire: " + error.message);
+                }
+            } catch (error) {
+                console.error("Erreur lors de l'envoi du commentaire:", error);
+                alert("Une erreur s'est produite lors de l'envoi du commentaire. Veuillez réessayer.");
+            }
+        }
+
+        // Ajoutez ceci à la fin de votre script
+        document.getElementById("create-comment-button").addEventListener("click", createComment);
+    </script>
+</body>
+
+</html>
