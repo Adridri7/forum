@@ -1,3 +1,5 @@
+import { DisplayMessages } from "./displayMessage.js";
+
 document.addEventListener('DOMContentLoaded', () => {
     fetchPosts();
 });
@@ -52,7 +54,7 @@ toggleButton.addEventListener('click', () => {
     sidebar.classList.toggle('close');
 });
 
-
+let currentUser = ''
 async function fetchPosts() {
     const messagesList = document.getElementById('users-post');
     messagesList.innerHTML = '<p>Loading...</p>';
@@ -63,7 +65,6 @@ async function fetchPosts() {
         }
 
         const posts = await response.json();
-        console.log(posts)
         messagesList.innerHTML = '';
 
         if (posts.length === 0) {
@@ -80,61 +81,7 @@ async function fetchPosts() {
     }
 }
 
-function DisplayMessages(post) {
-    const displayTimeStamp = post.created_at ? new Date(post.created_at).toLocaleString() : new Date().toLocaleString();
-
-    const messagesList = document.getElementById('users-post');
-
-    const messageItem = document.createElement('div');
-    messageItem.classList.add('message-item');
-    messageItem.setAttribute('post_uuid', post.post_uuid);
-
-    const messageHeader = document.createElement('div');
-    messageHeader.classList.add('message-header');
-
-    const userInfo = document.createElement('div');
-    userInfo.classList.add('user-info');
-
-    const profilePicture = document.createElement('img');
-    profilePicture.src = post.profile_picture || 'default-profile-picture.jpg';
-    profilePicture.alt = 'Profile Picture';
-    profilePicture.classList.add('profile-picture');
-
-    const userNameSpan = document.createElement('span');
-    userNameSpan.classList.add('username');
-    userNameSpan.textContent = post.username;
-
-    userInfo.appendChild(profilePicture);
-    userInfo.appendChild(userNameSpan);
-
-    const timeStampSpan = document.createElement('span');
-    timeStampSpan.classList.add('timestamp');
-    timeStampSpan.textContent = displayTimeStamp;
-
-    const deleteButton = document.createElement('button');
-    deleteButton.classList.add('delete-button');
-    deleteButton.textContent = 'Delete';
-    deleteButton.addEventListener('click', () => {
-        deletePost(post.post_uuid);
-    });
-
-    messageHeader.appendChild(userInfo);
-    messageHeader.appendChild(timeStampSpan);
-    messageHeader.appendChild(deleteButton);
-
-    const messageContent = document.createElement('div');
-    messageContent.classList.add('message-content');
-    messageContent.textContent = post.content;
-
-    messageItem.appendChild(messageHeader);
-    messageItem.appendChild(messageContent);
-
-    messagesList.appendChild(messageItem);
-    messagesList.scrollTop = messagesList.scrollHeight;
-}
-
-
-async function deletePost(post_uuid) {
+export async function deletePost(post_uuid) {
     const confirmDelete = confirm("Êtes-vous sûr de vouloir supprimer ce post ?");
     if (!confirmDelete) return;
 
@@ -230,7 +177,7 @@ document.addEventListener('DOMContentLoaded', () => {
         postHeader.textContent = 'New Post';
 
         const userNameSpan = document.createElement('div');
-        userNameSpan.classList.add('username');
+        userNameSpan.classList.add('user-name');
         userNameSpan.textContent = username; // Affichez le nom d'utilisateur ici
 
         const form = document.createElement('form');

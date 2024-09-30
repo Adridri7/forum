@@ -187,8 +187,7 @@ body {
 
 .message-item {
     display: flex;
-    flex-direction: column;
-    gap: 10px;
+    position: relative;
     background-color: var(--background-message-color);
     padding: 25px;
     border-bottom: 1px solid var(--border-color);
@@ -202,12 +201,33 @@ body {
     color: var(--description-color);
 }
 
+.message-header {
+    display: flex;
+    gap: 12px;
+    width: 100%;
+    flex: 1;
+}
+
+.message-header button {
+    margin-left: auto;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.message-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 8px;
+    margin-left: 10px;
+}
+
 .reaction-btn {
     display: flex;
-    align-items: center;
-    gap: 20px;
+    gap: 40px;
     /* Espacement entre les boutons */
-    justify-content: flex-start;
+    margin-top: 10px;
 }
 
 .reaction-btn button {
@@ -216,40 +236,41 @@ body {
     cursor: pointer;
     transition: transform 0.2s ease;
     font-size: 16px;
-    height: 35px;
-    margin-top: 10px;
-    border-radius: 8px;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
     transition: transform .15s ease;
+    box-sizing: border-box;
 }
 
-.reaction-btn button:first-child {
-    border: 1px solid var(--border-color);
-    width: 60px;
-    transition: background-color .15s ease;
+.reaction-btn button svg {
+    margin-top: 6px;
+    width: 1.75em;
+    height: 1.75em;
 }
 
-.reaction-btn button:first-child:hover {
-    background-color: var(--like-color);
-    border: none;
-    color: var(--text-color);
-}
-
-.reaction-btn button:last-child {
-    border: 1px solid var(--border-color);
-    width: 100px;
-    transition: background-color .15s ease;
-}
-
-.reaction-btn button:last-child:hover {
-    background-color: var(--primary-color);
-    border: none;
-    color: var(--text-color);
-}
 
 .reaction-btn button:hover {
     transform: scale(102%);
     /* Légèrement agrandir au survol */
 }
+
+.reaction-btn button:first-child:hover {
+    background-color: rgba(104, 104, 104, 0.3);
+
+    >svg {
+        fill: red;
+    }
+}
+
+.reaction-btn button:last-child:hover {
+    background-color: rgba(69, 69, 69, 0.3);
+
+    >svg {
+        fill: var(--primary-color);
+    }
+}
+
 
 #add-button {
     position: fixed;
@@ -302,7 +323,9 @@ body {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    z-index: 1000;
+    /* Assombrit l'arrière-plan */
+    z-index: 10;
+    /* Assure que .created-post est au-dessus */
     box-sizing: border-box;
 }
 
@@ -368,4 +391,66 @@ body {
 
 .delete-button:hover {
     background-color: #ff1a1a;
+}
+
+.profil-picture {
+    padding: 4px 0;
+    margin-right: 7px;
+}
+
+.profil-picture img {
+    border-radius: 50%;
+    height: 48px;
+    width: 48px;
+    object-fit: cover;
+}
+
+.menu-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    position: relative;
+}
+
+/* Style pour le menu déroulant */
+.menu {
+    display: none;
+    /* Menu caché par défaut */
+    position: absolute;
+    right: 0;
+    top: 50px;
+    right: 10px;
+    background-color: var(--background-color);
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    z-index: 1;
+}
+
+.menu-item {
+    color: var(--second-text-color);
+    padding: 10px 20px;
+    cursor: pointer;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.menu-item:hover {
+    background-color: var(--background-message-color);
+    color: #FFFFFF;
+}
+
+.menu-item:last-child {
+    border: none;
+}
+
+.menu-item:last-child:hover {
+    background-color: var(--error-color);
+}
+
+/* Afficher le menu lorsque la classe 'open' est ajoutée */
+.menu.open {
+    display: block;
 }
