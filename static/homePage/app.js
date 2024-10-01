@@ -159,11 +159,16 @@ async function deletePost(post_uuid) {
 document.addEventListener('DOMContentLoaded', () => {
     const addButton = document.getElementById('add-button');
     const modalPost = document.getElementById('modal-post');
-    const userPost = document.getElementById('users-post')
+    const userPost = document.getElementById('users-post');
+    const loginBtn = document.getElementById('login-btn');
 
     let isModal = false;
 
-    // Fonction pour afficher le modal
+    // LoginBtn envoie vers la page de login
+    loginBtn.onclick = () => {
+        window.location.href = "/authenticate"
+    };
+
     // Fonction pour afficher le modal
     function NewPost() {
         CreatedModal();
