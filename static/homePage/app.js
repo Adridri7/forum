@@ -196,6 +196,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     addButton.addEventListener('click', NewPost);
 
+    loginBtn.addEventListener('click', () => {
+        window.location.href = "/authenticate"
+    })
+
 });
 
 document.addEventListener('DOMContentLoaded', () => {

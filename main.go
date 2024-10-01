@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"forum/server/api/categories"
 	comments "forum/server/api/comment"
 	authentification "forum/server/api/login"
 	"forum/server/api/post"
@@ -26,6 +27,8 @@ func main() {
 
 	http.HandleFunc("/api/login", authentification.LoginHandler)
 	http.HandleFunc("/api/registration", authentification.RegisterHandler)
+
+	http.HandleFunc("/api/post/fetchAllCategories", categories.FetchAllCategoriesHandler)
 
 	http.HandleFunc("/authenticate", func(w http.ResponseWriter, r *http.Request) {
 		if _, err := r.Cookie("UserLogged"); err == nil {
