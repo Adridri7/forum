@@ -1,7 +1,6 @@
 package authentification
 
 import (
-	"encoding/json"
 	"fmt"
 	dbUser "forum/server/users"
 	generator "forum/server/utils"
@@ -12,7 +11,7 @@ import (
 
 func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	if !r.Form.Has("new-username") || r.Method != "POST" {
-		http.Error(w, "Bad request", http.StatusBadRequest)
+		http.Error(w, "Method not allowed", http.StatusBadRequest)
 		fmt.Fprintln(os.Stderr, r.Form)
 		return
 	}
@@ -33,14 +32,7 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if usrFound != (dbUser.User{}) {
-			/*
-				renderTemplate(w, "./static/authentification/authentification.html", map[string]interface{}{
-					"Error": "User already exists with this email address. Please try with another.",
-				})
-			*/
-			json.NewEncoder(w).Encode(map[string]interface{}{
-				"Error": "User already exists with this email address. Please try with another.",
-			})
+			http.Error(w, "User already exists with this email address. Please try with another.", http.StatusUnauthorized)
 			return
 		}
 	}
@@ -64,16 +56,11 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Printf("New user registered: %s -> %s (%s)\n", newUser.UUID, newUser.Username, newUser.Email)
 
-	/*
-		http.SetCookie(w, &http.Cookie{
-			Name:   "UserLogged",
-			Value:  newUser.ToCookieValue(),
-			MaxAge: 300, // 5 minutes
-		})
-	*/
-
-	//renderTemplate(w, "./static/homePage/index.html", nil)
-	json.NewEncoder(w).Encode(map[string]interface{}{
-		"CookieValue": newUser.ToCookieValue(),
+	http.SetCookie(w, &http.Cookie{
+		Name:   "UserLogged",
+		Value:  newUser.ToCookieValue(),
+		MaxAge: 300, // 5 minutes
 	})
+
+	w.WriteHeader(http.StatusOK)
 }
