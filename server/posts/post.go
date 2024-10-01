@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"forum/server"
 	posts "forum/server/utils"
+	"net/http"
 	"strings"
 	"time"
 )
@@ -22,20 +23,23 @@ type Post struct {
 	Created_at     time.Time `json:"created_at"`
 }
 
-func CreatePost(db *sql.DB, params map[string]interface{}) (*Post, error) {
-	post_UUID, err := posts.GenerateUUID()
+func CreatePost(db *sql.DB, r *http.Request, params map[string]interface{}) (*Post, error) {
+
+	post_UUID, _ := posts.GenerateUUID()
+
+	// extraire le uuid du cookie
+	user_UUID, err := posts.GetUserFromCookie(r)
+
 	if err != nil {
-		return nil, fmt.Errorf("erreur lors de la génération du uuid: %v", err)
+		return nil, fmt.Errorf("{erreur lors de la génération du uuid: %v}", err)
 	}
 
 	//user_UUID := params["user_uuid"].(string)
 	content, contentOK := params["content"].(string)
 
 	if !contentOK {
-		return nil, errors.New("caca")
+		return nil, errors.New("informations manquantes")
 	}
-
-	user_uuid := "123e4567-e89b-12d3-a456-426614174000"
 
 	// Extraire les hashtags du content
 	categories := posts.ExtractHashtags(content)
@@ -43,14 +47,14 @@ func CreatePost(db *sql.DB, params map[string]interface{}) (*Post, error) {
 	createPostQuery := `INSERT INTO posts (post_uuid, content, user_uuid, categories, likes, dislikes, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)`
 	creationDate := time.Now()
 
-	_, err = server.RunQuery(createPostQuery, post_UUID, content, user_uuid, strings.Join(categories, ","), 0, 0, creationDate)
+	_, err = server.RunQuery(createPostQuery, post_UUID, content, user_UUID, strings.Join(categories, ","), 0, 0, creationDate)
 	if err != nil {
 		return nil, fmt.Errorf("erreur lors de la création du post: %v", err)
 	}
 
 	newPost := &Post{
 		Post_uuid:  post_UUID,
-		User_uuid:  user_uuid,
+		User_uuid:  user_UUID,
 		Content:    content,
 		Category:   categories,
 		Likes:      0,
