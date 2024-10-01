@@ -50,31 +50,58 @@ func FetchUserByEmail(email string) (User, error) {
 	fetchUserQuery := `SELECT * FROM users WHERE email= ?`
 	params := []interface{}{email}
 
-	rows, err := server.RunQuery(fetchUserQuery, params)
+	rows, err := server.RunQuery(fetchUserQuery, params...)
 	if err != nil {
 		return User{}, fmt.Errorf("erreur lors de la récupération du formulaire: %v", err)
 	}
 
 	if len(rows) > 1 {
 		fmt.Fprintln(os.Stderr, "Y'a plus d'un user avec le même email. C'est normal ça ?")
+	} else if len(rows) == 0 {
+		return User{}, nil
 	}
 
-	var newUser User
+	newUser := User{}
+	result := rows[0]
 
-	for _, row := range rows {
-		newUser = NewUser(row["user_uuid"].(string), row["username"].(string), row["email"].(string), "", row["created_at"].(time.Time), row["role"].(string), row["profile_picture"].(string))
+	// Utiliser des assertions de type avec vérification de valeur nulle
+	if v, ok := result["user_uuid"]; ok && v != nil {
+		newUser.UUID = v.(string)
 	}
+	if v, ok := result["username"]; ok && v != nil {
+		newUser.Username = v.(string)
+	}
+	if v, ok := result["password"]; ok && v != nil {
+		newUser.EncryptedPassword = v.(string)
+	}
+	if v, ok := result["profile_picture"]; ok && v != nil {
+		newUser.ProfilePicture = v.(string)
+	}
+	if v, ok := result["email"]; ok && v != nil {
+		newUser.Email = v.(string)
+	}
+	if v, ok := result["role"]; ok && v != nil {
+		newUser.Role = v.(string)
+	}
+	if v, ok := result["created_at"]; ok && v != nil {
+		parsedTime, err := time.Parse("2006-01-02", result["created_at"].(string))
+		if err != nil {
+			fmt.Fprintln(os.Stderr, "dommage")
+		}
+		newUser.CreatedAt = parsedTime
+	}
+
 	return newUser, nil
 }
 
 func (u *User) ToMap() map[string]interface{} {
 	usrMap := make(map[string]interface{}, 0)
 
-	usrMap["uuid"] = u.UUID
+	usrMap["user_uuid"] = u.UUID
 	usrMap["username"] = u.Username
 	usrMap["email"] = u.Email
 	usrMap["password"] = u.EncryptedPassword
-	usrMap["created_at"] = u.CreatedAt
+	usrMap["created_at"] = u.CreatedAt.Format("2006-01-02")
 	usrMap["role"] = u.Role
 	usrMap["profile_picture"] = u.ProfilePicture
 
@@ -94,8 +121,8 @@ func (u *User) ToCookieValue() string {
 func RegisterUser(params map[string]interface{}) error {
 	re := regexp.MustCompile(`(?i)<[^>]+>|(SELECT|UPDATE|DELETE|INSERT|DROP|FROM|COUNT|AS|WHERE|--)|^\s|^\s*$|<script.*?>.*?</script.*?>`)
 
-	for _, value := range params {
-		if re.FindAllString(value.(string), -1) != nil {
+	for key, value := range params {
+		if (key == "username" || key == "email" || key == "password") && re.FindAllString(value.(string), -1) != nil {
 			return fmt.Errorf("injection detected")
 		}
 	}
@@ -103,13 +130,7 @@ func RegisterUser(params map[string]interface{}) error {
 	registerUserQuery := `INSERT INTO users (user_uuid, username, email, password, role, created_at, profile_picture )  VALUES (?, ?, ?, ?, ?, ?, ?)`
 	var err error
 
-	// Cryptage du mot de passe
-	params["password"], err = HashPassword(params["password"].(string))
-	if err != nil {
-		return fmt.Errorf("password encryption: %s", err.Error())
-	}
-
-	_, err = server.RunQuery(registerUserQuery, params)
+	_, err = server.RunQuery(registerUserQuery, params["user_uuid"], params["username"], params["email"], params["password"], params["role"], params["created_at"], params["profile_picture"])
 
 	if err != nil {
 		return err

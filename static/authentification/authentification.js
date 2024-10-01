@@ -67,7 +67,7 @@ document.getElementById('submit-register').addEventListener('click', async () =>
     }
 
     try {
-        const response = await fetch("/api/login", {
+        const response = await fetch("/api/registration", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -82,6 +82,6 @@ document.getElementById('submit-register').addEventListener('click', async () =>
             alert("Erreur lors du login", + error.message);
         }
     } catch (error) {
-        console.error("Erreur lors du login", error)
+        console.error("Erreur lors du login", error.message)
     }
 });

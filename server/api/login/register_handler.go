@@ -15,7 +15,7 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	if r.Method != "POST" {
-		http.Error(w, "Method not allowed", http.StatusBadRequest)
+		http.Error(w, "{\"Error\": \"Method not allowed\"}", http.StatusBadRequest)
 		fmt.Fprintln(os.Stderr, r.Form)
 		return
 	}
@@ -25,18 +25,18 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	var err error
 
 	if reqBody, err = io.ReadAll(r.Body); err != nil {
-		http.Error(w, "Fatal error body", http.StatusInternalServerError)
+		http.Error(w, "{\"Error\": \"Fatal error body\"}", http.StatusInternalServerError)
 		fmt.Fprintln(os.Stderr, err.Error())
 		return
 	}
 
 	if len(reqBody) == 0 {
-		http.Error(w, "Body empty", http.StatusBadRequest)
+		http.Error(w, "{\"Error\": \"Body empty\"}", http.StatusBadRequest)
 		return
 	}
 
 	if err = json.Unmarshal(reqBody, &newUser); err != nil {
-		http.Error(w, "Fatal error marshal", http.StatusInternalServerError)
+		http.Error(w, "{\"Error\": \"Fatal error marshal\"}", http.StatusInternalServerError)
 		fmt.Fprintln(os.Stderr, err.Error())
 		return
 	}
@@ -47,13 +47,13 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 
 		usrFound, err = dbUser.FetchUserByEmail(newUser.Email)
 		if err != nil {
-			http.Error(w, "Fatal error fetching", http.StatusInternalServerError)
+			http.Error(w, "{\"Error\": \"Fatal error fetching\"}", http.StatusInternalServerError)
 			fmt.Fprintln(os.Stderr, err.Error())
 			return
 		}
 
 		if usrFound != (dbUser.User{}) {
-			http.Error(w, "User already exists with this email address. Please try with another.", http.StatusUnauthorized)
+			http.Error(w, "{\"Error\": \"User already exists with this email address. Please try with another.\"}", http.StatusUnauthorized)
 			return
 		}
 	}
@@ -61,24 +61,29 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	// TODO : Profile picture
 
 	var uuid string
+	var encrypted string
+
 	if uuid, err = generator.GenerateUUID(); err != nil {
-		http.Error(w, "Fatal error gen", http.StatusInternalServerError)
+		http.Error(w, "{\"Error\": \"Fatal error gen\"}", http.StatusInternalServerError)
 		fmt.Fprintln(os.Stderr, err.Error())
 		return
 	}
 
-	if newUser.EncryptedPassword, err = dbUser.HashPassword(newUser.EncryptedPassword); err != nil {
-		http.Error(w, "Fatal error hash", http.StatusInternalServerError)
+	if encrypted, err = dbUser.HashPassword(newUser.EncryptedPassword); err != nil {
+		http.Error(w, "{\"Error\": \"Fatal error hash\"}", http.StatusInternalServerError)
 		fmt.Fprintln(os.Stderr, err.Error())
 		return
 	}
+
+	fmt.Printf("%s -> %s\n", newUser.EncryptedPassword, encrypted)
 
 	newUser.UUID = uuid
+	newUser.EncryptedPassword = encrypted
 	newUser.CreatedAt = time.Now()
 	newUser.Role = "user"
 
 	if err = dbUser.RegisterUser(newUser.ToMap()); err != nil {
-		http.Error(w, "Fatal error add", http.StatusInternalServerError)
+		http.Error(w, "{\"Error\": \"Fatal error add\"}", http.StatusInternalServerError)
 		fmt.Fprintln(os.Stderr, err.Error())
 		return
 	}
@@ -88,6 +93,7 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	http.SetCookie(w, &http.Cookie{
 		Name:   "UserLogged",
 		Value:  newUser.ToCookieValue(),
+		Path:   "/",
 		MaxAge: 300, // 5 minutes
 	})
 

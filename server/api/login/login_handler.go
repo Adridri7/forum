@@ -13,7 +13,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	if r.Method != "POST" {
-		http.Error(w, "Method not allowed", http.StatusBadRequest)
+		http.Error(w, "{\"Error\": \"Method not allowed\"}", http.StatusBadRequest)
 		fmt.Fprintln(os.Stderr, r.Form)
 		return
 	}
@@ -23,18 +23,19 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	var err error
 
 	if reqBody, err = io.ReadAll(r.Body); err != nil {
-		http.Error(w, "Fatal error body", http.StatusInternalServerError)
+		http.Error(w, "{\"Error\": \"Fatal error body\"}", http.StatusInternalServerError)
 		fmt.Fprintln(os.Stderr, err.Error())
 		return
 	}
 
 	if len(reqBody) == 0 {
-		http.Error(w, "Body empty", http.StatusBadRequest)
+		http.Error(w, "{\"Error\": \"Body empty\"}", http.StatusBadRequest)
+		fmt.Fprintln(os.Stderr, "Body is empty")
 		return
 	}
 
 	if err = json.Unmarshal(reqBody, &usr); err != nil {
-		http.Error(w, "Fatal error marshal", http.StatusInternalServerError)
+		http.Error(w, "{\"Error\": \"Fatal error marshal\"}", http.StatusInternalServerError)
 		fmt.Fprintln(os.Stderr, err.Error())
 		return
 	}
@@ -45,20 +46,22 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		// Does user exist?
 		usrFound, err = dbUser.FetchUserByEmail(usr.Email)
 		if err != nil {
-			http.Error(w, "Fatal error fetching", http.StatusInternalServerError)
+			http.Error(w, "{\"Error\": \"Fatal error fetching\"}", http.StatusInternalServerError)
 			fmt.Fprintln(os.Stderr, err.Error())
 			return
 		}
 
 		// No => return error
 		if usrFound == (dbUser.User{}) {
-			http.Error(w, "No user was found with this email address. Please try another.", http.StatusNotFound)
+			http.Error(w, "{\"Error\": \"No user was found with this email address. Please try another.\"}", http.StatusNotFound)
+			fmt.Fprintln(os.Stderr, "No user found")
 			return
 		}
 
 		// Yes but password invalid => return error
 		if err = dbUser.CheckPassword(usrFound.EncryptedPassword, usr.EncryptedPassword); err != nil {
-			http.Error(w, "Password did not match. Please try another.", http.StatusUnauthorized)
+			http.Error(w, "{\"Error\": \"Password did not match. Please try another.\"}", http.StatusUnauthorized)
+			fmt.Fprintf(os.Stderr, "Invalid password : %v (%s) != %v (%s)\n%v\n", []byte(usrFound.EncryptedPassword), usrFound.EncryptedPassword, []byte(usr.EncryptedPassword), usr.EncryptedPassword, err)
 			return
 		}
 
