@@ -61,7 +61,6 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	// TODO : Profile picture
 
 	var uuid string
-	var encrypted string
 
 	if uuid, err = generator.GenerateUUID(); err != nil {
 		http.Error(w, "{\"Error\": \"Fatal error gen\"}", http.StatusInternalServerError)
@@ -69,16 +68,13 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if encrypted, err = dbUser.HashPassword(newUser.EncryptedPassword); err != nil {
+	if newUser.EncryptedPassword, err = dbUser.HashPassword(newUser.EncryptedPassword); err != nil {
 		http.Error(w, "{\"Error\": \"Fatal error hash\"}", http.StatusInternalServerError)
 		fmt.Fprintln(os.Stderr, err.Error())
 		return
 	}
 
-	fmt.Printf("%s -> %s\n", newUser.EncryptedPassword, encrypted)
-
 	newUser.UUID = uuid
-	newUser.EncryptedPassword = encrypted
 	newUser.CreatedAt = time.Now()
 	newUser.Role = "user"
 
