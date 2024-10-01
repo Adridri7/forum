@@ -15,13 +15,13 @@ const (
 )
 
 type User struct {
-	UUID              string
-	Username          string
-	Email             string
-	EncryptedPassword string
-	CreatedAt         time.Time
-	role              string
-	profile_picture   string
+	UUID              string    `json:"user_uuid"`
+	Username          string    `json:"username"`
+	Email             string    `json:"email"`
+	EncryptedPassword string    `json:"password"`
+	CreatedAt         time.Time `json:"created_at"`
+	Role              string    `json:"role"`
+	ProfilePicture    string    `json:"profile_picture"`
 }
 
 func HashPassword(password string) (string, error) {
@@ -75,8 +75,8 @@ func (u *User) ToMap() map[string]interface{} {
 	usrMap["email"] = u.Email
 	usrMap["password"] = u.EncryptedPassword
 	usrMap["created_at"] = u.CreatedAt
-	usrMap["role"] = u.role
-	usrMap["profile_picture"] = u.profile_picture
+	usrMap["role"] = u.Role
+	usrMap["profile_picture"] = u.ProfilePicture
 
 	return usrMap
 }
@@ -85,8 +85,8 @@ func (u *User) ToCookieValue() string {
 	// A faire valider
 	return u.Username + SEPARATOR +
 		u.Email + SEPARATOR +
-		u.role + SEPARATOR +
-		u.profile_picture
+		u.Role + SEPARATOR +
+		u.ProfilePicture
 }
 
 // Enregistrer un user complet ( Register )

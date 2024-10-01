@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	comments "forum/server/api/comment"
+	authentification "forum/server/api/login"
 	"forum/server/api/post"
 	"html/template"
 	"net/http"
@@ -23,8 +24,8 @@ func main() {
 	http.HandleFunc("/api/post/fetchAllComments", comments.FetchAllCommentsHandler)
 	http.HandleFunc("/api/post/deleteComment", comments.DeleteCommentHandler)
 
-	http.HandleFunc("/api/login", LoginHandler)
-	http.HandleFunc("/api/registration", RegisterHandler)
+	http.HandleFunc("/api/login", authentification.LoginHandler)
+	http.HandleFunc("/api/registration", authentification.RegisterHandler)
 
 	http.HandleFunc("/authenticate", func(w http.ResponseWriter, r *http.Request) {
 		if _, err := r.Cookie("UserLogged"); err == nil {
