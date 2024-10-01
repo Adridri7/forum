@@ -1,6 +1,7 @@
 import { deletePost } from "./app.js";
 
 export function DisplayMessages(post) {
+    console.log("Commentaire pour le post :", post)
     const displayTimeStamp = post.created_at ? new Date(post.created_at).toLocaleString() : new Date().toLocaleString();
     const messagesList = document.getElementById('users-post');
 

@@ -61,23 +61,31 @@ func CreateComment(db *sql.DB, params map[string]interface{}) (*Comment, error) 
 
 // FetchAllComments récupère tous les commentaires de la base de données
 func FetchAllComments(db *sql.DB) ([]Comment, error) {
-
-	results, err := server.RunQuery("SELECT comment_id, post_uuid, user_uuid, created_at FROM comments")
+	results, err := server.RunQuery("SELECT comment_id, post_uuid, user_uuid, content, created_at FROM comments")
 	if err != nil {
 		return nil, err
 	}
 
-	// Convertir les résultats en slice de commentaire
 	var comments []Comment
 	for _, row := range results {
+		comment := Comment{}
 
-		comment := Comment{
-			Comment_id: row["comment_id"].(int),
-			Post_uuid:  row["post_uuid"].(string),
-			User_uuid:  row["user_uuid"].(string),
-			Content:    row["content"].(string),
-			Created_at: row["created_at"].(time.Time),
+		if id, ok := row["comment_id"].(int64); ok {
+			comment.Comment_id = int(id)
 		}
+		if postUUID, ok := row["post_uuid"].(string); ok {
+			comment.Post_uuid = postUUID
+		}
+		if userUUID, ok := row["user_uuid"].(string); ok {
+			comment.User_uuid = userUUID
+		}
+		if content, ok := row["content"].(string); ok {
+			comment.Content = content
+		}
+		if createdAt, ok := row["created_at"].(time.Time); ok {
+			comment.Created_at = createdAt
+		}
+
 		comments = append(comments, comment)
 	}
 

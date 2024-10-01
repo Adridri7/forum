@@ -1,5 +1,6 @@
 import { fetchPosts } from "./app.js";
 import { toggleMenu } from "./displayMessage.js";
+import { fetchAllcomments } from "./showComment.js";
 
 let previousState = null;
 
@@ -23,9 +24,11 @@ function handleCommentClick() {
     commentSection.innerHTML = `
         <div class="comment-section">
             <h3>Comments</h3>
+            <li class="comment"></li>
         </div>
     `;
     userPostsContainer.appendChild(commentSection);
+    fetchAllcomments();
 
     // Sauvegarder le postId et l'état précédent dans l'historique
     history.pushState({ postId: postId, previousHTML: previousState, title: 'Post' }, `Post ${postId}`, `#post-${postId}`);
@@ -54,7 +57,7 @@ export function initEventListeners() {
     });
 
     // Sélectionne tous les boutons de menu (dans chaque message-item)
-    const menuButtons = document.querySelectorAll('.menu-btn'); // Assure-toi que tous les boutons de menu ont la classe 'menu-btn'
+    const menuButtons = document.querySelectorAll('.menu-btn');
 
     // Réinitialise les événements pour chaque bouton de menu
     menuButtons.forEach(button => {
