@@ -1,30 +1,51 @@
 package authentification
 
 import (
+	"encoding/json"
 	"fmt"
 	dbUser "forum/server/users"
 	generator "forum/server/utils"
+	"io"
 	"net/http"
 	"os"
 	"time"
 )
 
 func RegisterHandler(w http.ResponseWriter, r *http.Request) {
-	if !r.Form.Has("new-username") || r.Method != "POST" {
+	w.Header().Set("Content-Type", "application/json")
+
+	if r.Method != "POST" {
 		http.Error(w, "Method not allowed", http.StatusBadRequest)
 		fmt.Fprintln(os.Stderr, r.Form)
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-
+	var reqBody []byte
+	var newUser dbUser.User
 	var err error
+
+	if reqBody, err = io.ReadAll(r.Body); err != nil {
+		http.Error(w, "Fatal error body", http.StatusInternalServerError)
+		fmt.Fprintln(os.Stderr, err.Error())
+		return
+	}
+
+	if len(reqBody) == 0 {
+		http.Error(w, "Body empty", http.StatusBadRequest)
+		return
+	}
+
+	if err = json.Unmarshal(reqBody, &newUser); err != nil {
+		http.Error(w, "Fatal error marshal", http.StatusInternalServerError)
+		fmt.Fprintln(os.Stderr, err.Error())
+		return
+	}
 
 	// Verify that user doesn't exist already
 	{
 		var usrFound dbUser.User
 
-		usrFound, err = dbUser.FetchUserByEmail(r.FormValue("email"))
+		usrFound, err = dbUser.FetchUserByEmail(newUser.Email)
 		if err != nil {
 			http.Error(w, "Fatal error fetching", http.StatusInternalServerError)
 			fmt.Fprintln(os.Stderr, err.Error())
@@ -46,7 +67,15 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	newUser := dbUser.NewUser(uuid, r.FormValue("new-username"), r.FormValue("email"), r.FormValue("new-password"), time.Now(), "user", "")
+	if newUser.EncryptedPassword, err = dbUser.HashPassword(newUser.EncryptedPassword); err != nil {
+		http.Error(w, "Fatal error hash", http.StatusInternalServerError)
+		fmt.Fprintln(os.Stderr, err.Error())
+		return
+	}
+
+	newUser.UUID = uuid
+	newUser.CreatedAt = time.Now()
+	newUser.Role = "user"
 
 	if err = dbUser.RegisterUser(newUser.ToMap()); err != nil {
 		http.Error(w, "Fatal error add", http.StatusInternalServerError)

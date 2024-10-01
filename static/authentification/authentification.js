@@ -24,3 +24,64 @@ loginBtn.addEventListener('click', () => {
 homeBtn.addEventListener('click', () => {
     window.location.href = '/';
 });
+
+
+document.getElementById('submit-login').addEventListener('click', async () => {
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+
+    const data = {
+        email: email,
+        password: password
+    }
+
+    try {
+        const response = await fetch("/api/login", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(data)
+        });
+        console.log(data)
+        if (response.ok) {
+            window.location.href = "/"
+        } else {
+            const error = await response.json();
+            alert("Erreur lors du login", + error.message);
+        }
+    } catch (error) {
+        console.error("Erreur lors du login", error)
+    }
+});
+
+document.getElementById('submit-register').addEventListener('click', async () => {
+    const username = document.getElementById("new-username").value;
+    const password = document.getElementById("new-password").value;
+    const email = document.getElementById('new-email').value;
+
+    const data = {
+        username: username,
+        password: password,
+        email: email
+    }
+
+    try {
+        const response = await fetch("/api/login", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(data)
+        });
+        console.log(data)
+        if (response.ok) {
+            window.location.href = "/"
+        } else {
+            const error = await response.json();
+            alert("Erreur lors du login", + error.message);
+        }
+    } catch (error) {
+        console.error("Erreur lors du login", error)
+    }
+});

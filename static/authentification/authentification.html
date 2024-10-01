@@ -36,20 +36,20 @@
                 <!-- Formulaire de Log in -->
                 <form action="/api/login" method="POST" id="login-form" class="form active">
                     <div class="input-group">
-                        <input type="text" id="username" placeholder="Username" required minlength="3">
+                        <input type="email" id="email" placeholder="Email" required>
                         <input type="password" id="password" placeholder="Password" required minlength="6">
                     </div>
-                    <button type="submit" class="submit-btn">Continue</button>
+                    <button type="submit" id="submit-login" class="submit-btn">Continue</button>
                 </form>
 
                 <!-- Formulaire de sign up -->
-                <form action="/api/registration" method="POST" class="form inactive" id="signup-form">
+                <form action="/api/registration" method="POST" id="signup-form" class="form inactive">
                     <div class="input-group" id="input-group-signup">
                         <input type="text" id="new-username" placeholder="Username" required minlength="3">
                         <input type="password" id="new-password" placeholder="Password" required minlength="6">
-                        <input type="email" id="email" placeholder="Email" required>
+                        <input type="email" id="new-email" placeholder="Email" required>
                     </div>
-                    <button type="submit" class="submit-btn">Sign Up</button>
+                    <button type="submit" id="submit-register" class="submit-btn">Sign Up</button>
                 </form>
                 <p class="separator">Or Continue With</p>
                 <div class="social-login">
