@@ -109,8 +109,8 @@ func (u *User) ToMap() map[string]interface{} {
 }
 
 func (u *User) ToCookieValue() string {
-	// A faire valider
-	return u.Username + SEPARATOR +
+	return u.UUID + SEPARATOR +
+		u.Username + SEPARATOR +
 		u.Email + SEPARATOR +
 		u.Role + SEPARATOR +
 		u.ProfilePicture
