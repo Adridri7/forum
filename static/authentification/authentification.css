@@ -1,0 +1,282 @@
+:root {
+    --background-color: #dadada;
+    --border-color: #9C9FA8;
+    --text-color: #FFFFFF;
+    --error-color: #B3001B;
+    --primary-color: #3c85de;
+    --accent-color: #317ad3;
+    --secondary-color: #000000;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+#back-home {
+    position: absolute;
+    top: 2vh;
+    left: 2vw;
+    padding: 10px;
+    border: none;
+    background-color: var(--secondary-color);
+    color: var(--text-color);
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+#container {
+    display: flex;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.login-section {
+    background-color: transparent;
+    color: var(--border-color);
+    width: 45%;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.login-section header .logo {
+    width: 50px;
+}
+
+main {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    width: 50%;
+}
+
+form {
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+h1 {
+    margin: 20px 0;
+    font-size: 24px;
+    color: var(--secondary-color);
+}
+
+h2 {
+    font-size: 24px;
+    color: var(--secondary-color);
+}
+
+p {
+    color: var(--border-color);
+    margin-bottom: 20px;
+}
+
+.login-options {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.login-options button {
+    width: 48%;
+    padding: 10px 0;
+    border: 1px solid var(--border-color);
+    background-color: transparent;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform .15s ease, background-color .15s ease;
+
+}
+
+.login-options button:hover {
+    background-color: var(--primary-color);
+    color: var(--text-color);
+    transform: scale(102%);
+}
+
+.login-options button:active {
+    transform: scale(100%);
+}
+
+.login-options button.active {
+    background-color: var(--primary-color);
+    color: var(--text-color);
+    transition: transform .15s ease, background-color .15s ease;
+}
+
+.login-options button.active:hover {
+    background-color: var(--accent-color);
+    transform: scale(102%);
+}
+
+.login-options button.active:active {
+    transform: scale(100%);
+}
+
+.form {
+    width: 100%;
+}
+
+.input-group {
+    margin-bottom: 20px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    /* Espace les éléments */
+    background-color: var(--text-color);
+    border-radius: 8px;
+}
+
+.input-group input {
+    width: 48%;
+    /* Ajuste la largeur avec un espace de 10px */
+    border-radius: 8px;
+    padding: 10px !important;
+    border: 1px solid var(--border-color);
+    background-color: transparent;
+    font-size: 16px;
+    box-sizing: border-box;
+
+    /* Assure que padding et bordure sont inclus */
+}
+
+.submit-btn {
+    width: 100%;
+    padding: 15px;
+    background-color: var(--primary-color);
+    color: var(--text-color);
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-bottom: 20px;
+    transition: transform .15s ease, background-color .15s ease;
+}
+
+.submit-btn:hover {
+    background-color: var(--accent-color);
+    transform: scale(102%);
+}
+
+.submit-btn:active {
+    transform: scale(100%);
+}
+
+.separator {
+    text-align: center;
+    /* Centre le texte */
+    margin: 20px 0;
+    /* Ajoute de l'espace au-dessus et en dessous du texte */
+}
+
+.social-login {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    margin-top: 20px;
+}
+
+.social-login .social-btn {
+    background-color: var(--text-color);
+    border: none;
+    padding: 10px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: transform 0.3s;
+}
+
+.social-login .social-btn:hover {
+    transform: scale(1.05);
+}
+
+.design-section {
+    background-image: url(/static/authentification/Frame\ 2.jpg);
+    background-size: cover;
+    /* Pour couvrir toute la zone */
+    background-repeat: no-repeat;
+    /* Pour éviter la répétition de l'image */
+    background-position: center;
+    background-color: var(--border-color);
+    width: 60%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.design-section img {
+    width: 70%;
+}
+
+.active {
+    display: block;
+    animation: fadeIn 1s .1s backwards;
+}
+
+.inactive {
+    display: none;
+    animation: fadeOut 1.5s .1 backwards;
+    pointer-events: none;
+}
+
+#input-group-signup {
+    flex-direction: column;
+    gap: 20px;
+}
+
+#input-group-signup input {
+    width: 100%;
+}
+
+@media (max-width: 600px) {
+    .login-section {
+        width: 100%;
+        padding: 20px;
+    }
+
+    .design-section {
+        width: 0%;
+    }
+}
+
+/* Animation pour afficher le formulaire */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Animation pour masquer le formulaire */
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    to {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+}

@@ -2,31 +2,58 @@ package main
 
 import (
 	"fmt"
-	"forum/server/api/categories"
 	comments "forum/server/api/comment"
 	"forum/server/api/post"
-	"log"
+	"html/template"
 	"net/http"
+	"os"
 )
 
 func main() {
+
+	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 
 	http.HandleFunc("/api/post/createPost", post.CreatePostHandler)
 	http.HandleFunc("/api/post/fetchPost", post.FetchPostHandler)
 	http.HandleFunc("/api/post/fetchAllPost", post.FetchAllPostHandler)
 	http.HandleFunc("/api/post/deletePost", post.DeletePostHandler)
 
-	http.HandleFunc("/api/createComment", comments.CreateCommentHandler)
+	http.HandleFunc("/api/post/createComment", comments.CreateCommentHandler)
 	http.HandleFunc("/api/post/fetchComment", comments.FetchCommentHandler)
 	http.HandleFunc("/api/post/fetchAllComments", comments.FetchAllCommentsHandler)
 	http.HandleFunc("/api/post/deleteComment", comments.DeleteCommentHandler)
 
-	http.HandleFunc("/api/post/fetchAllCategories", categories.FetchAllCategoriesHandler)
+	http.HandleFunc("/api/login", LoginHandler)
+	http.HandleFunc("/api/registration", RegisterHandler)
+
+	http.HandleFunc("/authenticate", func(w http.ResponseWriter, r *http.Request) {
+		if _, err := r.Cookie("UserLogged"); err == nil {
+			renderTemplate(w, "./static/homePage/index.html", nil)
+		}
+		renderTemplate(w, "./static/authentification/authentification.html", nil)
+	})
 
 	// A faire pour tester : ajouter une route pour la page createPost.html
-	http.Handle("/", http.FileServer(http.Dir("./static/homePage")))
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		renderTemplate(w, "./static/homePage/index.html", nil)
+	})
 
 	fmt.Println("Serveur démarré : http://localhost:8080/")
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	fmt.Fprintln(os.Stderr, http.ListenAndServe(":8080", nil))
+}
 
+func renderTemplate(w http.ResponseWriter, tmpl string, data interface{}) {
+	w.Header().Set("Content-Type", "text/html")
+
+	t, errTmpl := template.ParseFiles(tmpl)
+	if errTmpl != nil {
+		fmt.Fprintln(os.Stderr, errTmpl.Error())
+		http.Error(w, "Error parsing template "+tmpl, http.StatusInternalServerError)
+		return
+	}
+
+	if errExec := t.Execute(w, data); errExec != nil {
+		fmt.Fprintln(os.Stderr, errExec.Error())
+		return
+	}
 }

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/authentification/authentification.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300&display=swap"
+        rel="stylesheet">
+    <title>Forum</title>
+</head>
+
+<body>
+    <script>
+        if (document.cookie) {
+            window.location.href = '/';
+        }
+    </script>
+
+    <div id="container">
+        <button id="back-home">Back to Home</button>
+        <div class="login-section">
+            {{if .Error}}
+            <div class="error-msg"></div>
+                <p>{{.Error}}</p>
+            </div>
+            {{end}}
+            <main>
+                <h2>Welcome</h2>
+                <p>Please enter your details</p>
+                <div class="login-options">
+                    <button id="login-btn" class="active">Log in</button>
+                    <button id="signup-btn">Sign up</button>
+                </div>
+                <!-- Formulaire de Log in -->
+                <form action="/api/login" method="POST" id="login-form" class="form active">
+                    <div class="input-group">
+                        <input type="text" id="username" placeholder="Username" required minlength="3">
+                        <input type="password" id="password" placeholder="Password" required minlength="6">
+                    </div>
+                    <button type="submit" class="submit-btn">Continue</button>
+                </form>
+
+                <!-- Formulaire de sign up -->
+                <form action="/api/registration" method="POST" class="form inactive" id="signup-form">
+                    <div class="input-group" id="input-group-signup">
+                        <input type="text" id="new-username" placeholder="Username" required minlength="3">
+                        <input type="password" id="new-password" placeholder="Password" required minlength="6">
+                        <input type="email" id="email" placeholder="Email" required>
+                    </div>
+                    <button type="submit" class="submit-btn">Sign Up</button>
+                </form>
+                <p class="separator">Or Continue With</p>
+                <div class="social-login">
+                    <button class="social-btn google">
+                        <img src="/static/authentification/google.png" alt="Google logo" width="24px" height="24px">
+                    </button>
+                    <button class="social-btn apple">
+                        <img src="/static/authentification/apple.png" alt="Apple logo" width="24px" height="24px">
+                    </button>
+                    <button class="social-btn github">
+                        <img src="/static/authentification/github.png" alt="Github logo" width="24px" height="24px">
+                    </button>
+                </div>
+            </main>
+        </div>
+        <div class="design-section">
+        </div>
+    </div>
+    <script type="module" src="/static/authentification/authentification.js"></script>
+
+</body>
+
+</html>

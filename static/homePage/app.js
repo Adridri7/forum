@@ -109,7 +109,8 @@ export async function deletePost(post_uuid) {
 document.addEventListener('DOMContentLoaded', () => {
     const addButton = document.getElementById('add-button');
     const modalPost = document.getElementById('modal-post');
-    const userPost = document.getElementById('users-post')
+    const userPost = document.getElementById('users-post');
+    const loginBtn = document.getElementById('login-btn');
 
     let isModal = false;
 
