@@ -68,12 +68,27 @@
                     <button id="login-btn">Log in</button>
                 </div>
             </header>
-            <ul id="users-post">
-                <!-- ici va se trouver les posts -->
-            </ul>
-            <div class="modal-post" id="modal-post">
+            <div class="chat-center">
+                <ul id="users-post">
+                    <!-- ici va se trouver les posts -->
+                </ul>
+                <div class="modal-post" id="modal-post">
+                </div>
+                <div class="tendances">
+                    <div id="categories-container">
+                        <h3>Categories</h3>
+                        <ul id="categories-list"></ul>
+                    </div>
+
+                    <div class="trending-hashtags">
+                        <h3>Tendances</h3>
+                        <ul id="hashtags-list">
+                            <!-- Les hashtags vont ici -->
+                        </ul>
+                    </div>
+                </div>
+                <button id="add-button">+</button>
             </div>
-            <button id="add-button">+</button>
         </div>
         <script type="module" src="app.js"></script>
 </body>

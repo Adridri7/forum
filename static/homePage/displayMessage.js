@@ -121,7 +121,7 @@ export function DisplayMessages(post) {
     messagesList.scrollTop = messagesList.scrollHeight;
 }
 
-function toggleMenu(event, post) {
+export function toggleMenu(event, post) {
     event.stopPropagation();
     const menu = event.currentTarget.nextElementSibling;
 

@@ -159,7 +159,7 @@ body {
     -ms-overflow-style: none;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-start;
     height: 100vh;
     overflow-y: auto;
     box-sizing: border-box;
@@ -179,6 +179,8 @@ body {
     padding: 0;
     overflow-x: hidden;
     max-height: 100vh;
+    margin-left: 10vw;
+    margin-right: 80px;
     width: 40vw;
     border: 1px solid var(--border-color);
     border-top-left-radius: 15px;
@@ -321,13 +323,12 @@ body {
 }
 
 .created-post {
-    position: absolute;
+    position: fixed;
     background-color: var(--background-message-color);
-    margin-left: 2.5%;
-    top: 40%;
-    left: 0;
+    top: 10%;
+    left: 25%;
     border-radius: 8px;
-    width: 95%;
+    width: 45%;
     height: 210px;
     gap: 5px;
     display: none;
@@ -338,6 +339,7 @@ body {
     z-index: 10;
     /* Assure que .created-post est au-dessus */
     box-sizing: border-box;
+    overflow-y: hidden;
 }
 
 
@@ -464,4 +466,64 @@ body {
 /* Afficher le menu lorsque la classe 'open' est ajoutée */
 .menu.open {
     display: block;
+}
+
+.hashtag {
+    color: rgb(107, 107, 255);
+    /* Couleur bleue pour les hashtags */
+    font-weight: bold;
+    /* Mettre le hashtag en gras si vous le souhaitez */
+    cursor: pointer;
+}
+
+#categories-container {
+    max-height: 60vh;
+    margin-top: 20px;
+    overflow-y: auto;
+    scrollbar-width: none;
+}
+
+#categories-list {
+    list-style-type: none;
+    /* Pour enlever les puces */
+    padding: 0;
+}
+
+#categories-list li {
+    padding: 5px 0;
+    overflow-y: auto;
+}
+
+
+.chat-center {
+    display: flex;
+    overflow-y: hidden;
+    justify-content: space-between;
+    width: 80%;
+    margin: 0 auto;
+    /* Centrer la totalité de .chat-center */
+}
+
+.tendances {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    margin-top: 30px;
+    width: 35%;
+    max-height: fit-content;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background-color: var(--background-message-color);
+}
+
+#categories-container,
+.trending-hashtags {
+    margin-bottom: 20px;
+    /* Espacer les sections dans tendances */
+}
+
+.comment-section {
+    border-bottom: 1px solid var(--border-color);
+    padding: 12px;
+    box-sizing: border-box;
 }

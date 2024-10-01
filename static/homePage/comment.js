@@ -1,4 +1,5 @@
 import { fetchPosts } from "./app.js";
+import { toggleMenu } from "./displayMessage.js";
 
 let previousState = null;
 
@@ -43,11 +44,31 @@ function removeAllMessagesExceptCreatedPost() {
 
 // Fonction pour initialiser les événements des boutons
 export function initEventListeners() {
+    // Sélectionne tous les boutons de commentaire
     const commentButtons = document.querySelectorAll('.comment-btn');
+
+    // Réinitialise les événements pour chaque bouton de commentaire
     commentButtons.forEach(button => {
         button.removeEventListener('click', handleCommentClick);
         button.addEventListener('click', handleCommentClick);
     });
+
+    // Sélectionne tous les boutons de menu (dans chaque message-item)
+    const menuButtons = document.querySelectorAll('.menu-btn'); // Assure-toi que tous les boutons de menu ont la classe 'menu-btn'
+
+    // Réinitialise les événements pour chaque bouton de menu
+    menuButtons.forEach(button => {
+        button.removeEventListener('click', handleMenuClick);
+        button.addEventListener('click', handleMenuClick);
+    });
+}
+
+function handleMenuClick(event) {
+    event.stopPropagation();
+    const postElement = event.currentTarget.closest('.message-item');
+    const postId = postElement.getAttribute('post_uuid');
+
+    toggleMenu(event, postId);
 }
 
 // Gestion du lien #home pour revenir à la page principale avec tous les posts

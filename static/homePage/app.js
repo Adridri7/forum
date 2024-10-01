@@ -1,5 +1,7 @@
 import { DisplayMessages } from "./displayMessage.js";
 import { initEventListeners } from "./comment.js";
+import { fetchCategories } from "./fetchcategories.js";
+import { createPost } from "./createdPost.js";
 
 // Sélectionnez les éléments
 const toggleButton = document.getElementById('toggle-menu-btn');
@@ -68,6 +70,7 @@ export async function fetchPosts() {
             messagesList.innerHTML = '<p>No posts available.</p>';
         } else {
             currentUser = posts?.username || 'Anonymous';
+            posts.sort((b, a) => new Date(b.created_at) - new Date(a.created_at));
             posts.forEach(post => {
                 DisplayMessages(post);
             });
@@ -100,34 +103,6 @@ export async function deletePost(post_uuid) {
         fetchPosts();
     } catch (error) {
         console.error(error);
-    }
-}
-
-async function createPost(event) {
-    event.preventDefault();
-    const userName = document.getElementById('user-name').textContent;
-    const messageInput = document.getElementById("message");
-    const messageContent = messageInput.value;
-
-    const data = {
-        userName: userName,
-        content: messageContent,
-    };
-
-    const response = await fetch("http://localhost:8080/api/post/createPost", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(data)
-    });
-
-    if (response.ok) {
-        alert("Post créé avec succès!");
-        messageInput.value = '';
-    } else {
-        const error = await response.json();
-        alert("Erreur lors de la création du post: " + error.message);
     }
 }
 
@@ -165,7 +140,7 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log('Cookie non trouvé.');
     }
 
-    function CreatedModal(username) {
+    function CreatedModal() {
         const createdPost = document.createElement('div');
         createdPost.classList.add('created-post');
         createdPost.id = 'created-post';
@@ -174,9 +149,9 @@ document.addEventListener('DOMContentLoaded', () => {
         postHeader.classList.add('post');
         postHeader.textContent = 'New Post';
 
-        const userNameSpan = document.createElement('div');
-        userNameSpan.classList.add('user-name');
-        userNameSpan.textContent = username; // Affichez le nom d'utilisateur ici
+        // const userNameSpan = document.createElement('div');
+        // userNameSpan.classList.add('user-name');
+        // userNameSpan.textContent = username; // Affichez le nom d'utilisateur ici
 
         const form = document.createElement('form');
         form.classList.add('message-input');
@@ -193,7 +168,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         form.appendChild(inputField);
         createdPost.appendChild(postHeader);
-        createdPost.appendChild(userNameSpan); // Ajoutez l'élément du nom d'utilisateur ici
+        // createdPost.appendChild(userNameSpan); // Ajoutez l'élément du nom d'utilisateur ici
         createdPost.appendChild(form);
         createdPost.appendChild(postButton);
 
@@ -224,4 +199,5 @@ document.addEventListener('DOMContentLoaded', () => {
 
 document.addEventListener('DOMContentLoaded', () => {
     fetchPosts();
+    fetchCategories();
 });
