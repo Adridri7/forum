@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"forum/server"
 	posts "forum/server/utils"
+	"net/http"
+	"strings"
 	"time"
 )
 
@@ -15,35 +17,37 @@ type Post struct {
 	Username       string    `json:"username"`
 	ProfilePicture string    `json:"profile_picture"`
 	Content        string    `json:"content"`
-	Category       string    `json:"categories"`
+	Category       []string  `json:"categories"`
 	Likes          int       `json:"likes"`
 	Dislikes       int       `json:"dislikes"`
 	Created_at     time.Time `json:"created_at"`
 }
 
-// CreatePost remplit le rôle de constructeur en initialisant et
-// en retournant un pointeur vers une structure Post pas besoin de
-// constructor en go.
+func CreatePost(db *sql.DB, r *http.Request, params map[string]interface{}) (*Post, error) {
 
-func CreatePost(db *sql.DB, params map[string]interface{}) (*Post, error) {
+	post_UUID, _ := posts.GenerateUUID()
 
-	post_UUID, err := posts.GenerateUUID()
+	// extraire le uuid du cookie
+	user_UUID, err := posts.GetUserFromCookie(r)
+
 	if err != nil {
-		return nil, fmt.Errorf("erreur lors de la génération du uuid: %v", err)
+		return nil, fmt.Errorf("{erreur lors de la génération du uuid: %v}", err)
 	}
 
-	user_UUID, user_UUIDOK := params["user_uuid"].(string)
+	//user_UUID := params["user_uuid"].(string)
 	content, contentOK := params["content"].(string)
-	category, categoryOK := params["categories"].(string)
 
-	if !user_UUIDOK || !contentOK || !categoryOK {
+	if !contentOK {
 		return nil, errors.New("informations manquantes")
 	}
 
-	createPostQuery := `INSERT INTO posts (post_uuid, user_uuid, content, categories, likes, dislikes, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)`
+	// Extraire les hashtags du content
+	categories := posts.ExtractHashtags(content)
+
+	createPostQuery := `INSERT INTO posts (post_uuid, content, user_uuid, categories, likes, dislikes, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)`
 	creationDate := time.Now()
 
-	_, err = server.RunQuery(createPostQuery, post_UUID, user_UUID, content, category, 0, 0, creationDate)
+	_, err = server.RunQuery(createPostQuery, post_UUID, content, user_UUID, strings.Join(categories, ","), 0, 0, creationDate)
 	if err != nil {
 		return nil, fmt.Errorf("erreur lors de la création du post: %v", err)
 	}
@@ -52,7 +56,7 @@ func CreatePost(db *sql.DB, params map[string]interface{}) (*Post, error) {
 		Post_uuid:  post_UUID,
 		User_uuid:  user_UUID,
 		Content:    content,
-		Category:   category,
+		Category:   categories,
 		Likes:      0,
 		Dislikes:   0,
 		Created_at: creationDate,
@@ -97,7 +101,7 @@ func FetchPost(db *sql.DB, params map[string]interface{}) ([]Post, error) {
 			Username:       row["username"].(string),
 			ProfilePicture: row["profile_picture"].(string),
 			Content:        row["content"].(string),
-			Category:       row["categories"].(string),
+			Category:       strings.Split(row["categories"].(string), ","),
 			Likes:          int(row["likes"].(int64)),
 			Dislikes:       int(row["dislikes"].(int64)),
 			Created_at:     row["created_at"].(time.Time),
@@ -114,93 +118,34 @@ func FetchPost(db *sql.DB, params map[string]interface{}) ([]Post, error) {
 
 func FetchAllPosts(db *sql.DB) ([]Post, error) {
 	fetchAllPostsQuery := `
-		SELECT p.*, u.username, u.profile_picture 
-		FROM posts p
-		JOIN users u ON p.user_uuid = u.user_uuid
-		ORDER BY p.created_at DESC`
+        SELECT p.*, u.username, u.profile_picture 
+        FROM posts p
+        JOIN users u ON p.user_uuid = u.user_uuid
+        ORDER BY p.created_at DESC`
 
-	results, err := server.RunQuery(fetchAllPostsQuery)
+	rows, err := server.RunQuery(fetchAllPostsQuery)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("database query failed: %v", err)
 	}
 
 	var posts []Post
-	for _, row := range results {
-		post := Post{}
-
-		// Utiliser des assertions de type avec vérification de valeur nulle
-		if v, ok := row["post_uuid"]; ok && v != nil {
-			post.Post_uuid = v.(string)
+	for _, row := range rows {
+		post := Post{
+			Post_uuid:      row["post_uuid"].(string),
+			User_uuid:      row["user_uuid"].(string),
+			Username:       row["username"].(string),
+			ProfilePicture: row["profile_picture"].(string),
+			Content:        row["content"].(string),
+			Category:       strings.Split(row["categories"].(string), ","),
+			Likes:          int(row["likes"].(int64)),
+			Dislikes:       int(row["dislikes"].(int64)),
+			Created_at:     row["created_at"].(time.Time),
 		}
-		if v, ok := row["user_uuid"]; ok && v != nil {
-			post.User_uuid = v.(string)
-		}
-		if v, ok := row["username"]; ok && v != nil {
-			post.Username = v.(string)
-		}
-		if v, ok := row["profile_picture"]; ok && v != nil {
-			post.ProfilePicture = v.(string)
-		}
-		if v, ok := row["content"]; ok && v != nil {
-			post.Content = v.(string)
-		}
-		if v, ok := row["categories"]; ok && v != nil {
-			post.Category = v.(string)
-		}
-		if v, ok := row["likes"]; ok && v != nil {
-			post.Likes = int(v.(int64))
-		}
-		if v, ok := row["dislikes"]; ok && v != nil {
-			post.Dislikes = int(v.(int64))
-		}
-		if v, ok := row["created_at"]; ok && v != nil {
-			post.Created_at = v.(time.Time)
-		}
-
 		posts = append(posts, post)
 	}
 
 	return posts, nil
 }
-
-/*--------Important /!\ Cela fonctionne et est la func finale quand user fait décommenter----------*/
-
-/*
-func DeletePost(db *sql.DB, params map[string]interface{}) (*Post, error) {
-	post_UUID, post_UUIDOK := params["post_uuid"].(string)
-	user_UUID, user_UUIDOK := params["user_uuid"].(string)
-
-	if !post_UUIDOK || !user_UUIDOK {
-		return nil, errors.New("informations manquantes")
-	}
-
-	// Vérification de l'existence du post et de l'auteur
-	checkPostQuery := `SELECT user_uuid FROM posts WHERE post_uuid = ?`
-
-	var postUserUUID string
-	_, err := server.RunQuery(checkPostQuery, post_UUID)
-	if err != nil {
-		if err == sql.ErrNoRows {
-			return nil, errors.New("post non trouvé")
-		}
-		return nil, fmt.Errorf("erreur lors de la vérification du post: %v", err)
-	}
-
-	// Vérifier que l'utilisateur a le droit de supprimer le post
-	if postUserUUID != user_UUID {
-		return nil, errors.New("vous n'avez pas les droits pour supprimer ce post")
-	}
-
-	// Exécution de la requête de suppression
-	deletePostQuery := `DELETE FROM posts WHERE post_uuid = ?`
-	_, err = server.RunQuery(deletePostQuery, post_UUID)
-	if err != nil {
-		return nil, fmt.Errorf("erreur lors de la suppression du post: %v", err)
-	}
-
-	return &Post{Post_uuid: post_UUID}, nil
-}
--------------------------------------------------------------------------------------------------*/
 
 func DeletePost(db *sql.DB, params map[string]interface{}) error {
 	post_UUID, post_UUIDOK := params["post_uuid"].(string)
@@ -209,7 +154,6 @@ func DeletePost(db *sql.DB, params map[string]interface{}) error {
 		return errors.New("informations manquantes")
 	}
 
-	// Exécution de la requête de suppression
 	deletePostQuery := `DELETE FROM posts WHERE post_uuid = ?`
 	_, err := server.RunQuery(deletePostQuery, post_UUID)
 	if err != nil {
@@ -217,4 +161,96 @@ func DeletePost(db *sql.DB, params map[string]interface{}) error {
 	}
 
 	return nil
+}
+
+func FetchAllCategories(db *sql.DB) ([]string, error) {
+	fetchAllCategoriesQuery := `
+        SELECT DISTINCT categories
+        FROM posts
+        WHERE categories IS NOT NULL AND categories <> ''`
+
+	rows, err := server.RunQuery(fetchAllCategoriesQuery)
+	if err != nil {
+		return nil, fmt.Errorf("database query failed: %v", err)
+	}
+
+	var categories []string
+	for _, row := range rows {
+		// On récupère la colonne 'categories' et on la divise par les virgules
+		if catStr, ok := row["categories"].(string); ok {
+			for _, category := range strings.Split(catStr, ",") {
+				// Éliminer les espaces superflus et vérifier si la catégorie n'est pas déjà présente
+				trimmedCategory := strings.TrimSpace(category)
+				if trimmedCategory != "" {
+					categories = append(categories, "#"+trimmedCategory)
+				}
+			}
+		}
+	}
+
+	// Utiliser un map pour éliminer les doublons
+	categoryMap := make(map[string]struct{})
+	for _, category := range categories {
+		categoryMap[category] = struct{}{}
+	}
+
+	// Convertir le map en slice
+	uniqueCategories := make([]string, 0, len(categoryMap))
+	for category := range categoryMap {
+		uniqueCategories = append(uniqueCategories, category)
+	}
+
+	return uniqueCategories, nil
+}
+
+// Mini algo pour trouver les tendances
+
+/*----------------------------------------------------------------------------------------------------
+
+Explication de la Fonction
+Requête SQL :
+
+La requête utilise une sous-requête pour séparer les catégories (hashtags) en lignes distinctes.
+SUBSTRING_INDEX et numbers génèrent les catégories individuelles à partir d'une chaîne qui contient plusieurs catégories séparées par des virgules.
+Le nombre d'occurrences de chaque catégorie est ensuite compté et celles ayant plus de 10 occurrences sont sélectionnées.
+Traitement des Résultats :
+
+La fonction retourne un map[string]int où la clé est le nom de la catégorie (hashtag) et la valeur est le nombre de posts qui utilisent cette catégorie.
+
+----------------------------------------------------------------------------------------------------*/
+
+func FetchCategoryRanking(db *sql.DB) (map[string]int, error) {
+	// Requête pour compter le nombre d'occurrences de chaque catégorie
+	fetchCategoryRankingQuery := `
+        SELECT category, COUNT(*) AS count
+        FROM (
+            SELECT TRIM(SUBSTRING_INDEX(SUBSTRING_INDEX(categories, ',', numbers.n), ',', -1)) AS category
+            FROM posts
+            INNER JOIN (
+                SELECT 1 AS n UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL 
+                SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9 UNION ALL SELECT 10
+            ) AS numbers ON CHAR_LENGTH(categories) - CHAR_LENGTH(REPLACE(categories, ',', '')) >= numbers.n - 1
+        ) AS subquery
+        WHERE category <> ''
+        GROUP BY category
+        HAVING count > 10
+        ORDER BY count DESC`
+
+	// Exécute la requête
+	rows, err := server.RunQuery(fetchCategoryRankingQuery)
+	if err != nil {
+		return nil, fmt.Errorf("erreur lors de la récupération du classement des catégories: %v", err)
+	}
+
+	// Préparez le mappage des catégories et leur compte
+	categoryRanking := make(map[string]int)
+	for _, row := range rows {
+		if category, ok := row["category"].(string); ok {
+			if count, ok := row["count"].(int64); ok {
+				categoryRanking[category] = int(count)
+			}
+		}
+	}
+
+	return categoryRanking, nil
 }

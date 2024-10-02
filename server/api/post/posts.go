@@ -23,7 +23,7 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	newPost, err := posts.CreatePost(server.Db, params)
+	newPost, err := posts.CreatePost(server.Db, r, params)
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

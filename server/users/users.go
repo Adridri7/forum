@@ -119,6 +119,9 @@ func (u *User) ToCookieValue() string {
 // Enregistrer un user complet ( Register )
 
 func RegisterUser(params map[string]interface{}) error {
+
+	profile_picture, _ := params["profile_picture"].(string)
+
 	re := regexp.MustCompile(`(?i)<[^>]+>|(SELECT|UPDATE|DELETE|INSERT|DROP|FROM|COUNT|AS|WHERE|--)|^\s|^\s*$|<script.*?>.*?</script.*?>`)
 
 	for key, value := range params {
@@ -126,11 +129,14 @@ func RegisterUser(params map[string]interface{}) error {
 			return fmt.Errorf("injection detected")
 		}
 	}
+	if profile_picture == "" {
+		profile_picture = RandomProfilPicture()
+	}
 
 	registerUserQuery := `INSERT INTO users (user_uuid, username, email, password, role, created_at, profile_picture )  VALUES (?, ?, ?, ?, ?, ?, ?)`
 	var err error
 
-	_, err = server.RunQuery(registerUserQuery, params["user_uuid"], params["username"], params["email"], params["password"], params["role"], params["created_at"], params["profile_picture"])
+	_, err = server.RunQuery(registerUserQuery, params["user_uuid"], params["username"], params["email"], params["password"], params["role"], params["created_at"], profile_picture)
 
 	if err != nil {
 		return err

@@ -62,28 +62,28 @@
 
         <div class="chat-box">
             <header id="header">
-                <h2>General</h2>
+                <h2 id="title">General</h2>
                 <div class="profil-menu">
                     <button id="dark-mode-toggle">Dark Mode</button>
                     <button id="login-btn">Log in</button>
                 </div>
             </header>
-            <ul id="users-post">
-                <!-- ici va se trouver les posts -->
-                <div class="created-post" id="created-post">
-                    <div class="post">New Post</div>
-                    <div class="user-name">Rokat</div>
-                    <form class="message-input" id="message-form">
-                        <input type="text" id="message" placeholder="What's new ?">
-                    </form>
-                    <button id="post-btn">Post</button>
+            <div class="chat-center">
+                <ul id="users-post">
+                    <!-- ici va se trouver les posts -->
+                </ul>
+                <div class="modal-post" id="modal-post">
                 </div>
-            </ul>
-            <div class="modal-post" id="modal-post">
+                <div class="tendances">
+                    <div id="categories-container">
+                        <h3>Categories</h3>
+                        <ul id="categories-list"></ul>
+                    </div>
+                </div>
+                <button id="add-button">+</button>
             </div>
-            <button id="add-button">+</button>
         </div>
-        <script src="/static/homePage/app.js"></script>
+        <script type="module" src="/static/homePage/app.js"></script>
 </body>
 
 </html>

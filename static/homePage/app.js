@@ -1,6 +1,8 @@
-document.addEventListener('DOMContentLoaded', () => {
-    fetchPosts();
-});
+import { DisplayMessages } from "./displayMessage.js";
+import { initEventListeners } from "./comment.js";
+import { fetchCategories } from "./fetchcategories.js";
+import { createPost } from "./createdPost.js";
+import { getUserInfoFromCookie } from "./utils.js";
 
 // Sélectionnez les éléments
 const toggleButton = document.getElementById('toggle-menu-btn');
@@ -52,8 +54,8 @@ toggleButton.addEventListener('click', () => {
     sidebar.classList.toggle('close');
 });
 
-
-async function fetchPosts() {
+let currentUser = ''
+export async function fetchPosts() {
     const messagesList = document.getElementById('users-post');
     messagesList.innerHTML = '<p>Loading...</p>';
     try {
@@ -68,6 +70,8 @@ async function fetchPosts() {
         if (posts.length === 0) {
             messagesList.innerHTML = '<p>No posts available.</p>';
         } else {
+            currentUser = posts?.username || 'Anonymous';
+            posts.sort((b, a) => new Date(b.created_at) - new Date(a.created_at));
             posts.forEach(post => {
                 DisplayMessages(post);
             });
@@ -76,63 +80,10 @@ async function fetchPosts() {
         messagesList.innerHTML = '<p>Error loading posts. Please try again.</p>';
         console.error(error);
     }
+    initEventListeners();
 }
 
-function DisplayMessages(post) {
-    const displayTimeStamp = post.created_at ? new Date(post.created_at).toLocaleString() : new Date().toLocaleString();
-
-    const messagesList = document.getElementById('users-post');
-
-    const messageItem = document.createElement('div');
-    messageItem.classList.add('message-item');
-    messageItem.setAttribute('post_uuid', post.post_uuid);
-
-    const messageHeader = document.createElement('div');
-    messageHeader.classList.add('message-header');
-
-    const userInfo = document.createElement('div');
-    userInfo.classList.add('user-info');
-
-    const profilePicture = document.createElement('img');
-    profilePicture.src = post.profile_picture || 'default-profile-picture.jpg';
-    profilePicture.alt = 'Profile Picture';
-    profilePicture.classList.add('profile-picture');
-
-    const userNameSpan = document.createElement('span');
-    userNameSpan.classList.add('username');
-    userNameSpan.textContent = post.username;
-
-    userInfo.appendChild(profilePicture);
-    userInfo.appendChild(userNameSpan);
-
-    const timeStampSpan = document.createElement('span');
-    timeStampSpan.classList.add('timestamp');
-    timeStampSpan.textContent = displayTimeStamp;
-
-    const deleteButton = document.createElement('button');
-    deleteButton.classList.add('delete-button');
-    deleteButton.textContent = 'Delete';
-    deleteButton.addEventListener('click', () => {
-        deletePost(post.post_uuid);
-    });
-
-    messageHeader.appendChild(userInfo);
-    messageHeader.appendChild(timeStampSpan);
-    messageHeader.appendChild(deleteButton);
-
-    const messageContent = document.createElement('div');
-    messageContent.classList.add('message-content');
-    messageContent.textContent = post.content;
-
-    messageItem.appendChild(messageHeader);
-    messageItem.appendChild(messageContent);
-
-    messagesList.appendChild(messageItem);
-    messagesList.scrollTop = messagesList.scrollHeight;
-}
-
-
-async function deletePost(post_uuid) {
+export async function deletePost(post_uuid) {
     const confirmDelete = confirm("Êtes-vous sûr de vouloir supprimer ce post ?");
     if (!confirmDelete) return;
 
@@ -164,14 +115,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let isModal = false;
 
-    // LoginBtn envoie vers la page de login
-    loginBtn.onclick = () => {
-        window.location.href = "/authenticate"
-    };
-
-    // Fonction pour afficher le modal
     function NewPost() {
-        CreatedModal();
+        CreatedModal(currentUser); // Passez le nom d'utilisateur à la modal
         const newpost = document.getElementById('created-post');
         newpost.style.display = 'flex';
         modalPost.style.display = 'flex';
@@ -179,6 +124,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Ajouter un écouteur d'événement pour fermer le modal lorsqu'un clic se produit
         document.addEventListener('click', closeModal);
+    }
+
+    // Fonction pour récupérer un cookie
+    function getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+
+        if (parts.length === 2) return parts.pop().split(';').shift();
+    }
+
+    const token = getCookie('UserLogged'); // Récupère le cookie
+
+    if (token) {
+        console.log('Token récupéré:', token);
+    } else {
+        console.log('Cookie non trouvé.');
     }
 
     function CreatedModal() {
@@ -190,9 +151,9 @@ document.addEventListener('DOMContentLoaded', () => {
         postHeader.classList.add('post');
         postHeader.textContent = 'New Post';
 
-        const userName = document.createElement('div');
-        userName.classList.add('user-name');
-        userName.textContent = 'Rokat';
+        // const userNameSpan = document.createElement('div');
+        // userNameSpan.classList.add('user-name');
+        // userNameSpan.textContent = username; // Affichez le nom d'utilisateur ici
 
         const form = document.createElement('form');
         form.classList.add('message-input');
@@ -209,12 +170,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
         form.appendChild(inputField);
         createdPost.appendChild(postHeader);
-        createdPost.appendChild(userName);
+        // createdPost.appendChild(userNameSpan); // Ajoutez l'élément du nom d'utilisateur ici
         createdPost.appendChild(form);
         createdPost.appendChild(postButton);
 
         // Ajout du formulaire dans le modal
         userPost.appendChild(createdPost);
+
+        postButton.addEventListener('click', createPost);
+
+        inputField.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                createPost(); // Appelle la fonction pour créer le post
+            }
+        });
     }
 
 
@@ -234,4 +204,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     addButton.addEventListener('click', NewPost);
 
+    loginBtn.addEventListener('click', () => {
+        window.location.href = "/authenticate"
+    })
+
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    fetchPosts();
+    fetchCategories();
+
+    const userInfo = getUserInfoFromCookie();
+    console.log("Nom d'utilisateur:", userInfo.username);
+    console.log("URL de la photo de profil:", userInfo.profileImageURL);
+    console.log(userInfo)
 });

@@ -26,7 +26,10 @@ homeBtn.addEventListener('click', () => {
 });
 
 
-document.getElementById('submit-login').addEventListener('click', async () => {
+document.getElementById('submit-login').addEventListener('click', async (event) => {
+    event.preventDefault();
+    console.log("Bouton cliqué !");
+
     const email = document.getElementById("email").value;
     const password = document.getElementById("password").value;
 
@@ -43,19 +46,20 @@ document.getElementById('submit-login').addEventListener('click', async () => {
             },
             body: JSON.stringify(data)
         });
-        console.log(data)
+
         if (response.ok) {
-            window.location.href = "/"
+            window.location.href = "/";
         } else {
             const error = await response.json();
-            alert("Erreur lors du login", + error.message);
+            alert("Erreur lors du login: " + error.message);
         }
     } catch (error) {
-        console.error("Erreur lors du login", error)
+        console.error("Erreur lors du login", error);
     }
 });
 
-document.getElementById('submit-register').addEventListener('click', async () => {
+document.getElementById('submit-register').addEventListener('click', async (event) => {
+    event.preventDefault();
     const username = document.getElementById("new-username").value;
     const password = document.getElementById("new-password").value;
     const email = document.getElementById('new-email').value;
@@ -83,6 +87,17 @@ document.getElementById('submit-register').addEventListener('click', async () =>
         }
     } catch (error) {
         console.error("Erreur lors du login", error.message)
+    }
+});
+
+document.getElementById('profile-image-input').addEventListener('change', function (event) {
+    const fileNameElement = document.getElementById('file-name');
+    const files = event.target.files;
+
+    if (files.length > 0) {
+        fileNameElement.textContent = files[0].name;
+    } else {
+        fileNameElement.textContent = "Aucun fichier choisi";
     }
 });
 

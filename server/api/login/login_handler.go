@@ -72,8 +72,9 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	http.SetCookie(w, &http.Cookie{
 		Name:   "UserLogged",
+		Path:   "/",
 		Value:  usr.ToCookieValue(),
-		MaxAge: 300, // 5 minutes
+		MaxAge: 3600, // temporairement changer en 1h pour dev
 	})
 
 	w.WriteHeader(http.StatusOK)

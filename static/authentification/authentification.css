@@ -280,3 +280,28 @@ p {
         transform: translateX(20px);
     }
 }
+
+.file-upload {
+    display: none;
+}
+
+.file-upload-label {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: var(--primary-color);
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 600;
+    margin-top: 10px;
+}
+
+.file-upload-label:hover {
+    background-color: var(--accent-color);
+}
+
+.file-name {
+    margin-left: 10px;
+    font-style: italic;
+    color: #666;
+}
