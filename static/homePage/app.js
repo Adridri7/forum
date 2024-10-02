@@ -133,7 +133,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (parts.length === 2) return parts.pop().split(';').shift();
     }
 
-    const token = getCookie('token'); // Récupère le cookie
+    const token = getCookie('UserLogged'); // Récupère le cookie
 
     if (token) {
         console.log('Token récupéré:', token);
