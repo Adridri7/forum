@@ -9,27 +9,29 @@ import (
 
 func FetchCommentHandler(w http.ResponseWriter, r *http.Request) {
 
-	if r.Method != http.MethodGet {
+	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
-	queryParams := r.URL.Query()
-	commentUUID := queryParams.Get("comment_id")
-	userUUID := queryParams.Get("user_uuid")
-	postUUID := queryParams.Get("post_uuid")
+	var params map[string]interface{}
 
-	params := map[string]interface{}{}
-
-	if userUUID != "" {
-		params["user_uuid"] = userUUID
-	} else if postUUID != "" {
-		params["post_uuid"] = postUUID
-	} else if commentUUID != "" {
-		params["comment_id"] = commentUUID
+	if err := json.NewDecoder(r.Body).Decode(&params); err != nil {
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		return
 	}
 
-	commentData, err := comments.FetchComment(server.Db, params)
+	// Vérification de la présence de post_uuid
+	postUUID, ok := params["post_uuid"].(string)
+	if !ok || postUUID == "" {
+		http.Error(w, "Missing or invalid post_uuid", http.StatusBadRequest)
+		return
+	}
+
+	// Récupération des commentaires basés sur le post_uuid
+	commentData, err := comments.FetchComment(server.Db, map[string]interface{}{
+		"post_uuid": postUUID,
+	})
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -37,7 +39,7 @@ func FetchCommentHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content", "application/json")
-	json.NewEncoder(w).Encode(commentData)
+	if err := json.NewEncoder(w).Encode(commentData); err != nil {
+		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
+	}
 }
-
-// Pour l'instant on test sans user_uuid

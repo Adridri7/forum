@@ -2,17 +2,19 @@ import { DisplayMessages } from "./displayMessage.js";
 
 export async function fetchAllcomments() {
 
-    const usersPostContainer = document.getElementById('users-post');
-    const firstPostItem = usersPostContainer.querySelector('.message-item');
+    const firstPostItem = document.querySelector('[post_uuid]');
     const postUuid = firstPostItem.getAttribute('post_uuid');
+
     console.log("fetch comment: ", postUuid)
 
     try {
-        const response = await fetch(`/api/post/fetchComment/${postUuid}`, {
+        const response = await fetch(`/api/post/fetchComment`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
             },
+            // Pour récupérer un éléments précis
+            body: JSON.stringify({ post_uuid: postUuid })
         });
 
 
@@ -22,7 +24,7 @@ export async function fetchAllcomments() {
 
 
         const comment = await response.json();
-        console.log(comment)
+
         console.log(comment[0].content)
 
         comment.forEach(comment => {
