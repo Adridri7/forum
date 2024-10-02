@@ -525,3 +525,55 @@ body {
     padding: 12px;
     box-sizing: border-box;
 }
+
+.profile-image {
+    border-radius: 50%;
+    height: 48px;
+    width: 48px;
+    object-fit: cover;
+    margin-right: 10px;
+}
+
+.comment-input-container {
+    display: flex;
+    align-items: center;
+    height: 80px;
+    padding: 25px;
+    box-sizing: border-box;
+}
+
+#create-comment-form {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-direction: row;
+    width: 100%;
+}
+
+#create-comment-form button {
+    margin-left: 0;
+    width: 50px;
+    height: 40px;
+    padding: 10px;
+    border: none;
+    color: #FFFFFF;
+    background-color: var(--primary-color);
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+#create-comment-form .comment-input {
+    font-size: 18px;
+    background: none;
+    border: none;
+    outline: none;
+    height: 40px;
+    width: 100%;
+    flex-grow: 1;
+    margin-right: 10px;
+}
+
+.comment-input::placeholder {
+    font-size: 18px;
+}

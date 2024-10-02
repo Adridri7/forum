@@ -89,3 +89,14 @@ document.getElementById('submit-register').addEventListener('click', async (even
         console.error("Erreur lors du login", error.message)
     }
 });
+
+document.getElementById('profile-image-input').addEventListener('change', function (event) {
+    const fileNameElement = document.getElementById('file-name');
+    const files = event.target.files;
+
+    if (files.length > 0) {
+        fileNameElement.textContent = files[0].name;
+    } else {
+        fileNameElement.textContent = "Aucun fichier choisi";
+    }
+});

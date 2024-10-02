@@ -5,11 +5,12 @@ import (
 	"errors"
 	"fmt"
 	"forum/server"
+	posts "forum/server/utils"
 	"time"
 )
 
 type Comment struct {
-	Comment_id int       `json:"comment_id"`
+	Comment_id string    `json:"comment_id"`
 	Post_uuid  string    `json:"post_uuid"`
 	User_uuid  string    `json:"user_uuid"`
 	Content    string    `json:"content"`
@@ -18,6 +19,11 @@ type Comment struct {
 
 // CreateComment crée un nouveau commentaire et l'insère dans la base de données
 func CreateComment(db *sql.DB, params map[string]interface{}) (*Comment, error) {
+
+	comment_UUID, _ := posts.GenerateUUID()
+
+	fmt.Println(comment_UUID)
+
 	post_UUID, postOK := params["post_uuid"].(string)
 
 	// !userOK
@@ -33,23 +39,15 @@ func CreateComment(db *sql.DB, params map[string]interface{}) (*Comment, error) 
 	creationDate := time.Now()
 
 	// Insertion du commentaire dans la table
-	createCommentQuery := `INSERT INTO comments (post_uuid, user_uuid, content, created_at) VALUES (?, ?, ?, ?)`
-	_, err := server.RunQuery(createCommentQuery, post_UUID, user_UUID, content, creationDate, 0, 0)
+	createCommentQuery := `INSERT INTO comments (comment_id, post_uuid, user_uuid, content, created_at) VALUES (?, ?, ?, ?, ?)`
+	_, err := server.RunQuery(createCommentQuery, comment_UUID, post_UUID, user_UUID, content, creationDate, 0, 0)
 	if err != nil {
 		return nil, fmt.Errorf("erreur lors de la création du commentaire: %v", err)
 	}
 
-	// Récupération de l'ID généré automatiquement
-	var lastID int
-
-	err = db.QueryRow("SELECT last_insert_rowid()").Scan(&lastID)
-	if err != nil {
-		return nil, fmt.Errorf("erreur lors de la récupération de l'ID du commentaire: %v", err)
-	}
-
 	// Création de la structure Comment
 	newComment := &Comment{
-		Comment_id: lastID,
+		Comment_id: comment_UUID,
 		Post_uuid:  post_UUID,
 		User_uuid:  user_UUID,
 		Content:    content,
@@ -70,8 +68,8 @@ func FetchAllComments(db *sql.DB) ([]Comment, error) {
 	for _, row := range results {
 		comment := Comment{}
 
-		if id, ok := row["comment_id"].(int64); ok {
-			comment.Comment_id = int(id)
+		if commentUUID, ok := row["comment_id"].(string); ok {
+			comment.Comment_id = commentUUID
 		}
 		if postUUID, ok := row["post_uuid"].(string); ok {
 			comment.Post_uuid = postUUID
@@ -128,7 +126,7 @@ func FetchComment(db *sql.DB, params map[string]interface{}) ([]Comment, error) 
 	for _, row := range rows {
 
 		comment := Comment{
-			Comment_id: row["comment_id"].(int),
+			Comment_id: row["comment_id"].(string),
 			Post_uuid:  row["post_uuid"].(string),
 			User_uuid:  row["user_uuid"].(string),
 			Content:    row["content"].(string),
@@ -142,7 +140,7 @@ func FetchComment(db *sql.DB, params map[string]interface{}) ([]Comment, error) 
 			(NOT NULL) ou on ajoute des vérifications supplémentaires, par exemple :
 		*/
 
-		if val, ok := row["comment_id"].(int); ok {
+		if val, ok := row["comment_id"].(string); ok {
 			comment.Comment_id = val
 		}
 		comments = append(comments, comment)

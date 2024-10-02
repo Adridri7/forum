@@ -1,6 +1,7 @@
 import { fetchPosts } from "./app.js";
 import { toggleMenu } from "./displayMessage.js";
 import { fetchAllcomments } from "./showComment.js";
+import { getUserInfoFromCookie } from "./utils.js";
 
 let previousState = null;
 
@@ -20,13 +21,8 @@ function handleCommentClick() {
     removeAllMessagesExceptCreatedPost();
     userPostsContainer.appendChild(postElement);
 
-    const commentSection = document.createElement('div');
-    commentSection.innerHTML = `
-        <div class="comment-section">
-            <h3>Comments</h3>
-            <li class="comment"></li>
-        </div>
-    `;
+    const commentSection = createCommentInput();
+
     userPostsContainer.appendChild(commentSection);
     fetchAllcomments();
 
@@ -35,6 +31,106 @@ function handleCommentClick() {
 
     // Réinitialiser les écouteurs d'événements
     initEventListeners();
+}
+
+function createCommentInput() {
+    const userInfo = getUserInfoFromCookie();
+
+    const commentInputContainer = document.createElement('div');
+    commentInputContainer.classList.add('comment-input-container');
+
+    // Créer un conteneur pour l'image de profil
+    const profileImageContainer = document.createElement('div');
+    profileImageContainer.classList.add('profile-image-container'); // Ajoutez une classe pour le style si nécessaire
+
+    const profileImage = document.createElement('img');
+    profileImage.src = userInfo.profileImageURL;
+    profileImage.alt = 'Profil-picture';
+    profileImage.classList.add('profile-image');
+
+    // Ajouter l'image de profil au conteneur
+    profileImageContainer.appendChild(profileImage);
+
+    const form = document.createElement('form');
+    form.id = 'create-comment-form';
+
+    const commentInput = document.createElement('input');
+    commentInput.type = 'text';
+    commentInput.name = 'content';
+    commentInput.placeholder = `Post your reply`;
+    commentInput.classList.add('comment-input');
+
+    const submitButton = document.createElement('button');
+    submitButton.type = 'submit';
+    submitButton.textContent = 'Post';
+
+    // Ajouter le conteneur de l'image et les autres éléments au formulaire
+    form.appendChild(profileImageContainer);
+    form.appendChild(commentInput);
+    form.appendChild(submitButton);
+
+    const usersPostContainer = document.getElementById('users-post');
+    const firstPostItem = usersPostContainer.querySelector('.message-item');
+
+    let postUuid = null;
+    if (firstPostItem) {
+        postUuid = firstPostItem.getAttribute('post_uuid');
+        console.log("post_uuid:", postUuid);
+    } else {
+        console.log("Aucun post trouvé.");
+    }
+
+    form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        console.log(userInfo.uuid);
+
+        if (postUuid) {
+            await createComment(postUuid, userInfo.uuid);
+            commentInput.value = '';
+        } else {
+            console.error("post_uuid est introuvable, le commentaire ne peut pas être créé.");
+            alert("Impossible de soumettre le commentaire. Veuillez réessayer.");
+        }
+    });
+
+    commentInputContainer.appendChild(form);
+    return commentInputContainer;
+}
+
+async function createComment(post_uuid, user_uuid) {
+    const form = document.getElementById("create-comment-form");
+    const formData = new FormData(form);
+
+    const data = {};
+    formData.forEach((value, key) => (data[key] = value));
+
+    data.post_uuid = post_uuid;
+    data.user_uuid = user_uuid;
+
+    console.log("Données envoyées:", data);
+
+    try {
+        const response = await fetch("/api/post/createComment", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(data)
+        });
+
+        if (response.ok) {
+            console.log(data)
+            alert("Commentaire ajouté avec succès!");
+            // Vous pourriez vouloir actualiser la liste des commentaires ici
+        } else {
+            const error = await response.json();
+            alert("Erreur lors de l'ajout du commentaire: " + error.message);
+        }
+    } catch (error) {
+        console.error("Erreur lors de l'envoi du commentaire:", error);
+        alert("Une erreur s'est produite lors de l'envoi du commentaire. Veuillez réessayer.");
+    }
 }
 
 // Fonction pour supprimer tous les messages sauf le post créé

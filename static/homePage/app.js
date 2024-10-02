@@ -2,6 +2,7 @@ import { DisplayMessages } from "./displayMessage.js";
 import { initEventListeners } from "./comment.js";
 import { fetchCategories } from "./fetchcategories.js";
 import { createPost } from "./createdPost.js";
+import { getUserInfoFromCookie } from "./utils.js";
 
 // Sélectionnez les éléments
 const toggleButton = document.getElementById('toggle-menu-btn');
@@ -177,6 +178,13 @@ document.addEventListener('DOMContentLoaded', () => {
         userPost.appendChild(createdPost);
 
         postButton.addEventListener('click', createPost);
+
+        inputField.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                createPost(); // Appelle la fonction pour créer le post
+            }
+        });
     }
 
 
@@ -205,4 +213,9 @@ document.addEventListener('DOMContentLoaded', () => {
 document.addEventListener('DOMContentLoaded', () => {
     fetchPosts();
     fetchCategories();
+
+    const userInfo = getUserInfoFromCookie();
+    console.log("Nom d'utilisateur:", userInfo.username);
+    console.log("URL de la photo de profil:", userInfo.profileImageURL);
+    console.log(userInfo)
 });
