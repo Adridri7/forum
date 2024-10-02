@@ -85,3 +85,7 @@ document.getElementById('submit-register').addEventListener('click', async () =>
         console.error("Erreur lors du login", error.message)
     }
 });
+
+document.getElementById('google-btn').addEventListener('click', () => {
+    window.location.href = "/api/google_login"
+})

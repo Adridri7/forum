@@ -5,12 +5,17 @@ import (
 	comments "forum/server/api/comment"
 	authentification "forum/server/api/login"
 	"forum/server/api/post"
+	"forum/server/api/providers"
 	"html/template"
 	"net/http"
 	"os"
 )
 
 func main() {
+	if err := providers.LoadEnvVariables(); err != nil {
+		fmt.Fprintf(os.Stderr, "Error %v\n", err)
+		return
+	}
 
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 
@@ -26,6 +31,9 @@ func main() {
 
 	http.HandleFunc("/api/login", authentification.LoginHandler)
 	http.HandleFunc("/api/registration", authentification.RegisterHandler)
+
+	http.HandleFunc("/api/google_login", providers.HandleGoogleLogin)
+	http.HandleFunc("/api/google_callback", providers.HandleGoogleCallback)
 
 	http.HandleFunc("/authenticate", func(w http.ResponseWriter, r *http.Request) {
 		if _, err := r.Cookie("UserLogged"); err == nil {
