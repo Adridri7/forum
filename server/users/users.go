@@ -1,6 +1,7 @@
 package users
 
 import (
+	"database/sql"
 	"fmt"
 	"forum/server"
 	"os"
@@ -163,4 +164,35 @@ func (u *User) UpdateUser(params map[string]interface{}) error {
 	}
 
 	return nil
+}
+
+// FetchAllComments récupère tous les commentaires de la base de données
+func FetchAllUsers(db *sql.DB) ([]User, error) {
+	results, err := server.RunQuery("SELECT user_uuid, username, profile_picture, created_at FROM users")
+	if err != nil {
+		return nil, err
+	}
+
+	var users []User
+
+	// ce qu'on veut renvoyer
+	for _, row := range results {
+		user := User{}
+
+		if userUUID, ok := row["user_uuid"].(string); ok {
+			user.UUID = userUUID
+		}
+		if createdAt, ok := row["created_at"].(time.Time); ok {
+			user.CreatedAt = createdAt
+		}
+		if username, ok := row["username"].(string); ok {
+			user.Username = username
+		}
+		if profilePicture, ok := row["profile_picture"].(string); ok {
+			user.ProfilePicture = profilePicture
+		}
+		users = append(users, user)
+	}
+
+	return users, nil
 }

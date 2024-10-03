@@ -6,6 +6,7 @@ import (
 	comments "forum/server/api/comment"
 	authentification "forum/server/api/login"
 	"forum/server/api/post"
+	users "forum/server/api/user"
 	"html/template"
 	"net/http"
 	"os"
@@ -29,6 +30,10 @@ func main() {
 	http.HandleFunc("/api/registration", authentification.RegisterHandler)
 
 	http.HandleFunc("/api/post/fetchAllCategories", categories.FetchAllCategoriesHandler)
+
+	http.HandleFunc("/api/users/fetchAllUsers", users.FetchAllUsersHandler)
+
+	http.HandleFunc("/logout", users.LogoutHandler)
 
 	http.HandleFunc("/authenticate", func(w http.ResponseWriter, r *http.Request) {
 		if _, err := r.Cookie("UserLogged"); err == nil {
@@ -60,4 +65,5 @@ func renderTemplate(w http.ResponseWriter, tmpl string, data interface{}) {
 		fmt.Fprintln(os.Stderr, errExec.Error())
 		return
 	}
+
 }

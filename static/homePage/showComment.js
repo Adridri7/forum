@@ -3,6 +3,8 @@ import { DisplayMessages } from "./displayMessage.js";
 export async function fetchAllcomments() {
 
     const firstPostItem = document.querySelector('[post_uuid]');
+
+    // Extrait la valeur de `post_uuid` de l'élément HTML
     const postUuid = firstPostItem.getAttribute('post_uuid');
 
     console.log("fetch comment: ", postUuid)
@@ -13,7 +15,7 @@ export async function fetchAllcomments() {
             headers: {
                 "Content-Type": "application/json"
             },
-            // Pour récupérer un éléments précis
+            // Envoi le post_uuid au backend sous form de JSON pour traitement
             body: JSON.stringify({ post_uuid: postUuid })
         });
 
@@ -22,8 +24,11 @@ export async function fetchAllcomments() {
             throw new Error('Erreur lors de la récupération des commentaires');
         }
 
-
+        // Récupère et parse les commentaires retournés par le backend à partir de post_uuid
         const comment = await response.json();
+        comment.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+        console.log("Commentaire:", comment)
 
         console.log(comment[0].content)
 
