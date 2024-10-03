@@ -254,3 +254,42 @@ func FetchCategoryRanking(db *sql.DB) (map[string]int, error) {
 
 	return categoryRanking, nil
 }
+
+func FetchPostsByCategory(db *sql.DB, category string) ([]Post, error) {
+	fetchPostsByCategoryQuery := `
+		SELECT p.*, u.username, u.profile_picture 
+		FROM posts p
+		JOIN users u ON p.user_uuid = u.user_uuid
+		WHERE p.categories LIKE ?
+		ORDER BY p.created_at DESC`
+
+	category = strings.TrimPrefix(category, "#")
+	param := "%" + category + "%"
+
+	// Log pour voir la requête et les paramètres
+	fmt.Println("Executing Query:", fetchPostsByCategoryQuery)
+	fmt.Println("With parameter:", param)
+
+	rows, err := server.RunQuery(fetchPostsByCategoryQuery, param)
+	if err != nil {
+		return nil, fmt.Errorf("erreur lors de la récupération des posts par catégorie: %v", err)
+	}
+
+	var posts []Post
+	for _, row := range rows {
+		post := Post{
+			Post_uuid:      row["post_uuid"].(string),
+			User_uuid:      row["user_uuid"].(string),
+			Username:       row["username"].(string),
+			ProfilePicture: row["profile_picture"].(string),
+			Content:        row["content"].(string),
+			Category:       strings.Split(row["categories"].(string), ","),
+			Likes:          int(row["likes"].(int64)),
+			Dislikes:       int(row["dislikes"].(int64)),
+			Created_at:     row["created_at"].(time.Time),
+		}
+		posts = append(posts, post)
+	}
+
+	return posts, nil
+}

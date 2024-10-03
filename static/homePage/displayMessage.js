@@ -138,7 +138,7 @@ export function toggleMenu(event, post) {
 }
 
 document.addEventListener('click', (event) => {
-    if (!event.target.closest('.message-item')) {
+    if (!event.target.closest('.menu-btn')) {
         const allMenus = document.querySelectorAll('.menu');
         allMenus.forEach(menu => {
             menu.style.display = 'none';

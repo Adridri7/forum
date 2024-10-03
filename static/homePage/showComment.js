@@ -28,10 +28,6 @@ export async function fetchAllcomments() {
         const comment = await response.json();
         comment.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
-        console.log("Commentaire:", comment)
-
-        console.log(comment[0].content)
-
         comment.forEach(comment => {
             DisplayMessages(comment);
         });
