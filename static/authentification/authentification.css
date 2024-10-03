@@ -300,8 +300,41 @@ p {
     background-color: var(--accent-color);
 }
 
-.file-name {
-    margin-left: 10px;
-    font-style: italic;
-    color: #666;
+/* Container for image and remove button */
+.image-container {
+    width: 96px;       
+    height: 96px;         
+    display: none;  
+    justify-content: center;
+}
+
+#file-input {
+    border-radius: 50%;
+    width: 100%;   /* Ensure it fits the container */
+    height: 100%;  /* Ensure it fits the container */
+    object-fit: cover;
+    display: none;  /* Hidden by default */
+
+}
+
+#remove-image {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background-color: transparent;  /* No background */
+    color: red;  /* Red trash icon */
+    border: none;
+    cursor: pointer;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    font-size: 16px;
+    line-height: 24px;
+    text-align: center;
+    padding: 0;
+    display: none;  /* Hidden by default */
+}
+
+#remove-image:hover {
+    background-color: #d32f2f;  /* Darker red background on hover */
 }
