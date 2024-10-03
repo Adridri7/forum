@@ -1,5 +1,5 @@
 import { createPost } from "./createdPost.js";
-import { getUserInfoFromCookie } from "./utils.js";
+import { getUserInfoFromCookie, isUserInfoValid, getPPFromID } from "../utils.js";
 
 
 const addButton = document.getElementById('add-button');
@@ -41,7 +41,10 @@ function CreatedModal() {
     profile_picture.classList.add('profile-picture');
 
     const image = document.createElement('img');
-    image.src = userInfo.profileImageURL;
+
+    console.log(userInfo.uuid);
+
+    getPPFromID(userInfo.uuid).then(img => {image.src = img});
 
     profile_picture.appendChild(image)
 
@@ -92,7 +95,14 @@ function CreatedModal() {
     // Ajout du formulaire dans le modal
     userPost.appendChild(createdPost);
 
-    postButton.addEventListener('click', createPost);
+    postButton.addEventListener('click', () => {
+        if (!isUserInfoValid()) {
+            window.location.href = "/authenticate";
+            return;
+        }
+        
+        createPost();
+    });
 
     inputField.addEventListener('keydown', (event) => {
         if (event.key === 'Enter') {

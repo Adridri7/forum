@@ -1,7 +1,7 @@
 import { fetchPosts } from "./app.js";
 import { toggleMenu } from "./displayMessage.js";
 import { fetchAllcomments } from "./showComment.js";
-import { getUserInfoFromCookie } from "./utils.js";
+import { getUserInfoFromCookie, getPPFromID } from "../utils.js";
 
 let previousState = null;
 
@@ -81,7 +81,7 @@ window.addEventListener('popstate', function (event) {
     }
 });
 
-function createCommentInput() {
+async function createCommentInput() {
     const userInfo = getUserInfoFromCookie();
 
     const commentInputContainer = document.createElement('div');
@@ -92,7 +92,7 @@ function createCommentInput() {
     profileImageContainer.classList.add('profile-image-container'); // Ajoutez une classe pour le style si nécessaire
 
     const profileImage = document.createElement('img');
-    profileImage.src = userInfo.profileImageURL;
+    profileImage.src = await getPPFromID(userInfo.uuid);
     profileImage.alt = 'Profil-picture';
     profileImage.classList.add('profile-image');
 
@@ -131,8 +131,6 @@ function createCommentInput() {
     form.addEventListener('submit', async (event) => {
         event.preventDefault();
 
-        console.log(userInfo.uuid);
-
         if (postUuid) {
             await createComment(postUuid, userInfo.uuid);
             commentInput.value = '';
@@ -168,7 +166,7 @@ async function createComment(post_uuid, user_uuid) {
         });
 
         if (response.ok) {
-            console.log(data)
+            //console.log(data)
             alert("Commentaire ajouté avec succès!");
             // Vous pourriez vouloir actualiser la liste des commentaires ici
         } else {

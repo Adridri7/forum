@@ -1,3 +1,30 @@
+export async function getPPFromID(id) {
+    var pp = "";
+
+    try {
+        const response = await fetch("/api/get-pp", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({user_uuid: id})  // Send the data as JSON
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            console.log(data);
+            pp = data.profile_picture;
+        } else {
+            alert("Erreur lors de l'inscription : " + data.message);
+        }
+    } catch (error) {
+        console.error("Erreur lors de l'inscription", error.message);
+    }
+
+    return pp;
+}
+
 export function getUserInfoFromCookie() {
     const cookies = document.cookie.split(';');
     let userInfo = {};

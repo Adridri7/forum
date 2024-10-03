@@ -29,7 +29,7 @@ export async function createPost(event) {
             },
             body: JSON.stringify(data)
         });
-        console.log(data)
+        //console.log(data)
         if (response.ok) {
             alert("Post créé avec succès!");
             messageInput.value = '';

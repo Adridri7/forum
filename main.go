@@ -35,11 +35,12 @@ func main() {
 
 	mux.HandleFunc("/api/login", authentification.LoginHandler)
 	mux.HandleFunc("/api/registration", authentification.RegisterHandler)
+	mux.HandleFunc("/api/get-pp", authentification.PP_Handler)
 
-	http.HandleFunc("/api/google_login", providers.HandleGoogleLogin)
-	http.HandleFunc("/api/google_callback", providers.HandleGoogleCallback)
+	mux.HandleFunc("/api/google_login", providers.HandleGoogleLogin)
+	mux.HandleFunc("/api/google_callback", providers.HandleGoogleCallback)
 
-	http.HandleFunc("/api/post/fetchAllCategories", categories.FetchAllCategoriesHandler)
+	mux.HandleFunc("/api/post/fetchAllCategories", categories.FetchAllCategoriesHandler)
 
 	mux.HandleFunc("/api/users/fetchAllUsers", users.FetchAllUsersHandler)
 

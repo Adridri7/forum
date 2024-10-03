@@ -65,41 +65,47 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-document.getElementById('submit-register').addEventListener('click', async (event) => {
-    event.preventDefault();
+    document.getElementById('submit-register').addEventListener('click', async (event) => {
+        event.preventDefault();
 
-    const username = document.getElementById("new-username").value;
-    const password = document.getElementById("new-password").value;
-    const email = document.getElementById('new-email').value;
-    const profileImageSrc = document.getElementById('file-input').src;  // Get the image source from the <img> element
+        const username = document.getElementById("new-username").value;
+        const password = document.getElementById("new-password").value;
+        const email = document.getElementById('new-email').value;
+        const profileImageSrc = document.getElementById('file-input').src;  // Get the image source from the <img> element
 
-    // Prepare data object to be sent
-    const data = {
-        username: username,
-        password: password,
-        email: email,
-        profile_picture: String(profileImageSrc)
-    };
+        // Prepare data object to be sent
+        const data = {
+            username: username,
+            password: password,
+            email: email,
+            profile_picture: ""
+        };
 
-    try {
-        const response = await fetch("/api/registration", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(data)  // Send the data as JSON
-        });
-
-        if (response.ok) {
-            window.location.href = "/";
-        } else {
-            const error = await response.json();
-            alert("Erreur lors de l'inscription : " + error.message);
+        if (profileImageSrc) {
+            data.profile_picture = profileImageSrc;
         }
-    } catch (error) {
-        console.error("Erreur lors de l'inscription", error.message);
-    }
-});
+
+        try {
+            const response = await fetch("/api/registration", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(data)  // Send the data as JSON
+            });
+
+            if (response.ok) {
+                window.location.href = "/";
+            } else {
+                const error = await response.json();
+                alert("Erreur lors de l'inscription : " + error.message);
+            }
+        } catch (error) {
+            console.error("Erreur lors de l'inscription", error.message);
+        }
+
+    
+    });
 
 
     document.getElementById('profile-image-input').addEventListener('change', function (event) {
@@ -119,7 +125,7 @@ document.getElementById('submit-register').addEventListener('click', async (even
             imageContainer.style.display = 'inline-block';  // Show the image container
         }
 
-            reader.readAsDataURL(file);
+        reader.readAsDataURL(file);
 
         } else {
             fileInput.src = "";  // Clear the image if no file is chosen

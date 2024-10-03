@@ -95,6 +95,33 @@ func FetchUserByEmail(email string) (User, error) {
 	return newUser, nil
 }
 
+// Trouver l'image de profil utilisateur avec ID
+func FetchPPByID(id string) (string, error) {
+	fetchUserQuery := `SELECT profile_picture FROM users WHERE user_uuid= ?`
+	params := []interface{}{id}
+
+	rows, err := server.RunQuery(fetchUserQuery, params...)
+	if err != nil {
+		return "", fmt.Errorf("erreur lors de la récupération du formulaire: %v", err)
+	}
+
+	if len(rows) > 1 {
+		fmt.Fprintln(os.Stderr, "Y'a plus d'un user avec le même ID. C'est normal ça ?")
+	} else if len(rows) == 0 {
+		return "", nil
+	}
+
+	usrFound := User{}
+	result := rows[0]
+
+	// Utiliser une assertion de type avec vérification de valeur nulle
+	if v, ok := result["profile_picture"]; ok && v != nil {
+		usrFound.ProfilePicture = v.(string)
+	}
+
+	return usrFound.ProfilePicture, nil
+}
+
 func (u *User) ToMap() map[string]interface{} {
 	usrMap := make(map[string]interface{}, 0)
 
@@ -113,8 +140,7 @@ func (u *User) ToCookieValue() string {
 	return u.UUID + SEPARATOR +
 		u.Username + SEPARATOR +
 		u.Email + SEPARATOR +
-		u.Role + SEPARATOR +
-		u.ProfilePicture
+		u.Role
 }
 
 // Enregistrer un user complet ( Register )

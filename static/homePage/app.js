@@ -1,7 +1,7 @@
 import { DisplayMessages } from "./displayMessage.js";
 import { initEventListeners } from "./comment.js";
 import { fetchCategories } from "./fetchcategories.js";
-import { getUserInfoFromCookie } from "./utils.js";
+import { getUserInfoFromCookie, getPPFromID } from "../utils.js";
 import { NewPost } from "./newPost.js";
 import { handleLogout } from "./logout.js";
 import { fetchAllUsers } from "./displayUser.js";
@@ -15,9 +15,9 @@ const addButton = document.getElementById('add-button');
 const logoutButton = document.getElementById('logout-div');
 
 
-
 // Fonction pour appliquer le mode
 function applyMode(mode) {
+    
     const root = document.documentElement;
 
     if (mode === 'dark') {
@@ -56,13 +56,13 @@ darkModeToggle.addEventListener('click', () => {
     applyMode(newMode);
 });
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     const loginButton = document.getElementById('login-btn');
     const profilMenu = document.querySelector('.profil-menu');
 
     // Fonction pour récupérer les informations utilisateur depuis le cookie
     const userInfo = getUserInfoFromCookie(); // Assure-toi que cette fonction existe
-    console.log(userInfo)
+    //console.log(userInfo)
 
     if (userInfo && userInfo.profileImageURL) {
         // Créer la div qui remplacera le bouton "Login"
@@ -70,7 +70,7 @@ document.addEventListener('DOMContentLoaded', () => {
         profileDiv.classList.add('profile-container');
 
         const profileImage = document.createElement('img');
-        profileImage.src = userInfo.profileImageURL;
+        profileImage.src = await getPPFromID(userInfo.uuid);
         profileImage.alt = 'User profile';
         profileImage.classList.add('profile-image'); // Ajoute une classe pour styliser l'image
 
