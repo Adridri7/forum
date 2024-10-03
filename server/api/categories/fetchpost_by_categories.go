@@ -2,10 +2,8 @@ package categories
 
 import (
 	"encoding/json"
-	"fmt"
 	"forum/server"
 	"forum/server/posts"
-	"log"
 	"net/http"
 )
 
@@ -31,12 +29,8 @@ func FetchPostByCategoriesHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Println("Fetching posts for category:", category)
-
 	// Récupération des commentaires basés sur le post_uuid
 	categoriesData, err := posts.FetchPostsByCategory(server.Db, category)
-
-	fmt.Println("API: Response:", categoriesData)
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

@@ -93,7 +93,6 @@ body {
 
 #sidebar #user-list-containers {
     flex-grow: 1;
-    max-height: 70vh;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -720,4 +719,87 @@ body {
 
 .profile-menu button:hover {
     background-color: var(--hover-color);
+}
+
+#like-btn {
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+
+    >div {
+        margin-top: 5px;
+        font-size: 18px;
+    }
+}
+
+.like-btn,
+.dislike-btn {
+    background-color: transparent;
+    /* État par défaut */
+    border: 2px solid #ccc;
+    /* Bordure grise par défaut */
+    color: #ccc;
+    /* Couleur du texte par défaut */
+    cursor: pointer;
+    /* Curseur en forme de main */
+    padding: 10px 15px;
+    /* Espacement intérieur */
+    border-radius: 5px;
+    /* Coins arrondis */
+    transition: background-color 0.3s, color 0.3s;
+    /* Transition douce */
+}
+
+.like-btn.active,
+.dislike-btn.active {
+    background-color: #007bff;
+    /* Couleur de fond lorsqu'il est actif */
+    border-color: #007bff;
+    /* Couleur de bordure lorsqu'il est actif */
+    color: white;
+    /* Couleur du texte lorsqu'il est actif */
+}
+
+.like-count,
+.dislike-count {
+    margin-left: 5px;
+    /* Espacement entre le nombre et le bouton */
+    font-weight: bold;
+    /* Met le nombre en gras */
+}
+
+.like-btn,
+.dislike-btn {
+    background-color: transparent;
+    /* État par défaut */
+    border: 2px solid #ccc;
+    /* Bordure grise par défaut */
+    color: #ccc;
+    /* Couleur du texte par défaut */
+    cursor: pointer;
+    /* Curseur en forme de main */
+    padding: 10px 15px;
+    /* Espacement intérieur */
+    border-radius: 5px;
+    /* Coins arrondis */
+    transition: background-color 0.3s, color 0.3s;
+    /* Transition douce */
+}
+
+.like-btn.active,
+.dislike-btn.active {
+    background-color: #007bff;
+    /* Couleur de fond lorsqu'il est actif */
+    border-color: #007bff;
+    /* Couleur de bordure lorsqu'il est actif */
+    color: white;
+    /* Couleur du texte lorsqu'il est actif */
+}
+
+.like-count,
+.dislike-count {
+    margin-left: 5px;
+    /* Espacement entre le nombre et le bouton */
+    font-weight: bold;
+    /* Met le nombre en gras */
 }

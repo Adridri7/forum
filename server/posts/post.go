@@ -78,10 +78,11 @@ func FetchPost(db *sql.DB, params map[string]interface{}) ([]Post, error) {
 		param = post_UUID
 	} else if user_UUID, ok := params["user_uuid"].(string); ok {
 		fetchPostquery = `
-			SELECT p.*, u.username, u.profile_picture 
-			FROM posts p
-			JOIN users u ON p.user_uuid = u.user_uuid
-			WHERE p.user_uuid = ?`
+		SELECT p.*, u.username, u.profile_picture 
+		FROM posts p
+		JOIN users u ON p.user_uuid = u.user_uuid
+		WHERE p.post_uuid = ?`
+		//	WHERE p.user_uuid = ?`
 		param = user_UUID
 	} else {
 		return nil, errors.New("informations manquantes")

@@ -37,6 +37,8 @@ func main() {
 
 	http.HandleFunc("/api/post/fetchPostsByCategories", categories.FetchPostByCategoriesHandler)
 
+	http.HandleFunc("/api/like-dislike", post.HandleLikeDislikeAPI)
+
 	http.HandleFunc("/authenticate", func(w http.ResponseWriter, r *http.Request) {
 		if _, err := r.Cookie("UserLogged"); err == nil {
 			renderTemplate(w, "./static/homePage/index.html", nil)
