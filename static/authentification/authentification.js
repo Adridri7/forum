@@ -60,15 +60,19 @@ document.getElementById('submit-login').addEventListener('click', async (event) 
 
 document.getElementById('submit-register').addEventListener('click', async (event) => {
     event.preventDefault();
+
     const username = document.getElementById("new-username").value;
     const password = document.getElementById("new-password").value;
     const email = document.getElementById('new-email').value;
+    const profileImageSrc = document.getElementById('file-input').src;  // Get the image source from the <img> element
 
+    // Prepare data object to be sent
     const data = {
         username: username,
         password: password,
-        email: email
-    }
+        email: email,
+        profile_picture: String(profileImageSrc)
+    };
 
     try {
         const response = await fetch("/api/registration", {
@@ -76,19 +80,20 @@ document.getElementById('submit-register').addEventListener('click', async (even
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify(data)
+            body: JSON.stringify(data)  // Send the data as JSON
         });
-        console.log(data)
+
         if (response.ok) {
-            window.location.href = "/"
+            window.location.href = "/";
         } else {
             const error = await response.json();
-            alert("Erreur lors du login", + error.message);
+            alert("Erreur lors de l'inscription : " + error.message);
         }
     } catch (error) {
-        console.error("Erreur lors du login", error.message)
+        console.error("Erreur lors de l'inscription", error.message);
     }
 });
+
 
 document.getElementById('profile-image-input').addEventListener('change', function (event) {
     const fileInput = document.getElementById('file-input');
@@ -102,9 +107,9 @@ document.getElementById('profile-image-input').addEventListener('change', functi
 
         reader.onload = function (e) {
             fileInput.src = e.target.result;
-            fileInput.style.display = 'flex';  // Show the image
+            fileInput.style.display = 'block';  // Show the image
             removeImageButton.style.display = 'block';  // Show the remove button
-            imageContainer.style.display = 'flex';  // Show the image container
+            imageContainer.style.display = 'inline-block';  // Show the image container
         }
 
         reader.readAsDataURL(file);

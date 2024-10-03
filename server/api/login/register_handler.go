@@ -58,8 +58,6 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	// TODO : Profile picture
-
 	var uuid string
 
 	if uuid, err = generator.GenerateUUID(); err != nil {
