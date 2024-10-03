@@ -140,10 +140,7 @@
         }
 
         // Charger les posts au chargement de la page
-        window.onload = () => {
-            fetchPosts();
-            console.log(document.cookie);
-        };
+        window.onload = fetchPosts;
     </script>
 </body>
 

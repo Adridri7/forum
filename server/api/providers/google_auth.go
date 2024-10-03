@@ -44,7 +44,7 @@ func LoadEnvVariables() error {
 		}
 
 		// Debug
-		fmt.Printf("New env variable: %s = %s", string(line)[:strings.Index(string(line), "=")], os.Getenv(string(line)[:strings.Index(string(line), "=")]))
+		//fmt.Printf("New env variable: %s = %s", string(line)[:strings.Index(string(line), "=")], os.Getenv(string(line)[:strings.Index(string(line), "=")]))
 	}
 
 	return nil
