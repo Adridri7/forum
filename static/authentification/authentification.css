@@ -302,10 +302,10 @@ p {
 
 /* Container for image and remove button */
 .image-container {
-    width: 96px;       
-    height: 96px;         
-    display: none;  
-    justify-content: center;
+    position: relative;   /* Make the container relative so child absolute elements are positioned correctly */
+    width: 96px;          /* Same width as the image */
+    height: 96px;         /* Same height as the image */
+    display: none;        /* Hidden by default */
 }
 
 #file-input {
@@ -314,7 +314,6 @@ p {
     height: 100%;  /* Ensure it fits the container */
     object-fit: cover;
     display: none;  /* Hidden by default */
-
 }
 
 #remove-image {

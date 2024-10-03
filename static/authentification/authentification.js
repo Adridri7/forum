@@ -65,37 +65,42 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    document.getElementById('submit-register').addEventListener('click', async (event) => {
-        event.preventDefault();
-        const username = document.getElementById("new-username").value;
-        const password = document.getElementById("new-password").value;
-        const email = document.getElementById('new-email').value;
+document.getElementById('submit-register').addEventListener('click', async (event) => {
+    event.preventDefault();
 
-        const data = {
-            username: username,
-            password: password,
-            email: email
-        }
+    const username = document.getElementById("new-username").value;
+    const password = document.getElementById("new-password").value;
+    const email = document.getElementById('new-email').value;
+    const profileImageSrc = document.getElementById('file-input').src;  // Get the image source from the <img> element
 
-        try {
-            const response = await fetch("/api/registration", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(data)
-            });
-            //console.log(data)
-            if (response.ok) {
-                window.location.href = "/"
-            } else {
-                const error = await response.json();
-                alert("Erreur lors du login", + error.message);
-            }
-        } catch (error) {
-            console.error("Erreur lors du login", error.message)
+    // Prepare data object to be sent
+    const data = {
+        username: username,
+        password: password,
+        email: email,
+        profile_picture: String(profileImageSrc)
+    };
+
+    try {
+        const response = await fetch("/api/registration", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(data)  // Send the data as JSON
+        });
+
+        if (response.ok) {
+            window.location.href = "/";
+        } else {
+            const error = await response.json();
+            alert("Erreur lors de l'inscription : " + error.message);
         }
-    });
+    } catch (error) {
+        console.error("Erreur lors de l'inscription", error.message);
+    }
+});
+
 
     document.getElementById('profile-image-input').addEventListener('change', function (event) {
         const fileInput = document.getElementById('file-input');
@@ -107,12 +112,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const file = files[0];
             const reader = new FileReader();
 
-            reader.onload = function (e) {
-                fileInput.src = e.target.result;
-                fileInput.style.display = 'flex';  // Show the image
-                removeImageButton.style.display = 'block';  // Show the remove button
-                imageContainer.style.display = 'flex';  // Show the image container
-            }
+        reader.onload = function (e) {
+            fileInput.src = e.target.result;
+            fileInput.style.display = 'block';  // Show the image
+            removeImageButton.style.display = 'block';  // Show the remove button
+            imageContainer.style.display = 'inline-block';  // Show the image container
+        }
 
             reader.readAsDataURL(file);
 
