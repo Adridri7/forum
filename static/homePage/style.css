@@ -18,6 +18,8 @@
     --primary-color: #3c85de;
     --accent-color: #317ad3;
     --background-message-color: #FFFFFF;
+    --hover-color: rgba(69, 69, 69, 0.3);
+
 }
 
 body {
@@ -65,7 +67,7 @@ body {
 }
 
 #sidebar a,
-.settings-div,
+.logout-div,
 #sidebar .name {
     border-radius: .5em;
     padding: .85em;
@@ -75,6 +77,28 @@ body {
     align-items: center;
     gap: 1em;
     transition: color .25s ease, fill .25s ease;
+}
+
+
+#sidebar a {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: inherit;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+#sidebar a:hover {
+    background-color: var(--hover-color);
+
+    >span {
+        color: var(--primary-color);
+    }
+
+    >svg {
+        fill: var(--primary-color);
+        transition: fill 0.3s ease;
+    }
 }
 
 #sidebar>ul>li:first-child {
@@ -92,15 +116,37 @@ body {
     cursor: pointer;
 }
 
-.settings-div {
+.logout-div {
+    display: flex;
+    align-items: center;
+    gap: 1em;
     margin-top: auto;
+    cursor: pointer;
+    height: 30px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+#logout-btn {
+    background: none;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
     cursor: pointer;
 }
 
-#settings-btn {
-    border: none;
-    background: none;
-    cursor: pointer;
+.logout-div:hover {
+    background-color: var(--hover-color);
+
+    >span {
+        color: var(--error-color);
+    }
+
+    >button svg {
+        fill: var(--error-color);
+        transition: fill 0.3s ease;
+    }
 }
 
 #container {
@@ -122,7 +168,7 @@ body {
 .profil-menu {
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 25px;
     margin-left: auto;
 }
 
@@ -268,7 +314,7 @@ body {
 }
 
 .reaction-btn button:first-child:hover {
-    background-color: rgba(104, 104, 104, 0.3);
+    background-color: var(--hover-color);
 
     >svg {
         fill: red;
@@ -276,7 +322,7 @@ body {
 }
 
 .reaction-btn button:last-child:hover {
-    background-color: rgba(69, 69, 69, 0.3);
+    background-color: var(--hover-color);
 
     >svg {
         fill: var(--primary-color);
@@ -325,17 +371,18 @@ body {
     position: fixed;
     background-color: var(--background-message-color);
     top: 10%;
-    left: 25%;
+    left: 26.5%;
     border-radius: 8px;
-    width: 45%;
-    height: 210px;
-    gap: 5px;
+    width: 40%;
+    height: 260px;
+    gap: 25px;
     display: none;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     /* Assombrit l'arrière-plan */
     z-index: 10;
+    padding: 0 0 0 20px;
     /* Assure que .created-post est au-dessus */
     box-sizing: border-box;
     overflow-y: hidden;
@@ -351,18 +398,15 @@ body {
 .message-input {
     display: flex;
     border-radius: 8px;
-    height: 70px;
-    padding-left: 20px;
     width: 100%;
     /* Adapte la largeur de la barre de message à celle de .created-post */
     margin: 0;
     flex-shrink: 0;
-    box-sizing: border-box;
-
 }
 
 .message-input input {
     flex: 1;
+    font-size: 16px;
     background: none;
     border: none;
     outline: none;
@@ -388,8 +432,13 @@ body {
     border-radius: 8px;
     font-weight: 500;
     cursor: pointer;
+    transition: background-color .25s ease;
 }
 
+
+#post-btn:hover {
+    background-color: var(--accent-color);
+}
 
 .delete-button {
     background-color: #ff4d4d;
@@ -561,6 +610,12 @@ body {
     border-radius: 8px;
     font-weight: 600;
     cursor: pointer;
+    transition: transform .25s ease, background-color .25s ease;
+}
+
+#create-comment-form button:hover {
+    transform: scale(102%);
+    background-color: var(--accent-color);
 }
 
 #create-comment-form .comment-input {
@@ -576,4 +631,61 @@ body {
 
 .comment-input::placeholder {
     font-size: 18px;
+}
+
+.profil-picture {
+    border-radius: 50%;
+}
+
+.profile-picture img {
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    object-fit: cover;
+    align-self: center;
+}
+
+.profile-info {
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.profile-info .user-name {
+    align-self: center;
+    font-size: 22px;
+}
+
+.sendBox {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.image-upload {
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: transform .15s ease;
+
+    >svg {
+        fill: var(--primary-color);
+    }
+}
+
+.image-upload:hover {
+    transform: scale(105%);
+}
+
+.profile-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.profile-image {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
 }

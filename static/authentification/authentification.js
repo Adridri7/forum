@@ -97,18 +97,44 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    document.getElementById('profile-image-input').addEventListener('change', function (event) {
-        const fileNameElement = document.getElementById('file-name');
-        const files = event.target.files;
+document.getElementById('profile-image-input').addEventListener('change', function (event) {
+    const fileInput = document.getElementById('file-input');
+    const removeImageButton = document.getElementById('remove-image');
+    const imageContainer = document.querySelector('.image-container'); // Select the container
+    const files = event.target.files;
 
-        if (files.length > 0) {
-            fileNameElement.textContent = files[0].name;
-        } else {
-            fileNameElement.textContent = "Aucun fichier choisi";
+    if (files.length > 0) {
+        const file = files[0];
+        const reader = new FileReader();
+
+        reader.onload = function (e) {
+            fileInput.src = e.target.result;
+            fileInput.style.display = 'flex';  // Show the image
+            removeImageButton.style.display = 'block';  // Show the remove button
+            imageContainer.style.display = 'flex';  // Show the image container
         }
-    });
 
-    document.getElementById('google-btn').addEventListener('click', () => {
-        window.location.href = "/api/google_login"
-    })
+        reader.readAsDataURL(file);
+
+    } else {
+        fileInput.src = "";  // Clear the image if no file is chosen
+        fileInput.style.display = 'none';  // Hide the image
+        removeImageButton.style.display = 'none';  // Hide the remove button
+        imageContainer.style.display = 'none';  // Hide the image container
+    }
+});
+
+// Remove image button logic
+document.getElementById('remove-image').addEventListener('click', function () {
+    const fileInput = document.getElementById('file-input');
+    const removeImageButton = document.getElementById('remove-image');
+    const fileInputElement = document.getElementById('profile-image-input');
+    const imageContainer = document.querySelector('.image-container');
+
+    // Clear the file input value
+    fileInputElement.value = '';
+    fileInput.src = '';  // Remove the src attribute of the image
+    fileInput.style.display = 'none';  // Hide the image
+    removeImageButton.style.display = 'none';  // Hide the remove button
+    imageContainer.style.display = 'none';  // Hide the image container
 });

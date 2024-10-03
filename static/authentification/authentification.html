@@ -40,7 +40,12 @@
                         <input type="email" id="new-email" placeholder="Email" required>
                         <input type="file" accept="image/*" id="profile-image-input" class="file-upload">
                         <label for="profile-image-input" class="file-upload-label">Chose a profil picture</label>
-                        <span id="file-name" class="file-name">No file selected</span>
+                        <!--span id="file-name" class="file-name">No file selected</span-->
+
+                    <div class="image-container">
+                        <img id="file-input" src="" alt="profile-picture">
+                        <button id="remove-image" type="button">&times;</button>
+                    </div>
                     </div>
                     <button id="submit-register" class="submit-btn">Sign Up</button>
                 </form>

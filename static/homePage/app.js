@@ -1,13 +1,20 @@
 import { DisplayMessages } from "./displayMessage.js";
 import { initEventListeners } from "./comment.js";
 import { fetchCategories } from "./fetchcategories.js";
-import { createPost } from "./createdPost.js";
 import { getUserInfoFromCookie } from "./utils.js";
+import { NewPost } from "./newPost.js";
+import { handleLogout } from "./logout.js";
+import { fetchAllUsers } from "./displayUser.js";
+
 
 // Sélectionnez les éléments
 const toggleButton = document.getElementById('toggle-menu-btn');
 const sidebar = document.getElementById('sidebar');
 const darkModeToggle = document.getElementById('dark-mode-toggle');
+const addButton = document.getElementById('add-button');
+const logoutButton = document.getElementById('logout-div');
+
+
 
 // Fonction pour appliquer le mode
 function applyMode(mode) {
@@ -47,6 +54,44 @@ darkModeToggle.addEventListener('click', () => {
     const currentMode = localStorage.getItem('theme') || 'light';
     const newMode = currentMode === 'dark' ? 'light' : 'dark';
     applyMode(newMode);
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    const loginButton = document.getElementById('login-btn');
+    const profilMenu = document.querySelector('.profil-menu');
+
+    // Fonction pour récupérer les informations utilisateur depuis le cookie
+    const userInfo = getUserInfoFromCookie(); // Assure-toi que cette fonction existe
+    console.log(userInfo)
+
+    if (userInfo && userInfo.profileImageURL) {
+        // Créer la div qui remplacera le bouton "Login"
+        const profileDiv = document.createElement('div');
+        profileDiv.classList.add('profile-container');
+
+        const profileImage = document.createElement('img');
+        profileImage.src = userInfo.profileImageURL;
+        profileImage.alt = 'User profile';
+        profileImage.classList.add('profile-image'); // Ajoute une classe pour styliser l'image
+
+
+        // Ajouter l'image et le nom d'utilisateur dans la div
+        profileDiv.appendChild(profileImage);
+
+        // Remplacer le bouton "Login" par la div
+        profilMenu.replaceChild(profileDiv, loginButton);
+    } else {
+        // Si l'utilisateur n'est pas connecté ou a perdu le cookie, s'assurer que le bouton "Login" est visible
+        if (!profilMenu.contains(loginButton)) {
+            // Créer un nouveau bouton "Login" si nécessaire
+            const newLoginButton = document.createElement('button');
+            newLoginButton.id = 'login-btn';
+            newLoginButton.textContent = 'Log in';
+
+            // Ajouter à nouveau le bouton à la place de la div
+            profilMenu.appendChild(newLoginButton);
+        }
+    }
 });
 
 // Événement pour le menu
@@ -108,114 +153,9 @@ export async function deletePost(post_uuid) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    const addButton = document.getElementById('add-button');
-    const modalPost = document.getElementById('modal-post');
-    const userPost = document.getElementById('users-post');
-    const loginBtn = document.getElementById('login-btn');
-
-    let isModal = false;
-
-    function NewPost() {
-        CreatedModal(currentUser); // Passez le nom d'utilisateur à la modal
-        const newpost = document.getElementById('created-post');
-        newpost.style.display = 'flex';
-        modalPost.style.display = 'flex';
-        isModal = true;
-
-        // Ajouter un écouteur d'événement pour fermer le modal lorsqu'un clic se produit
-        document.addEventListener('click', closeModal);
-    }
-
-    // Fonction pour récupérer un cookie
-    function getCookie(name) {
-        const value = `; ${document.cookie}`;
-        const parts = value.split(`; ${name}=`);
-
-        if (parts.length === 2) return parts.pop().split(';').shift();
-    }
-
-    const token = getCookie('UserLogged'); // Récupère le cookie
-
-    if (token) {
-        console.log('Token récupéré:', token);
-    } else {
-        console.log('Cookie non trouvé.');
-    }
-
-    function CreatedModal() {
-        const createdPost = document.createElement('div');
-        createdPost.classList.add('created-post');
-        createdPost.id = 'created-post';
-
-        const postHeader = document.createElement('div');
-        postHeader.classList.add('post');
-        postHeader.textContent = 'New Post';
-
-        // const userNameSpan = document.createElement('div');
-        // userNameSpan.classList.add('user-name');
-        // userNameSpan.textContent = username; // Affichez le nom d'utilisateur ici
-
-        const form = document.createElement('form');
-        form.classList.add('message-input');
-        form.id = 'message-form';
-
-        const inputField = document.createElement('input');
-        inputField.type = 'text';
-        inputField.id = 'message';
-        inputField.placeholder = "What's new ?";
-
-        const postButton = document.createElement('button');
-        postButton.id = 'post-btn';
-        postButton.textContent = 'Post';
-
-        form.appendChild(inputField);
-        createdPost.appendChild(postHeader);
-        // createdPost.appendChild(userNameSpan); // Ajoutez l'élément du nom d'utilisateur ici
-        createdPost.appendChild(form);
-        createdPost.appendChild(postButton);
-
-        // Ajout du formulaire dans le modal
-        userPost.appendChild(createdPost);
-
-        postButton.addEventListener('click', createPost);
-
-        inputField.addEventListener('keydown', (event) => {
-            if (event.key === 'Enter') {
-                event.preventDefault();
-                createPost(); // Appelle la fonction pour créer le post
-            }
-        });
-    }
-
-
-    // Fonction pour fermer le modal si on clique à l'extérieur de 'created-post'
-    function closeModal(event) {
-        const newpost = document.getElementById('created-post');
-        const modalpost = document.getElementById('modal-post');
-        // Vérifie si le clic a eu lieu en dehors de 'created-post'
-        if (!newpost.contains(event.target) && event.target !== addButton && isModal) {
-            newpost.style.display = 'none'; // Ferme le post
-            modalpost.style.display = 'none'; // Ferme aussi le fond modal
-            isModal = false;
-
-            document.removeEventListener('click', closeModal);
-        }
-    }
-
-    addButton.addEventListener('click', NewPost);
-
-    loginBtn.addEventListener('click', () => {
-        window.location.href = "/authenticate"
-    })
-
-});
-
-document.addEventListener('DOMContentLoaded', () => {
     fetchPosts();
     fetchCategories();
-
-    const userInfo = getUserInfoFromCookie();
-    console.log("Nom d'utilisateur:", userInfo.username);
-    console.log("URL de la photo de profil:", userInfo.profileImageURL);
-    console.log(userInfo)
+    addButton.addEventListener('click', NewPost);
+    logoutButton.addEventListener('click', handleLogout)
+    fetchAllUsers();
 });

@@ -28,10 +28,58 @@ function handleCommentClick() {
 
     // Sauvegarder le postId et l'état précédent dans l'historique
     history.pushState({ postId: postId, previousHTML: previousState, title: 'Post' }, `Post ${postId}`, `#post-${postId}`);
-
     // Réinitialiser les écouteurs d'événements
     initEventListeners();
 }
+
+window.addEventListener('popstate', function (event) {
+    const userPostsContainer = document.getElementById('users-post');
+    const title = document.getElementById('title');
+
+    if (event.state) {
+        const previousHTML = event.state.previousHTML;
+        const restoredTitle = event.state.title;
+
+        // Rétablir l'état précédent
+        userPostsContainer.innerHTML = previousHTML || '';
+        title.textContent = restoredTitle;
+
+        // Vérifier s'il s'agit d'un post spécifique (avec postId)
+        if (event.state.postId) {
+            // Afficher l'espace de commentaires pour ce post
+            const postElement = userPostsContainer.querySelector(`.message-item[post_uuid="${event.state.postId}"]`);
+
+            if (postElement) {
+                // Supprimer les autres posts sauf celui-ci
+                removeAllMessagesExceptCreatedPost();
+                userPostsContainer.appendChild(postElement);
+
+                // Créer l'espace des commentaires
+                const commentSection = createCommentInput();
+                userPostsContainer.appendChild(commentSection);
+
+                // Fetcher les commentaires associés
+                fetchAllcomments();
+                userPostsContainer.scrollTop = userPostsContainer.scrollHeight;
+
+            }
+        }
+
+        // Mettre à jour l'URL sans ajouter une nouvelle entrée dans l'historique
+        const newUrl = event.state.postId ? `#post-${event.state.postId}` : '#home';
+        history.replaceState(event.state, '', newUrl);
+        userPostsContainer.scrollTop = userPostsContainer.scrollHeight;
+
+        // Réinitialiser les écouteurs d'événements
+        initEventListeners();
+    } else {
+        // Si l'utilisateur revient à l'état général (sans postId)
+        fetchPosts();
+        title.textContent = 'General';
+        history.replaceState(null, '', '#home');
+        userPostsContainer.scrollTop = userPostsContainer.scrollHeight;
+    }
+});
 
 function createCommentInput() {
     const userInfo = getUserInfoFromCookie();
@@ -185,40 +233,6 @@ document.getElementById('home-link').addEventListener('click', function (e) {
 
     // Sauvegarder l'état de la page d'accueil dans l'historique
     history.pushState({ title: 'General', previousHTML: previousState }, 'Home', '#home');
-});
-
-// Écouter les événements de navigation (popstate)
-window.addEventListener('popstate', function (event) {
-
-    if (event.state) {
-
-        // Récupérer l'état précédent
-        const previousHTML = event.state.previousHTML;
-        const restoredTitle = event.state.title;
-
-        // Rétablir l'état précédent
-        const userPostsContainer = document.getElementById('users-post');
-        userPostsContainer.innerHTML = previousHTML || '';
-
-        // Mettre à jour le titre avec le titre restauré
-        const title = document.getElementById('title');
-        title.textContent = restoredTitle;
-
-        // Mettre à jour l'URL sans ajouter une nouvelle entrée dans l'historique
-        const newUrl = event.state.postId ? `#post-${event.state.postId}` : '#home';
-        history.replaceState(event.state, '', newUrl);
-
-        initEventListeners();
-    } else {
-        fetchPosts();
-
-        // Mettre à jour le titre pour refléter l'état "General"
-        const title = document.getElementById('title');
-        title.textContent = 'General';
-
-        // Mettre à jour l'URL pour refléter l'état général
-        history.replaceState(null, '', '#home');
-    }
 });
 
 // Initialisation des événements des boutons au chargement de la page

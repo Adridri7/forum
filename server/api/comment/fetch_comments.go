@@ -16,6 +16,7 @@ func FetchCommentHandler(w http.ResponseWriter, r *http.Request) {
 
 	var params map[string]interface{}
 
+	// Récupere la demande du front et decode le JSON post_uuid
 	if err := json.NewDecoder(r.Body).Decode(&params); err != nil {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
@@ -38,6 +39,7 @@ func FetchCommentHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Si trouvé renvoie la réponse en format JSON pour le fronted etc....
 	w.Header().Set("Content", "application/json")
 	if err := json.NewEncoder(w).Encode(commentData); err != nil {
 		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
