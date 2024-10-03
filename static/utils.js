@@ -13,8 +13,7 @@ export async function getPPFromID(id) {
         const data = await response.json();
 
         if (response.ok) {
-            console.log(data);
-            pp = data.profile_picture;
+            pp = data;
         } else {
             alert("Erreur lors de l'inscription : " + data.message);
         }
@@ -26,26 +25,21 @@ export async function getPPFromID(id) {
 }
 
 export function getUserInfoFromCookie() {
-    const cookies = document.cookie.split(';');
     let userInfo = {};
 
-    cookies.forEach(cookie => {
-        const [name, value] = cookie.trim().split('=');
-        if (name === 'UserLogged') {
-            const decodedValue = decodeURIComponent(value);
-            const parts = decodedValue.split('|');
+    if (document.cookie.substring(0, 10) === 'UserLogged') {
+        const parts = document.cookie.substring(11).split('|');
 
-            if (parts.length >= 5) {
-                userInfo = {
-                    uuid: removeQuotes(parts[0]),          // UUID
-                    username: parts[1],      // Nom d'utilisateur
-                    email: parts[2],         // Email
-                    role: parts[3],          // Rôle
-                    profileImageURL: removeQuotes(parts[4]) // URL de l'image de profil
-                };
-            }
+        if (parts.length >= 5) {
+            userInfo = {
+                uuid: removeQuotes(parts[0]),          // UUID
+                username: parts[1],      // Nom d'utilisateur
+                email: parts[2],         // Email
+                role: parts[3],          // Rôle
+                profileImageURL: removeQuotes(parts[4]) // URL de l'image de profil
+            };
         }
-    });
+    }
 
     return userInfo;
 }
