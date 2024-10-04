@@ -1,13 +1,21 @@
 import { deletePost } from "./app.js";
 
-export function DisplayMessages(post) {
+export function DisplayMessages(post, isComment = false) {
+
+    const svgLike = `<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentcolor"><path d="M720-120H280v-520l280-280 50 50q7 7 11.5 19t4.5 23v14l-44 174h258q32 0 56 24t24 56v80q0 7-2 15t-4 15L794-168q-9 20-30 34t-44 14Zm-360-80h360l120-280v-80H480l54-220-174 174v406Zm0-406v406-406Zm-80-34v80H160v360h120v80H80v-520h200Z"/></svg>`
+    const svgDislike = `<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentcolor"><path d="M240-840h440v520L400-40l-50-50q-7-7-11.5-19t-4.5-23v-14l44-174H120q-32 0-56-24t-24-56v-80q0-7 2-15t4-15l120-282q9-20 30-34t44-14Zm360 80H240L120-480v80h360l-54 220 174-174v-406Zm0 406v-406 406Zm80 34v-80h120v-360H680v-80h200v520H680Z"/></svg>`;
     const displayTimeStamp = post.created_at ? new Date(post.created_at).toLocaleString() : new Date().toLocaleString();
     const messagesList = document.getElementById('users-post');
 
     // Créer l'élément 'li' pour le message
     const messageItem = document.createElement('li');
     messageItem.classList.add('message-item');
-    messageItem.setAttribute('post_uuid', post.post_uuid);
+
+    if (isComment) {
+        messageItem.setAttribute('post_uuid', post.comment_id);
+    } else {
+        messageItem.setAttribute('post_uuid', post.post_uuid);
+    }
 
     // Créer le conteneur de l'image de profil
     const profileContainer = document.createElement('div');
@@ -83,23 +91,27 @@ export function DisplayMessages(post) {
     const likeButton = document.createElement('button');
     likeButton.classList.add('like-btn');
     likeButton.id = 'like-btn';
-    const likeSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    likeSvg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-    likeSvg.setAttribute('height', '24px');
-    likeSvg.setAttribute('width', '24px');
-    likeSvg.setAttribute('viewBox', '0 -960 960 960');
-    likeSvg.setAttribute('fill', 'currentcolor');
-    const likePath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    likePath.setAttribute('d', 'm480-120-58-52q-101-91-167-157T150-447.5Q111-500 95.5-544T80-634q0-94 63-157t157-63q52 0 99 22t81 62q34-40 81-62t99-22q94 0 157 63t63 157q0 46-15.5 90T810-447.5Q771-395 705-329T538-172l-58 52Zm0-108q96-86 158-147.5t98-107q36-45.5 50-81t14-70.5q0-60-40-100t-100-40q-47 0-87 26.5T518-680h-76q-15-41-55-67.5T300-774q-60 0-100 40t-40 100q0 35 14 70.5t50 81q36 45.5 98 107T480-228Zm0-273Z');
-    likeSvg.appendChild(likePath);
+    likeButton.innerHTML = svgLike;
 
     const countLike = document.createElement('div');
-    countLike.classList.add('count-like');
+    countLike.classList.add('like-count');
     countLike.textContent = post.likes;
 
-
-    likeButton.appendChild(likeSvg);
     likeButton.appendChild(countLike);
+
+
+    // Bouton Dislike + compteur
+    const dislikeButton = document.createElement('button');
+    dislikeButton.classList.add('dislike-btn');
+    dislikeButton.id = 'dislike-btn';
+    dislikeButton.innerHTML = svgDislike;
+
+    const countDislike = document.createElement('div');
+    countDislike.classList.add('dislike-count');
+    countDislike.textContent = post.dislikes;
+
+    dislikeButton.appendChild(countDislike);
+
 
     // Bouton Comment avec SVG
     const commentButton = document.createElement('button');
@@ -115,7 +127,16 @@ export function DisplayMessages(post) {
     commentSvg.appendChild(commentPath);
     commentButton.appendChild(commentSvg);
 
+    const commentCount = document.createElement('div');
+    commentCount.classList.add('comment-count');
+    commentCount.textContent = post.comment_count;
+
+    commentButton.appendChild(commentCount);
+
+
+    // Ajout des éléments à reaction
     reactionBtnContainer.appendChild(likeButton);
+    reactionBtnContainer.appendChild(dislikeButton);
     reactionBtnContainer.appendChild(commentButton);
 
     // Ajout des éléments au conteneur principal

@@ -2,6 +2,7 @@ package post
 
 import (
 	"encoding/json"
+	"fmt"
 	"forum/server"
 	"forum/server/posts/reaction"
 	posts "forum/server/utils"
@@ -15,8 +16,15 @@ type LikeDislikeRequest struct {
 }
 
 type LikeDislikeResponse struct {
-	Likes    int `json:"likes"`
-	Dislikes int `json:"dislikes"`
+	Likes        int          `json:"likes"`
+	Dislikes     int          `json:"dislikes"`
+	UserReaction UserReaction `json:"userReaction"`
+}
+
+type UserReaction struct {
+	UserUUID    string `json:"user_uuid"`
+	HasLiked    bool   `json:"hasLiked"`
+	HasDisliked bool   `json:"hasDisliked"` // Si tu gères aussi les dislikes
 }
 
 func HandleLikeDislikeAPI(w http.ResponseWriter, r *http.Request) {
@@ -52,11 +60,28 @@ func HandleLikeDislikeAPI(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Vérifie si l'utilisateur a aimé ou non
+	userReactionQuery := `SELECT 
+		(SELECT COUNT(*) FROM post_reactions WHERE post_uuid = ? AND user_uuid = ? AND action = 'like') AS hasLiked,
+		(SELECT COUNT(*) FROM post_reactions WHERE post_uuid = ? AND user_uuid = ? AND action = 'dislike') AS hasDisliked`
+
+	var hasLiked, hasDisliked bool
+	err = server.Db.QueryRow(userReactionQuery, req.PostID, userUUID, req.PostID, userUUID).Scan(&hasLiked, &hasDisliked)
+	if err != nil {
+		http.Error(w, "Erreur lors de la vérification de la réaction de l'utilisateur", http.StatusInternalServerError)
+		fmt.Println("Erreur lors de la vérif de la réac : ", err)
+		return
+	}
+
 	response := LikeDislikeResponse{
 		Likes:    int(rows[0]["likes"].(int64)),
 		Dislikes: int(rows[0]["dislikes"].(int64)),
+		UserReaction: UserReaction{
+			UserUUID:    userUUID,
+			HasLiked:    hasLiked,
+			HasDisliked: hasDisliked,
+		},
 	}
-
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(response)
 }

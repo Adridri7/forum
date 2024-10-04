@@ -3,84 +3,76 @@ import { toggleMenu } from "./displayMessage.js";
 import { fetchAllcomments } from "./showComment.js";
 import { getUserInfoFromCookie } from "./utils.js";
 
+const AppState = {
+    HOME: 'home',
+    POST: 'post'
+};
+
+let currentState = {
+    type: AppState.HOME,
+    data: null
+};
+
 let previousState = null;
 
 // Fonction pour gérer le clic sur le bouton de commentaire
 function handleCommentClick() {
-
     const postId = this.closest('.message-item')?.getAttribute('post_uuid');
-    const postElement = this.closest('.message-item');
 
-    previousState = document.getElementById('users-post').innerHTML;
+    if (postId) {
+        updateAppState({
+            type: AppState.POST,
+            data: { postId: postId, previousHTML: document.getElementById('users-post').innerHTML }
+        });
+    }
+}
 
+function updateAppState(newState, pushState = true) {
     const title = document.getElementById('title');
-    title.textContent = 'Post';
-
     const userPostsContainer = document.getElementById('users-post');
 
-    removeAllMessagesExceptCreatedPost();
-    userPostsContainer.appendChild(postElement);
+    switch (newState.type) {
+        case AppState.HOME:
+            title.textContent = 'General';
+            fetchPosts();
+            break;
+        case AppState.POST:
+            title.textContent = 'Post';
+            displaySinglePost(newState.data.postId);
+            break;
+    }
 
-    const commentSection = createCommentInput();
+    if (pushState) {
+        history.pushState(newState, '', newState.type === AppState.POST ? `#post-${newState.data.postId}` : '#home');
+    }
 
-    userPostsContainer.appendChild(commentSection);
-    fetchAllcomments();
-
-    // Sauvegarder le postId et l'état précédent dans l'historique
-    history.pushState({ postId: postId, previousHTML: previousState, title: 'Post' }, `Post ${postId}`, `#post-${postId}`);
-    // Réinitialiser les écouteurs d'événements
+    currentState = newState;
     initEventListeners();
 }
 
-window.addEventListener('popstate', function (event) {
+function displaySinglePost(postId) {
     const userPostsContainer = document.getElementById('users-post');
-    const title = document.getElementById('title');
+    const postElement = userPostsContainer.querySelector(`.message-item[post_uuid="${postId}"]`);
 
-    if (event.state) {
-        const previousHTML = event.state.previousHTML;
-        const restoredTitle = event.state.title;
+    if (postElement) {
+        userPostsContainer.innerHTML = '';
+        userPostsContainer.appendChild(postElement);
 
-        // Rétablir l'état précédent
-        userPostsContainer.innerHTML = previousHTML || '';
-        title.textContent = restoredTitle;
+        const commentSection = createCommentInput();
+        userPostsContainer.appendChild(commentSection);
 
-        // Vérifier s'il s'agit d'un post spécifique (avec postId)
-        if (event.state.postId) {
-            // Afficher l'espace de commentaires pour ce post
-            const postElement = userPostsContainer.querySelector(`.message-item[post_uuid="${event.state.postId}"]`);
-
-            if (postElement) {
-                // Supprimer les autres posts sauf celui-ci
-                removeAllMessagesExceptCreatedPost();
-                userPostsContainer.appendChild(postElement);
-
-                // Créer l'espace des commentaires
-                const commentSection = createCommentInput();
-                userPostsContainer.appendChild(commentSection);
-
-                // Fetcher les commentaires associés
-                fetchAllcomments();
-                userPostsContainer.scrollTop = userPostsContainer.scrollHeight;
-
-            }
-        }
-
-        // Mettre à jour l'URL sans ajouter une nouvelle entrée dans l'historique
-        const newUrl = event.state.postId ? `#post-${event.state.postId}` : '#home';
-        history.replaceState(event.state, '', newUrl);
-        userPostsContainer.scrollTop = userPostsContainer.scrollHeight;
-
-        // Réinitialiser les écouteurs d'événements
-        initEventListeners();
+        fetchAllcomments(postId);
     } else {
-        // Si l'utilisateur revient à l'état général (sans postId)
-        fetchPosts();
-        title.textContent = 'General';
-        history.replaceState(null, '', '#home');
-        userPostsContainer.scrollTop = userPostsContainer.scrollHeight;
+        console.error(`Post with id ${postId} not found`);
+    }
+}
+window.addEventListener('popstate', function (event) {
+    if (event.state) {
+        updateAppState(event.state, false);
+    } else {
+        updateAppState({ type: AppState.HOME }, false);
     }
 });
-
 function createCommentInput() {
     const userInfo = getUserInfoFromCookie();
 
@@ -182,12 +174,12 @@ async function createComment(post_uuid, user_uuid) {
 }
 
 // Fonction pour supprimer tous les messages sauf le post créé
-function removeAllMessagesExceptCreatedPost() {
-    const messageItems = document.querySelectorAll('.message-item');
-    messageItems.forEach(item => {
-        item.remove();
-    });
-}
+// function removeAllMessagesExceptCreatedPost() {
+//     const messageItems = document.querySelectorAll('.message-item');
+//     messageItems.forEach(item => {
+//         item.remove();
+//     });
+// }
 
 // Fonction pour initialiser les événements des boutons
 export function initEventListeners() {
@@ -221,22 +213,10 @@ function handleMenuClick(event) {
 // Gestion du lien #home pour revenir à la page principale avec tous les posts
 document.getElementById('home-link').addEventListener('click', function (e) {
     e.preventDefault();
-
-    previousState = document.getElementById('users-post').innerHTML;
-
-    // Mettre à jour le titre à "General"
-    const title = document.getElementById('title');
-    title.textContent = 'General';
-
-    // Recharger les posts
-    fetchPosts();
-
-    // Sauvegarder l'état de la page d'accueil dans l'historique
-    history.pushState({ title: 'General', previousHTML: previousState }, 'Home', '#home');
+    updateAppState({ type: AppState.HOME });
 });
 
 // Initialisation des événements des boutons au chargement de la page
 document.addEventListener("DOMContentLoaded", () => {
-    fetchPosts();
-    initEventListeners();
+    updateAppState({ type: AppState.HOME });
 });
