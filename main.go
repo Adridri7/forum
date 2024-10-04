@@ -46,6 +46,10 @@ func main() {
 
 	mux.HandleFunc("/logout", users.LogoutHandler)
 
+	http.HandleFunc("/api/post/fetchPostsByCategories", categories.FetchPostByCategoriesHandler)
+
+	http.HandleFunc("/api/like-dislike", post.HandleLikeDislikeAPI)
+
 	mux.HandleFunc("/authenticate", func(w http.ResponseWriter, r *http.Request) {
 		renderTemplate(w, "./static/authentification/authentification.html", nil)
 	})

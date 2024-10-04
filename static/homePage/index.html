@@ -8,6 +8,7 @@
         href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="/static/homePage/style.css">
+    <link rel="stylesheet" href="/static/homePage/responsive.css">
     <title>Forum</title>
 </head>
 
@@ -42,21 +43,23 @@
                         </svg>
                         <span>Dashboard</span>
                     </a>
-                    <div id="categories-container">
-                        <h3>Membres</h3>
-                        <ul id="user-list"></ul>
-                    </div>
                 </li>
+                <!-- <li>
+                    <a href="#Dashborad" id="search-link">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" class="icon"
+                            fill="currentcolor">
+                            <path
+                                d="M784-120 532-372q-30 24-69 38t-83 14q-109 0-184.5-75.5T120-580q0-109 75.5-184.5T380-840q109 0 184.5 75.5T640-580q0 44-14 83t-38 69l252 252-56 56ZM380-400q75 0 127.5-52.5T560-580q0-75-52.5-127.5T380-760q-75 0-127.5 52.5T200-580q0 75 52.5 127.5T380-400Z" />
+                        </svg>
+                        <span>Search</span>
+                    </a>
+                </li> -->
+                <div id="user-list-containers">
+                    <h3>Membres</h3>
+                    <ul id="user-list"></ul>
+                </div>
+
             </ul>
-            <div class="logout-div" id="logout-div">
-                <button class="logout-btn" id="logout-btn">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" class="icon" fill="currentcolor">
-                        <path
-                            d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h280v80H200v560h280v80H200Zm440-160-55-58 102-102H360v-80h327L585-622l55-58 200 200-200 200Z" />
-                    </svg>
-                </button>
-                <span class="logout-span">Log Out</span>
-            </div>
         </nav>
 
         <div class="chat-box">
@@ -72,7 +75,7 @@
                     <!-- ici va se trouver les posts -->
                 </ul>
                 <div class="modal-post" id="modal-post"></div>
-                <div class="tendances">
+                <div class="tendances" id="tendances">
                     <div id="categories-container">
                         <h3>Categories</h3>
                         <ul id="categories-list"></ul>

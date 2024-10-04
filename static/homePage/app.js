@@ -2,9 +2,12 @@ import { DisplayMessages } from "./displayMessage.js";
 import { initEventListeners } from "./comment.js";
 import { fetchCategories } from "./fetchcategories.js";
 import { getUserInfoFromCookie, getPPFromID } from "../utils.js";
+import { fetchPostsByCategory } from './fetchcategories.js';
 import { NewPost } from "./newPost.js";
 import { handleLogout } from "./logout.js";
 import { fetchAllUsers } from "./displayUser.js";
+import { toggleReaction } from "./reaction.js";
+
 
 
 // Sélectionnez les éléments
@@ -12,7 +15,6 @@ const toggleButton = document.getElementById('toggle-menu-btn');
 const sidebar = document.getElementById('sidebar');
 const darkModeToggle = document.getElementById('dark-mode-toggle');
 const addButton = document.getElementById('add-button');
-const logoutButton = document.getElementById('logout-div');
 
 
 // Fonction pour appliquer le mode
@@ -74,9 +76,39 @@ document.addEventListener('DOMContentLoaded', async () => {
         profileImage.alt = 'User profile';
         profileImage.classList.add('profile-image'); // Ajoute une classe pour styliser l'image
 
+        // Créer le menu contextuel
+        const menu = document.createElement('div');
+        menu.classList.add('profile-menu'); // Classe pour styliser le menu
+        menu.style.display = 'none'; // Masquer le menu par défaut
 
-        // Ajouter l'image et le nom d'utilisateur dans la div
+        // Créer le bouton "Logout"
+        const logoutButton = document.createElement('button');
+        logoutButton.id = "logout-btn"
+        logoutButton.textContent = 'Log Out';
+        logoutButton.addEventListener('click', handleLogout)
+
+        // Ajouter le bouton "Logout" au menu
+        menu.appendChild(logoutButton);
+
+        // Ajouter l'image et le menu dans la div
         profileDiv.appendChild(profileImage);
+        profileDiv.appendChild(menu);
+
+        // Événement pour afficher/masquer le menu lorsque l'image est cliquée
+        profileImage.addEventListener('click', () => {
+            // Afficher ou masquer le menu
+            if (menu.style.display === 'none') {
+                menu.style.display = 'block';
+            } else {
+                menu.style.display = 'none';
+            }
+        });
+
+        document.addEventListener('click', (event) => {
+            if (!profileDiv.contains(event.target)) {
+                menu.style.display = 'none';
+            }
+        });
 
         // Remplacer le bouton "Login" par la div
         profilMenu.replaceChild(profileDiv, loginButton);
@@ -156,6 +188,19 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchPosts();
     fetchCategories();
     addButton.addEventListener('click', NewPost);
-    logoutButton.addEventListener('click', handleLogout)
     fetchAllUsers();
+    fetchPostsByCategory();
+
+    document.body.addEventListener('click', function (event) {
+        const likeButton = event.target.closest('.like-btn');
+        const dislikeButton = event.target.closest('.dislike-btn');
+
+        if (likeButton || dislikeButton) {
+            const messageItem = (likeButton || dislikeButton).closest('.message-item');
+            if (messageItem) {
+                const postUuid = messageItem.getAttribute('post_uuid');
+                toggleReaction(event, postUuid);
+            }
+        }
+    });
 });
