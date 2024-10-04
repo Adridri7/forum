@@ -44,6 +44,7 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	// Verify that user doesn't exist already
 	{
 		var usrFound dbUser.User
+		var exists bool
 
 		usrFound, err = dbUser.FetchUserByEmail(newUser.Email)
 		if err != nil {
@@ -54,6 +55,18 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 
 		if usrFound != (dbUser.User{}) {
 			http.Error(w, "{\"Error\": \"User already exists with this email address. Please try with another.\"}", http.StatusUnauthorized)
+			return
+		}
+
+		exists, err = dbUser.IsUsernameTaken(newUser.Username)
+		if err != nil {
+			http.Error(w, "{\"Error\": \"Fatal error fetching\"}", http.StatusInternalServerError)
+			fmt.Fprintln(os.Stderr, err.Error())
+			return
+		}
+
+		if exists {
+			http.Error(w, "{\"Error\": \"User already exists with this username. Please try with another.\"}", http.StatusUnauthorized)
 			return
 		}
 	}

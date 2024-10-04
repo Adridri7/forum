@@ -95,6 +95,26 @@ func FetchUserByEmail(email string) (User, error) {
 	return newUser, nil
 }
 
+// Savoir si un utilisateur existe par son nom d'utilisateur ( pour register )
+
+func IsUsernameTaken(username string) (bool, error) {
+	re := regexp.MustCompile(`(?i)<[^>]+>|(SELECT|UPDATE|DELETE|INSERT|DROP|FROM|COUNT|AS|WHERE|--)|^\s|^\s*$|<script.*?>.*?</script.*?>`)
+
+	if re.FindAllString(username, -1) != nil {
+		return false, fmt.Errorf("injection detected")
+	}
+
+	fetchUserQuery := `SELECT * FROM users WHERE username= ?`
+	params := []interface{}{username}
+
+	rows, err := server.RunQuery(fetchUserQuery, params...)
+	if err != nil {
+		return false, fmt.Errorf("erreur lors de la récupération du formulaire: %v", err)
+	}
+
+	return len(rows) >= 1, nil
+}
+
 // Trouver l'image de profil utilisateur avec ID
 func FetchPPByID(id string) (string, error) {
 	fetchUserQuery := `SELECT profile_picture FROM users WHERE user_uuid= ?`
