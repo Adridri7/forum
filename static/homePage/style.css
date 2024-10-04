@@ -221,6 +221,13 @@ body {
     border-top-right-radius: 15px;
 }
 
+#users-post>li:last-child:nth-child(odd) {
+    grid-column: span 2;
+    /* Aide à visualiser */
+    box-sizing: border-box;
+}
+
+
 .message-item {
     display: flex;
     position: relative;
@@ -751,4 +758,15 @@ body {
     >svg {
         fill: var(--primary-color);
     }
+}
+
+.categorie {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    font-size: 32px;
+    font-weight: 600;
+    height: 180px;
+    border-radius: 8px;
 }

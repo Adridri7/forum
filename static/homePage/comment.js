@@ -1,11 +1,13 @@
 import { fetchPosts } from "./app.js";
 import { toggleMenu } from "./displayMessage.js";
+import { fetchCategories } from "./fetchcategories.js";
 import { fetchAllcomments } from "./showComment.js";
 import { getUserInfoFromCookie } from "./utils.js";
 
 const AppState = {
     HOME: 'home',
-    POST: 'post'
+    POST: 'post',
+    SEARCH: 'search'
 };
 
 let currentState = {
@@ -27,6 +29,7 @@ function handleCommentClick() {
     }
 }
 
+
 function updateAppState(newState, pushState = true) {
     const title = document.getElementById('title');
     const userPostsContainer = document.getElementById('users-post');
@@ -40,15 +43,37 @@ function updateAppState(newState, pushState = true) {
             title.textContent = 'Post';
             displaySinglePost(newState.data.postId);
             break;
+        case AppState.SEARCH:
+            title.textContent = 'Search';
+            fetchCategories();
+            break;
+        default:
+            // Si l'état n'est pas reconnu, revenez à l'accueil
+            newState.type = AppState.HOME;
+            title.textContent = 'General';
+            fetchPosts();
+            break;
     }
 
     if (pushState) {
-        history.pushState(newState, '', newState.type === AppState.POST ? `#post-${newState.data.postId}` : '#home');
+        let url;
+        switch (newState.type) {
+            case AppState.POST:
+                url = `#post-${newState.data.postId}`;
+                break;
+            case AppState.SEARCH:
+                url = '#search';
+                break;
+            default:
+                url = '#home';
+        }
+        history.pushState(newState, '', url);
     }
 
     currentState = newState;
     initEventListeners();
 }
+
 
 function displaySinglePost(postId) {
     const userPostsContainer = document.getElementById('users-post');
@@ -66,13 +91,25 @@ function displaySinglePost(postId) {
         console.error(`Post with id ${postId} not found`);
     }
 }
+
+
 window.addEventListener('popstate', function (event) {
     if (event.state) {
         updateAppState(event.state, false);
     } else {
-        updateAppState({ type: AppState.HOME }, false);
+        // Détermine l'état en fonction de l'URL actuelle
+        const hash = window.location.hash;
+        if (hash.startsWith('#post-')) {
+            const postId = hash.slice(6); // Retire '#post-' du début
+            updateAppState({ type: AppState.POST, data: { postId } }, false);
+        } else if (hash === '#search') {
+            updateAppState({ type: AppState.SEARCH }, false);
+        } else {
+            updateAppState({ type: AppState.HOME }, false);
+        }
     }
 });
+
 function createCommentInput() {
     const userInfo = getUserInfoFromCookie();
 
@@ -210,13 +247,20 @@ function handleMenuClick(event) {
     toggleMenu(event, postId);
 }
 
+
+// Initialisation des événements des boutons au chargement de la page
+document.addEventListener("DOMContentLoaded", () => {
+    // Toujours commencer par la page d'accueil
+    updateAppState({ type: AppState.HOME });
+});
+
 // Gestion du lien #home pour revenir à la page principale avec tous les posts
 document.getElementById('home-link').addEventListener('click', function (e) {
     e.preventDefault();
     updateAppState({ type: AppState.HOME });
 });
 
-// Initialisation des événements des boutons au chargement de la page
-document.addEventListener("DOMContentLoaded", () => {
-    updateAppState({ type: AppState.HOME });
+document.getElementById('search-link').addEventListener('click', function (e) {
+    e.preventDefault();
+    updateAppState({ type: AppState.SEARCH });
 });

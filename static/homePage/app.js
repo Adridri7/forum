@@ -1,7 +1,7 @@
 import { DisplayMessages } from "./displayMessage.js";
 import { initEventListeners } from "./comment.js";
 import { fetchCategories } from "./fetchcategories.js";
-import { getUserInfoFromCookie } from "./utils.js";
+import { getUserInfoFromCookie, resetUsersPost } from "./utils.js";
 import { fetchPostsByCategory } from './fetchcategories.js';
 import { NewPost } from "./newPost.js";
 import { handleLogout } from "./logout.js";
@@ -131,6 +131,7 @@ toggleButton.addEventListener('click', () => {
 
 let currentUser = ''
 export async function fetchPosts() {
+    resetUsersPost();
     const messagesList = document.getElementById('users-post');
     messagesList.innerHTML = '<p>Loading...</p>';
     try {
@@ -184,11 +185,8 @@ export async function deletePost(post_uuid) {
 
 document.addEventListener('DOMContentLoaded', () => {
     fetchPosts();
-    fetchCategories();
     addButton.addEventListener('click', NewPost);
     fetchAllUsers();
-    fetchPostsByCategory();
-
     document.body.addEventListener('click', function (event) {
         const likeButton = event.target.closest('.like-btn');
         const dislikeButton = event.target.closest('.dislike-btn');
