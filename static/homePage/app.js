@@ -121,6 +121,8 @@ document.addEventListener('DOMContentLoaded', () => {
             // Ajouter à nouveau le bouton à la place de la div
             profilMenu.appendChild(newLoginButton);
         }
+
+        addButton.style.display = 'none'
     }
 });
 

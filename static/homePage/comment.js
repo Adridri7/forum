@@ -141,6 +141,20 @@ function createCommentInput() {
     submitButton.type = 'submit';
     submitButton.textContent = 'Post';
 
+    // Vérifiez si l'utilisateur est connecté
+    if (!userInfo || !userInfo.uuid) {
+        // Désactivez le champ d'entrée et le bouton si l'utilisateur n'est pas connecté
+        commentInput.disabled = true;
+        submitButton.disabled = true;
+
+        // Ajoutez un message d'information
+        const infoMessage = document.createElement('div');
+        infoMessage.classList.add('info-message');
+        commentInput.placeholder = 'Please login to comment';
+        commentInputContainer.appendChild(infoMessage);
+    }
+
+
     // Ajouter le conteneur de l'image et les autres éléments au formulaire
     form.appendChild(profileImageContainer);
     form.appendChild(commentInput);

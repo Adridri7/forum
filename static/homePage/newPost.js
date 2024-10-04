@@ -15,6 +15,8 @@ export function NewPost() {
     newpost.style.display = 'flex';
     modalPost.style.display = 'flex';
     isModal = true;
+    const inputField = document.getElementById('message');
+    inputField.focus();
 
     // Ajouter un écouteur d'événement pour fermer le modal lorsqu'un clic se produit
     document.addEventListener('click', closeModal);
