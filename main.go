@@ -23,9 +23,16 @@ func main() {
 
 	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 
+	mux.HandleFunc("/api/login", authentification.LoginHandler)
+	mux.HandleFunc("/api/registration", authentification.RegisterHandler)
+	mux.HandleFunc("/api/get-pp", authentification.PP_Handler)
+	mux.HandleFunc("/api/like-dislike", post.HandleLikeDislikeAPI)
+
 	mux.HandleFunc("/api/post/createPost", post.CreatePostHandler)
 	mux.HandleFunc("/api/post/fetchPost", post.FetchPostHandler)
 	mux.HandleFunc("/api/post/fetchAllPost", post.FetchAllPostHandler)
+	mux.HandleFunc("/api/post/fetchAllCategories", categories.FetchAllCategoriesHandler)
+	mux.HandleFunc("/api/post/fetchPostsByCategories", categories.FetchPostByCategoriesHandler)
 	mux.HandleFunc("/api/post/deletePost", post.DeletePostHandler)
 
 	mux.HandleFunc("/api/post/createComment", comments.CreateCommentHandler)
@@ -33,22 +40,12 @@ func main() {
 	mux.HandleFunc("/api/post/fetchAllComments", comments.FetchAllCommentsHandler)
 	mux.HandleFunc("/api/post/deleteComment", comments.DeleteCommentHandler)
 
-	mux.HandleFunc("/api/login", authentification.LoginHandler)
-	mux.HandleFunc("/api/registration", authentification.RegisterHandler)
-	mux.HandleFunc("/api/get-pp", authentification.PP_Handler)
-
 	mux.HandleFunc("/api/google_login", providers.HandleGoogleLogin)
 	mux.HandleFunc("/api/google_callback", providers.HandleGoogleCallback)
-
-	mux.HandleFunc("/api/post/fetchAllCategories", categories.FetchAllCategoriesHandler)
 
 	mux.HandleFunc("/api/users/fetchAllUsers", users.FetchAllUsersHandler)
 
 	mux.HandleFunc("/logout", users.LogoutHandler)
-
-	http.HandleFunc("/api/post/fetchPostsByCategories", categories.FetchPostByCategoriesHandler)
-
-	http.HandleFunc("/api/like-dislike", post.HandleLikeDislikeAPI)
 
 	mux.HandleFunc("/authenticate", func(w http.ResponseWriter, r *http.Request) {
 		renderTemplate(w, "./static/authentification/authentification.html", nil)
