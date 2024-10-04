@@ -30,15 +30,16 @@ export function getUserInfoFromCookie() {
     if (document.cookie.substring(0, 10) === 'UserLogged') {
         const parts = document.cookie.substring(11).split('|');
 
-        if (parts.length >= 5) {
-            userInfo = {
-                uuid: removeQuotes(parts[0]),          // UUID
-                username: parts[1],      // Nom d'utilisateur
-                email: parts[2],         // Email
-                role: parts[3],          // Rôle
-                profileImageURL: removeQuotes(parts[4]) // URL de l'image de profil
-            };
+        if (parts.length < 4) {
+            return {};
         }
+
+        userInfo = {
+            uuid: removeQuotes(parts[0]),          // UUID
+            username: parts[1],      // Nom d'utilisateur
+            email: parts[2],         // Email
+            role: parts[3]           // Rôle
+        };
     }
 
     return userInfo;
@@ -48,6 +49,8 @@ export function isUserInfoValid() {
     var userInfo = getUserInfoFromCookie();
     var uuidRegex = /([0-9a-f]{8})-([0-9a-f]{4})-([0-9a-f]{4})-([0-9a-f]{4})-([0-9a-f]{12})/;
     var emailRegex = /([0-9A-Za-z]+[\.-]*)+@([0-9A-Za-z]+-*)+.(com|org|fr)/;
+
+    console.log(userInfo);
 
     // Is UUID valid?
     if (!uuidRegex.test(userInfo.uuid)) {
@@ -61,7 +64,9 @@ export function isUserInfoValid() {
 
     // Is role valid?
     switch (userInfo.role) {
-        case "", "user", "mod", "admin":
+        case "user":
+        case "mod":
+        case "admin":
             break;
         default:
             return false;

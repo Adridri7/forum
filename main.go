@@ -47,9 +47,6 @@ func main() {
 	mux.HandleFunc("/logout", users.LogoutHandler)
 
 	mux.HandleFunc("/authenticate", func(w http.ResponseWriter, r *http.Request) {
-		if _, err := r.Cookie("UserLogged"); err == nil {
-			renderTemplate(w, "./static/homePage/index.html", nil)
-		}
 		renderTemplate(w, "./static/authentification/authentification.html", nil)
 	})
 
