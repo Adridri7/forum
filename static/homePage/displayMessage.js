@@ -5,6 +5,7 @@ export function DisplayMessages(post, isComment = false) {
     const svgLike = `<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentcolor"><path d="M720-120H280v-520l280-280 50 50q7 7 11.5 19t4.5 23v14l-44 174h258q32 0 56 24t24 56v80q0 7-2 15t-4 15L794-168q-9 20-30 34t-44 14Zm-360-80h360l120-280v-80H480l54-220-174 174v406Zm0-406v406-406Zm-80-34v80H160v360h120v80H80v-520h200Z"/></svg>`
     const svgDislike = `<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentcolor"><path d="M240-840h440v520L400-40l-50-50q-7-7-11.5-19t-4.5-23v-14l44-174H120q-32 0-56-24t-24-56v-80q0-7 2-15t4-15l120-282q9-20 30-34t44-14Zm360 80H240L120-480v80h360l-54 220 174-174v-406Zm0 406v-406 406Zm80 34v-80h120v-360H680v-80h200v520H680Z"/></svg>`;
     const displayTimeStamp = post.created_at ? new Date(post.created_at).toLocaleString() : new Date().toLocaleString();
+    const svgCertificate = `<svg xmlns="http://www.w3.org/2000/svg" class="certificate" fill="currentcolor" viewBox="0 0 512 512"><!--!Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M211 7.3C205 1 196-1.4 187.6 .8s-14.9 8.9-17.1 17.3L154.7 80.6l-62-17.5c-8.4-2.4-17.4 0-23.5 6.1s-8.5 15.1-6.1 23.5l17.5 62L18.1 170.6c-8.4 2.1-15 8.7-17.3 17.1S1 205 7.3 211l46.2 45L7.3 301C1 307-1.4 316 .8 324.4s8.9 14.9 17.3 17.1l62.5 15.8-17.5 62c-2.4 8.4 0 17.4 6.1 23.5s15.1 8.5 23.5 6.1l62-17.5 15.8 62.5c2.1 8.4 8.7 15 17.1 17.3s17.3-.2 23.4-6.4l45-46.2 45 46.2c6.1 6.2 15 8.7 23.4 6.4s14.9-8.9 17.1-17.3l15.8-62.5 62 17.5c8.4 2.4 17.4 0 23.5-6.1s8.5-15.1 6.1-23.5l-17.5-62 62.5-15.8c8.4-2.1 15-8.7 17.3-17.1s-.2-17.4-6.4-23.4l-46.2-45 46.2-45c6.2-6.1 8.7-15 6.4-23.4s-8.9-14.9-17.3-17.1l-62.5-15.8 17.5-62c2.4-8.4 0-17.4-6.1-23.5s-15.1-8.5-23.5-6.1l-62 17.5L341.4 18.1c-2.1-8.4-8.7-15-17.1-17.3S307 1 301 7.3L256 53.5 211 7.3z"/></svg>`
     const messagesList = document.getElementById('users-post');
 
     // Créer l'élément 'li' pour le message
@@ -32,9 +33,15 @@ export function DisplayMessages(post, isComment = false) {
     // Créer l'en-tête du message
     const messageHeader = document.createElement('div');
     messageHeader.classList.add('message-header');
+
     const userNameSpan = document.createElement('span');
     userNameSpan.classList.add('username');
     userNameSpan.textContent = post.username;
+
+
+    const roleDiv = document.createElement('div');
+    roleDiv.classList.add('user-role');
+    roleDiv.innerHTML = svgCertificate;
 
     const timeStampSpan = document.createElement('span');
     timeStampSpan.classList.add('timestamp');
@@ -74,6 +81,7 @@ export function DisplayMessages(post, isComment = false) {
 
     menu.appendChild(deleteMenuItem);
     messageHeader.appendChild(userNameSpan);
+    messageHeader.appendChild(roleDiv);
     messageHeader.appendChild(timeStampSpan);
     messageHeader.appendChild(menuButton);
     messageHeader.appendChild(menu); // Ajout du menu à l'en-tête

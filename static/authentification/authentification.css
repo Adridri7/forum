@@ -28,11 +28,16 @@ body {
     left: 2vw;
     padding: 10px;
     border: none;
-    background-color: var(--secondary-color);
+    background-color: var(--primary-color);
     color: var(--text-color);
     border-radius: 8px;
     font-weight: 600;
     cursor: pointer;
+    transition: transform .15s ease;
+}
+
+#back-home:hover {
+    transform: scale(102%);
 }
 
 #container {
@@ -244,7 +249,12 @@ p {
     width: 100%;
 }
 
-@media (max-width: 600px) {
+.file-upload-label::before {
+    content: "Choose a profile picture";
+}
+
+
+@media (max-width: 900px) {
     .login-section {
         width: 100%;
         padding: 20px;
@@ -252,6 +262,12 @@ p {
 
     .design-section {
         width: 0%;
+    }
+
+    .file-upload-label::before {
+        display: flex;
+        justify-content: center;
+        content: "Picture";
     }
 }
 
