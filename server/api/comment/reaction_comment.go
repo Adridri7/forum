@@ -46,7 +46,7 @@ func HandleLikeDislikeCommentAPI(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = reaction.HandleLikeDislike(server.Db, req.CommentID, userUUID, req.Action)
+	err = reaction.HandleLikeDislikeComment(server.Db, req.CommentID, userUUID, req.Action)
 	if err != nil {
 		fmt.Println("J'aimerai connaitre l'erreur :", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -54,8 +54,8 @@ func HandleLikeDislikeCommentAPI(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Récupérer les nouveaux compteurs
-	fmt.Println("Le post ID :", req.CommentID)
-	getCountsQuery := `SELECT likes, dislikes FROM comments WHERE post_uuid = ?`
+	fmt.Println("Le Comment ID :", req.CommentID)
+	getCountsQuery := `SELECT likes, dislikes FROM comments WHERE comment_id = ?`
 	rows, err := server.RunQuery(getCountsQuery, req.CommentID)
 	if err != nil || len(rows) == 0 {
 		fmt.Println("Erreur lors de la récup des compteurs :", err) // L'erreur est ici
@@ -65,8 +65,8 @@ func HandleLikeDislikeCommentAPI(w http.ResponseWriter, r *http.Request) {
 
 	// Vérifie si l'utilisateur a aimé ou non
 	userReactionQuery := `SELECT 
-		(SELECT COUNT(*) FROM comment_reactions WHERE post_uuid = ? AND user_uuid = ? AND action = 'like') AS hasLiked,
-		(SELECT COUNT(*) FROM comment_reactions WHERE post_uuid = ? AND user_uuid = ? AND action = 'dislike') AS hasDisliked`
+		(SELECT COUNT(*) FROM comment_reactions WHERE comment_id = ? AND user_uuid = ? AND action = 'like') AS hasLiked,
+		(SELECT COUNT(*) FROM comment_reactions WHERE comment_id = ? AND user_uuid = ? AND action = 'dislike') AS hasDisliked`
 
 	var hasLiked, hasDisliked bool
 	err = server.Db.QueryRow(userReactionQuery, req.CommentID, userUUID, req.CommentID, userUUID).Scan(&hasLiked, &hasDisliked)

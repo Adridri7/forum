@@ -76,9 +76,13 @@ function displayPosts(posts) {
 }*/
 
 
-export async function toggleCommentReaction(event, postUuid) {
-    console.log('toggleReaction called', postUuid);
+export async function toggleCommentReaction(event, commentID,) {
+    console.log('toggleReactionComment:', commentID);
     const button = event.target.closest('.like-comment-btn, .dislike-comment-btn');
+    if (!button) {
+        console.error('Button not found');
+        return;
+    }
     const action = button.classList.contains('like-comment-btn') ? 'like' : 'dislike';
     console.log('Action:', action);
 
@@ -88,20 +92,19 @@ export async function toggleCommentReaction(event, postUuid) {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ postId: postUuid, action: action }),
+            body: JSON.stringify({ commentId: commentID, action: action }),
             credentials: 'same-origin'
         });
 
         if (!response.ok) {
-            throw new Error('Erreur lors de la mise à jour de la réaction');
+            const errorText = await response.text();
+            throw new Error(`Erreur lors de la mise à jour de la réaction: ${errorText}`);
         }
 
         const result = await response.json();
-        console.log(result);
-        updateReactionCommentUI(postUuid, result.likes, result.dislikes, result.userReaction);
+        console.log("Résultat:", result);
+        updateReactionCommentUI(commentID, result.likes, result.dislikes, result.userReaction);
 
-        // Optionnel : Rafraîchir tous les posts si nécessaire
-        // fetchPosts();
     } catch (error) {
         console.error('Erreur :', error);
     }
