@@ -6,7 +6,9 @@ import { fetchPostsByCategory } from './fetchcategories.js';
 import { NewPost } from "./newPost.js";
 import { handleLogout } from "./logout.js";
 import { fetchAllUsers } from "./displayUser.js";
-import { toggleReaction } from "./reaction.js";
+import { toggleCommentReaction, toggleReaction } from "./reaction.js";
+import { FetchMostLikedPosts } from "./postMostLiked.js";
+import { FetchMostUseCategories } from "./tendance.js";
 
 
 
@@ -185,20 +187,27 @@ export async function deletePost(post_uuid) {
     }
 }
 
+export function Reaction(event) {
+    const likeButton = event.target.closest('.like-btn');
+    const dislikeButton = event.target.closest('.dislike-btn');
+
+    if (likeButton || dislikeButton) {
+        const messageItem = (likeButton || dislikeButton).closest('.message-item');
+        if (messageItem) {
+            const postUuid = messageItem.getAttribute('post_uuid');
+            toggleReaction(event, postUuid);
+        }
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     fetchPosts();
     addButton.addEventListener('click', NewPost);
     fetchAllUsers();
-    document.body.addEventListener('click', function (event) {
-        const likeButton = event.target.closest('.like-btn');
-        const dislikeButton = event.target.closest('.dislike-btn');
+    FetchMostUseCategories();
+    FetchMostLikedPosts();
+    document.body.addEventListener('click', Reaction);
+    document.body.addEventListener('click', toggleCommentReaction);
 
-        if (likeButton || dislikeButton) {
-            const messageItem = (likeButton || dislikeButton).closest('.message-item');
-            if (messageItem) {
-                const postUuid = messageItem.getAttribute('post_uuid');
-                toggleReaction(event, postUuid);
-            }
-        }
-    });
+
 });

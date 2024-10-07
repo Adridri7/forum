@@ -6,16 +6,6 @@ import (
 	"forum/server"
 )
 
-type LikeDislikeRequest struct {
-	PostID string `json:"postId"`
-	Action string `json:"action"`
-}
-
-type LikeDislikeResponse struct {
-	Likes    int `json:"likes"`
-	Dislikes int `json:"dislikes"`
-}
-
 func HandleLikeDislike(db *sql.DB, postID string, userID string, action string) error {
 	// Vérifier si l'utilisateur a déjà liké ou disliké ce post
 	checkQuery := `SELECT action FROM post_reactions WHERE post_uuid = ? AND user_uuid = ?`

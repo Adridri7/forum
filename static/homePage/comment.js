@@ -1,6 +1,7 @@
-import { fetchPosts } from "./app.js";
+import { fetchPosts, Reaction } from "./app.js";
 import { toggleMenu } from "./displayMessage.js";
 import { fetchCategories } from "./fetchcategories.js";
+import { toggleCommentReaction } from "./reaction.js";
 import { fetchAllcomments } from "./showComment.js";
 import { getUserInfoFromCookie } from "./utils.js";
 
@@ -243,10 +244,13 @@ export function initEventListeners() {
         button.addEventListener('click', handleCommentClick);
     });
 
+    document.body.addEventListener('click', Reaction);
+    document.body.addEventListener('click', toggleCommentReaction);
+
     // Sélectionne tous les boutons de menu (dans chaque message-item)
     const menuButtons = document.querySelectorAll('.menu-btn');
 
-    // Réinitialise les événements pour chaque bouton de menu
+    // Réinitialise les événements pour chaque bouton de menuÒ
     menuButtons.forEach(button => {
         button.removeEventListener('click', handleMenuClick);
         button.addEventListener('click', handleMenuClick);

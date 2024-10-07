@@ -221,18 +221,66 @@ La fonction retourne un map[string]int où la clé est le nom de la catégorie (
 ----------------------------------------------------------------------------------------------------*/
 
 func FetchCategoryRanking(db *sql.DB) (map[string]int, error) {
-	// Requête pour compter le nombre d'occurrences de chaque catégorie
+
+	/*---------------------------------------------------------------------------------------------------
+
+			  Cette requête a pour objectif de compter et de classer les catégories d'un ensemble de posts.
+			  Les catégories sont initialement stockées sous forme de chaînes de caractères, avec plusieurs
+			  catégories séparées par des virgules dans chaque post (par exemple : "sports,news,technology").
+			  La requête utilise une CTE récursive (Common Table Expression) pour décomposer ces chaînes de caractères
+			  en catégories individuelles, puis compte leur fréquence d'apparition.
+
+			  WITH RECURSIVE : Démarre une expression de table commune (CTE) récursive, appelée split.
+
+			 - split(category, rest) : La CTE split est définie avec deux colonnes :
+			 - category : Pour stocker chaque catégorie extraite individuellement.
+			 - rest : Pour stocker la portion restante de la chaîne de catégories qui doit encore être traitée.
+
+			 - SELECT '' : Cette première partie de la requête initialise la CTE avec une valeur vide pour la colonne category (car on n'a pas encore extrait de catégories).
+			 - categories || ',' : Concatène la chaîne de catégories avec une virgule finale (categories + ','), pour s'assurer que chaque catégorie est séparée proprement par une virgule, même si la chaîne se termine par la dernière catégorie.
+	         - FROM posts : Prend les données de la table posts. Cela génère une ligne pour chaque post avec la liste complète de catégories, prête à être traitée.
+
+			 UNION ALL : Combine les résultats de la requête initiale avec les résultats générés par l'itération suivante de la CTE.
+
+			 ---------------------------------------------------------------------------------------
+			 /!\ UNION ALL est utilisé car il inclut tous les résultats, y compris les doublons. /!\
+			 ---------------------------------------------------------------------------------------
+
+			 SELECT : Cette partie de la requête est la portion récursive de la CTE, qui va extraire chaque catégorie une par une de la chaîne de caractères rest.
+
+			 substr(rest, 0, instr(rest, ',')) :
+
+			 instr(rest, ',') : Trouve la position de la première virgule dans la chaîne rest. Cette position correspond à la fin de la prochaine catégorie.
+			 substr(rest, 0, instr(rest, ',')) : Utilise substr pour extraire la sous-chaîne (catégorie) de rest, qui commence à l'index 0 jusqu'à la position de la virgule (exclus).
+
+			 Par exemple, si rest est "sports,news,technology,", alors substr extrait "sports" lors de la première itération.
+			 substr(rest, instr(rest, ',') + 1) :
+
+			Utilise substr pour extraire la portion restante de rest après la première virgule trouvée. Cela devient la nouvelle chaîne rest pour la prochaine itération.
+			Par exemple, si rest est "sports,news,technology,", alors rest devient "news,technology," après la première itération.
+
+			SELECT category, COUNT(*) AS count : Sélectionne chaque category unique et calcule combien de fois elle apparaît.
+			FROM split : Utilise les résultats de la CTE split.
+			WHERE category != '' : Exclut toutes les lignes où category est une chaîne vide (celles-ci proviennent de la première ligne initiale SELECT '').
+			GROUP BY category : Regroupe les résultats par category pour obtenir le nombre total de chaque catégorie.
+			HAVING count > 10 : Filtre pour inclure seulement les catégories qui apparaissent plus de 10 fois.
+			ORDER BY count DESC : Trie les résultats par le nombre de catégories en ordre décroissant pour afficher d'abord les catégories les plus fréquentes.
+
+	/*---------------------------------------------------------------------------------------------------*/
+
 	fetchCategoryRankingQuery := `
+        WITH RECURSIVE split(category, rest) AS (
+            SELECT '', categories || ',' FROM posts
+            UNION ALL
+            SELECT
+                substr(rest, 0, instr(rest, ',')),
+                substr(rest, instr(rest, ',') + 1)
+            FROM split
+            WHERE rest != ''
+        )
         SELECT category, COUNT(*) AS count
-        FROM (
-            SELECT TRIM(SUBSTRING_INDEX(SUBSTRING_INDEX(categories, ',', numbers.n), ',', -1)) AS category
-            FROM posts
-            INNER JOIN (
-                SELECT 1 AS n UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL 
-                SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9 UNION ALL SELECT 10
-            ) AS numbers ON CHAR_LENGTH(categories) - CHAR_LENGTH(REPLACE(categories, ',', '')) >= numbers.n - 1
-        ) AS subquery
-        WHERE category <> ''
+        FROM split
+        WHERE category != ''
         GROUP BY category
         HAVING count > 10
         ORDER BY count DESC`
@@ -267,10 +315,6 @@ func FetchPostsByCategory(db *sql.DB, category string) ([]Post, error) {
 	category = strings.TrimPrefix(category, "#")
 	param := "%" + category + "%"
 
-	// Log pour voir la requête et les paramètres
-	fmt.Println("Executing Query:", fetchPostsByCategoryQuery)
-	fmt.Println("With parameter:", param)
-
 	rows, err := server.RunQuery(fetchPostsByCategoryQuery, param)
 	if err != nil {
 		return nil, fmt.Errorf("erreur lors de la récupération des posts par catégorie: %v", err)
@@ -294,3 +338,32 @@ func FetchPostsByCategory(db *sql.DB, category string) ([]Post, error) {
 
 	return posts, nil
 }
+
+func FetchPostMostLiked(db *sql.DB) (map[string]int, error) {
+	// Requête pour récupérer les posts les plus likés
+	fetchPostMostLikedQuery := `
+        SELECT post_uuid, SUM(likes) AS likes_count
+        FROM posts
+        GROUP BY post_uuid
+        ORDER BY likes_count DESC;`
+
+	// Exécute la requête en utilisant server.RunQuery
+	rows, err := server.RunQuery(fetchPostMostLikedQuery)
+	if err != nil {
+		return nil, fmt.Errorf("erreur lors de la récupération des posts les plus likés: %v", err)
+	}
+
+	// Prépare le mappage des posts et leur nombre de likes
+	postMostLikedRanking := make(map[string]int)
+	for _, row := range rows {
+		if postID, ok := row["post_uuid"].(string); ok {
+			if count, ok := row["likes_count"].(int64); ok {
+				postMostLikedRanking[postID] = int(count)
+			}
+		}
+	}
+
+	return postMostLikedRanking, nil
+}
+
+//  HAVING likes_count > 10

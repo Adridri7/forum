@@ -736,7 +736,7 @@ body {
     background-color: var(--hover-color);
 }
 
-#like-btn {
+.like-btn {
     display: flex;
     justify-content: space-evenly;
 
@@ -747,7 +747,8 @@ body {
 }
 
 
-#dislike-btn {
+
+.dislike-btn {
     display: flex;
     justify-content: space-evenly;
 
@@ -757,7 +758,7 @@ body {
     }
 }
 
-#dislike-btn:hover {
+.dislike-btn:hover {
     >svg {
         fill: var(--error-color);
     }

@@ -98,7 +98,13 @@ export function DisplayMessages(post, isComment = false) {
     // Bouton Like avec SVG
     const likeButton = document.createElement('button');
     likeButton.classList.add('like-btn');
-    likeButton.id = 'like-btn';
+
+    if (isComment) {
+        likeButton.id = 'like-comment-btn';
+    } else {
+        likeButton.id = 'like-btn';
+    }
+
     likeButton.innerHTML = svgLike;
 
     const countLike = document.createElement('div');
@@ -111,7 +117,12 @@ export function DisplayMessages(post, isComment = false) {
     // Bouton Dislike + compteur
     const dislikeButton = document.createElement('button');
     dislikeButton.classList.add('dislike-btn');
-    dislikeButton.id = 'dislike-btn';
+
+    if (isComment) {
+        dislikeButton.id = 'dislike-comment-btn';
+    } else {
+        dislikeButton.id = 'dislike-btn';
+    }
     dislikeButton.innerHTML = svgDislike;
 
     const countDislike = document.createElement('div');
