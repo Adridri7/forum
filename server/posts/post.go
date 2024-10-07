@@ -21,6 +21,7 @@ type Post struct {
 	Likes          int       `json:"likes"`
 	Dislikes       int       `json:"dislikes"`
 	Created_at     time.Time `json:"created_at"`
+	Post_image     string    `json:"post_image"`
 }
 
 func CreatePost(db *sql.DB, r *http.Request, params map[string]interface{}) (*Post, error) {
@@ -41,13 +42,23 @@ func CreatePost(db *sql.DB, r *http.Request, params map[string]interface{}) (*Po
 		return nil, errors.New("informations manquantes")
 	}
 
+	image, imageOK := params["post_image"].(string)
+
+	if !imageOK {
+		image = ""
+	}
+
+	if !contentOK {
+		return nil, errors.New("informations manquantes")
+	}
+
 	// Extraire les hashtags du content
 	categories := posts.ExtractHashtags(content)
 
-	createPostQuery := `INSERT INTO posts (post_uuid, content, user_uuid, categories, likes, dislikes, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)`
+	createPostQuery := `INSERT INTO posts (post_uuid, content, user_uuid, categories, likes, dislikes, created_at, post_image) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
 	creationDate := time.Now()
 
-	_, err = server.RunQuery(createPostQuery, post_UUID, content, user_UUID, strings.Join(categories, ","), 0, 0, creationDate)
+	_, err = server.RunQuery(createPostQuery, post_UUID, content, user_UUID, strings.Join(categories, ","), 0, 0, creationDate, image)
 	if err != nil {
 		return nil, fmt.Errorf("erreur lors de la création du post: %v", err)
 	}
@@ -60,6 +71,7 @@ func CreatePost(db *sql.DB, r *http.Request, params map[string]interface{}) (*Po
 		Likes:      0,
 		Dislikes:   0,
 		Created_at: creationDate,
+		Post_image: image,
 	}
 
 	return newPost, nil
