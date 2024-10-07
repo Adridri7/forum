@@ -1,7 +1,7 @@
 import { DisplayMessages } from "./displayMessage.js";
 import { initEventListeners } from "./comment.js";
 import { fetchCategories } from "./fetchcategories.js";
-import { getUserInfoFromCookie, getPPFromID, resetUsersPost } from "../utils.js";
+import { getUserInfoFromCookie, getPPFromID, resetUsersPost, isUserInfoValid } from "../utils.js";
 import { fetchPostsByCategory } from './fetchcategories.js';
 import { NewPost } from "./newPost.js";
 import { handleLogout } from "./logout.js";
@@ -68,7 +68,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const userInfo = getUserInfoFromCookie(); // Assure-toi que cette fonction existe
     //console.log(userInfo)
 
-    if (userInfo && userInfo.profileImageURL) {
+    if (isUserInfoValid()) {
         // Créer la div qui remplacera le bouton "Login"
         const profileDiv = document.createElement('div');
         profileDiv.classList.add('profile-container');

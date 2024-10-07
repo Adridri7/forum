@@ -35,14 +35,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('submit-login').addEventListener('click', async (event) => {
         event.preventDefault();
-        console.log("Bouton cliqué !");
+        //console.log("Bouton cliqué !");
 
-        const email = document.getElementById("email").value;
-        const password = document.getElementById("password").value;
+        const email = document.getElementById("email");
+        const password = document.getElementById("password");
+
+        if (!email.value) {
+            console.log("Email vide");
+            return;
+        }
+
+        if (!password.value) {
+            console.log("Password vide");
+            return;
+        }
 
         const data = {
-            email: email,
-            password: password
+            email: email.value,
+            password: password.value
         }
 
         try {

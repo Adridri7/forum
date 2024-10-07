@@ -1,6 +1,6 @@
 import { DisplayMessages } from "./displayMessage.js";
 import { initEventListeners } from "./comment.js";
-import { resetUsersPost, startGradientAnimation } from "./utils.js";
+import { resetUsersPost, startGradientAnimation } from "../utils.js";
 
 // Fonction pour récupérer toutes les catégories depuis l'API
 export async function fetchCategories() {

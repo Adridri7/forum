@@ -44,8 +44,6 @@ function CreatedModal() {
 
     const image = document.createElement('img');
 
-    console.log(userInfo.uuid);
-
     getPPFromID(userInfo.uuid).then(img => {image.src = img});
 
     profile_picture.appendChild(image)
@@ -62,6 +60,15 @@ function CreatedModal() {
     inputField.id = 'message';
     inputField.placeholder = "What's new ?";
 
+    const embedPreview = document.createElement('img');
+    embedPreview.id = 'embed-preview';
+    embedPreview.style.maxHeight = '300px';
+    embedPreview.style.maxWidth = '200px';
+
+    const removeImg = document.createElement('button');
+    removeImg.id = 'remove-image';
+    removeImg.innerHTML = '&times;';
+
     const sendBox = document.createElement('div');
     sendBox.classList.add('sendBox');
 
@@ -75,6 +82,38 @@ function CreatedModal() {
         <path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm0-80h560v-560H200v560Zm40-80h480L570-480 450-320l-90-120-120 160Zm-40 80v-560 560Z" />
     </svg>`;
 
+    const imageUploadInput = document.createElement('input');
+    imageUploadInput.type = 'file';
+    imageUploadInput.setAttribute('accept', 'image/*');
+    imageUploadInput.style.display = 'none';
+
+    imageUploadInput.addEventListener('change', () => {
+        createdPost.style.height = '580px';
+
+        var fr = new FileReader();
+        fr.onload = () => {
+            embedPreview.src = fr.result;
+        };
+        fr.readAsDataURL(imageUploadInput.files[0]);
+
+        embedPreview.alt = imageUploadInput.files.item(0).name;
+
+        removeImg.style.display = 'block';
+    });
+
+    imageUpload.addEventListener('click', () => {
+        imageUploadInput.click();
+    });
+    imageUpload.appendChild(imageUploadInput);
+
+    // Remove image button logic
+    removeImg.addEventListener('click', function () {
+        embedPreview.src = '';  // Remove the src attribute of the image
+        embedPreview.style.display = 'none';  // Hide the image
+        removeImg.style.display = 'none';  // Hide the remove button
+        createdPost.style.height = '260px';
+    });
+
     const postButton = document.createElement('button');
     postButton.id = 'post-btn';
     postButton.textContent = 'Post';
@@ -82,6 +121,8 @@ function CreatedModal() {
 
     // Ajout de l'élément au formulaire
     form.appendChild(inputField);
+    form.appendChild(embedPreview);
+    form.appendChild(removeImg);
 
     postIcon.appendChild(imageUpload)
 
@@ -92,7 +133,7 @@ function CreatedModal() {
     createdPost.appendChild(postHeader);
     createdPost.appendChild(profilInfo);
     createdPost.appendChild(form);
-    createdPost.appendChild(sendBox)
+    createdPost.appendChild(sendBox);
 
     // Ajout du formulaire dans le modal
     userPost.appendChild(createdPost);
@@ -117,10 +158,12 @@ function CreatedModal() {
 
 // Fonction pour fermer le modal si on clique à l'extérieur de 'created-post'
 function closeModal(event) {
+    console.log("ya un appel");
     const newpost = document.getElementById('created-post');
     const modalpost = document.getElementById('modal-post');
     // Vérifie si le clic a eu lieu en dehors de 'created-post'
     if (!newpost.contains(event.target) && event.target !== addButton && isModal) {
+        console.log("il ferme");
         newpost.style.display = 'none'; // Ferme le post
         modalpost.style.display = 'none'; // Ferme aussi le fond modal
         isModal = false;

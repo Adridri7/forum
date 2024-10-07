@@ -50,8 +50,6 @@ export function isUserInfoValid() {
     var uuidRegex = /([0-9a-f]{8})-([0-9a-f]{4})-([0-9a-f]{4})-([0-9a-f]{4})-([0-9a-f]{12})/;
     var emailRegex = /([0-9A-Za-z]+[\.-]*)+@([0-9A-Za-z]+-*)+.(com|org|fr)/;
 
-    console.log(userInfo);
-
     // Is UUID valid?
     if (!uuidRegex.test(userInfo.uuid)) {
         return false;
