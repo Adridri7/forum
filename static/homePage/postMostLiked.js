@@ -10,7 +10,7 @@ export async function FetchMostLikedPosts() {
         console.log("Post Ranking:", mostLikedPosts)
 
         // Affiche les posts dans la liste
-        displayMostLikedPost(mostLikedPosts);
+        // displayMostLikedPost(mostLikedPosts);
     } catch (error) {
         console.error('Erreur lors de la récupération des posts :', error);
     }

@@ -10,7 +10,7 @@ export async function FetchMostUseCategories() {
         console.log("Trend:", tendances)
 
         // Affiche les posts dans la liste
-        displayTendance(tendances);
+        // displayTendance(tendances);
     } catch (error) {
         console.error('Erreur lors de la récupération des posts :', error);
     }

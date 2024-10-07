@@ -17,6 +17,8 @@ type Comment struct {
 	Username       string    `json:"username"`
 	ProfilePicture string    `json:"profile_picture"`
 	Created_at     time.Time `json:"created_at"`
+	Likes          int64     `json:"likes"`
+	Dislikes       int64     `json:"dislikes"`
 }
 
 // CreateComment crée un nouveau commentaire et l'insère dans la base de données
@@ -114,7 +116,7 @@ func FetchComment(db *sql.DB, params map[string]interface{}) ([]Comment, error) 
 	if post_UUIDOK {
 
 		fetchCommentquery = `
-    SELECT c.comment_id, c.content, c.post_uuid, u.user_uuid, u.username, u.profile_picture, c.created_at
+    SELECT c.comment_id, c.content, c.post_uuid, u.user_uuid, u.username, u.profile_picture, c.created_at, likes, dislikes
     FROM comments AS c
     JOIN users AS u ON c.user_uuid = u.user_uuid
     WHERE c.post_uuid = ?`
@@ -164,6 +166,14 @@ func FetchComment(db *sql.DB, params map[string]interface{}) ([]Comment, error) 
 		}
 		if profilePicture, ok := row["profile_picture"].(string); ok {
 			comment.ProfilePicture = profilePicture
+		}
+
+		if like, ok := row["likes"].(int64); ok {
+			comment.Likes = like
+		}
+
+		if dislike, ok := row["dislikes"].(int64); ok {
+			comment.Dislikes = dislike
 		}
 
 		comments = append(comments, comment)

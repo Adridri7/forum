@@ -141,6 +141,18 @@ function createCommentInput() {
     const submitButton = document.createElement('button');
     submitButton.type = 'submit';
     submitButton.textContent = 'Post';
+    submitButton.disabled = true;
+    submitButton.classList.add('button-disabled')
+
+    commentInput.addEventListener('input', () => {
+        if (commentInput.value.trim() === '') {
+            submitButton.disabled = true;
+            submitButton.classList.add('button-disabled');
+        } else {
+            submitButton.disabled = false;
+            submitButton.classList.remove('button-disabled');
+        }
+    });
 
     // Vérifiez si l'utilisateur est connecté
     if (!userInfo || !userInfo.uuid) {

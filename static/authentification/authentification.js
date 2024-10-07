@@ -27,8 +27,15 @@ homeBtn.addEventListener('click', () => {
 
 
 document.getElementById('submit-login').addEventListener('click', async (event) => {
+
     event.preventDefault();
     console.log("Bouton cliqué !");
+
+    // Vérifie si le formulaire est valide
+    if (!loginForm.checkValidity()) {
+        loginForm.reportValidity();
+        return
+    }
 
     const email = document.getElementById("email").value;
     const password = document.getElementById("password").value;
@@ -51,7 +58,7 @@ document.getElementById('submit-login').addEventListener('click', async (event) 
             window.location.href = "/";
         } else {
             const error = await response.json();
-            alert("Erreur lors du login: " + error.message);
+            alert("Email or password not valid");
         }
     } catch (error) {
         console.error("Erreur lors du login", error);
@@ -60,6 +67,13 @@ document.getElementById('submit-login').addEventListener('click', async (event) 
 
 document.getElementById('submit-register').addEventListener('click', async (event) => {
     event.preventDefault();
+
+    // Vérifie si le formulaire est valide
+    if (!signupForm.checkValidity()) {
+        signupForm.reportValidity();
+        return
+    }
+
     const username = document.getElementById("new-username").value;
     const password = document.getElementById("new-password").value;
     const email = document.getElementById('new-email').value;

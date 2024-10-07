@@ -736,7 +736,8 @@ body {
     background-color: var(--hover-color);
 }
 
-.like-btn {
+.like-btn,
+.like-comment-btn {
     display: flex;
     justify-content: space-evenly;
 
@@ -746,9 +747,14 @@ body {
     }
 }
 
+.button-disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+    pointer-events: none;
+}
 
-
-.dislike-btn {
+.dislike-btn,
+.dislike-comment-btn {
     display: flex;
     justify-content: space-evenly;
 
