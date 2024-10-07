@@ -1,54 +1,22 @@
 package providers
 
 import (
-	"bufio"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"net/http"
 	"net/url"
 	"os"
-	"strings"
 )
 
-// Remplacez par vos identifiants OAuth2 Google
 const (
-	redirectURL    = "http://localhost:8080/api/google_callback"
-	oauthGoogleURL = "https://accounts.google.com/o/oauth2/auth"
-	tokenURL       = "https://oauth2.googleapis.com/token"
-	userInfoURL    = "https://www.googleapis.com/oauth2/v2/userinfo"
-	oauthState     = "pseudo-random" // À sécuriser avec un état aléatoire en production
+	OAuthState = "pseudo-random" // À sécuriser avec un état aléatoire en production
+
+	redirectGoogleURL = "http://localhost:8080/api/google_callback"
+	oauthGoogleURL    = "https://accounts.google.com/o/oauth2/auth"
+	tokenGoogleURL    = "https://oauth2.googleapis.com/token"
+	userInfoGoogleURL = "https://www.googleapis.com/oauth2/v2/userinfo"
 )
-
-func LoadEnvVariables() error {
-	envFile, err := os.Open("./.env")
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error opening ENV file: %v\n", err)
-	}
-
-	reader := bufio.NewReader(envFile)
-
-	for err == nil {
-		var line []byte
-
-		if line, err = reader.ReadBytes('\n'); err != nil {
-			if errors.Is(err, io.EOF) {
-				break
-			}
-			return fmt.Errorf("reading Env variables: %v", err)
-		}
-
-		if err = os.Setenv(string(line)[:strings.Index(string(line), "=")], string(line)[strings.Index(string(line), "=")+1:]); err != nil {
-			return fmt.Errorf("setting Env variables: %v", err)
-		}
-
-		// Debug
-		//fmt.Printf("New env variable: %s = %s", string(line)[:strings.Index(string(line), "=")], os.Getenv(string(line)[:strings.Index(string(line), "=")]))
-	}
-
-	return nil
-}
 
 // Gestion du clic sur le bouton de connexion "Login with Google"
 func HandleGoogleLogin(w http.ResponseWriter, r *http.Request) {
@@ -56,9 +24,9 @@ func HandleGoogleLogin(w http.ResponseWriter, r *http.Request) {
 	authURL := fmt.Sprintf("%s?client_id=%s&redirect_uri=%s&response_type=code&scope=%s&state=%s",
 		oauthGoogleURL,
 		os.Getenv("GOOGLE_ID"),
-		redirectURL,
+		redirectGoogleURL,
 		"url:https://www.googleapis.com/auth/userinfo.email",
-		oauthState,
+		OAuthState,
 	)
 
 	http.Redirect(w, r, authURL, http.StatusTemporaryRedirect)
@@ -67,7 +35,7 @@ func HandleGoogleLogin(w http.ResponseWriter, r *http.Request) {
 // Gestion du callback après l'authentification Google
 func HandleGoogleCallback(w http.ResponseWriter, r *http.Request) {
 	// Vérifier que l'état correspond
-	if r.URL.Query().Get("state") != oauthState {
+	if r.URL.Query().Get("state") != OAuthState {
 		http.Error(w, "Invalid state parameter", http.StatusBadRequest)
 		return
 	}
@@ -104,11 +72,11 @@ func getGoogleOauthToken(code string) (*OAuthToken, error) {
 	data.Set("code", code)
 	data.Set("client_id", os.Getenv("GOOGLE_ID"))
 	data.Set("client_secret", os.Getenv("GOOGLE_SECRET"))
-	data.Set("redirect_uri", redirectURL)
+	data.Set("redirect_uri", redirectGoogleURL)
 	data.Set("grant_type", "authorization_code")
 
 	// Faire la requête POST pour obtenir le token
-	response, err := http.PostForm(tokenURL, data)
+	response, err := http.PostForm(tokenGoogleURL, data)
 	if err != nil {
 		return nil, fmt.Errorf("failed to request token: %v", err)
 	}
@@ -131,7 +99,7 @@ func getGoogleOauthToken(code string) (*OAuthToken, error) {
 // Utilise le token d'accès pour récupérer les informations utilisateur
 func getGoogleUserInfo(accessToken string) (string, error) {
 	// Faire une requête GET avec le token d'accès
-	req, err := http.NewRequest("GET", userInfoURL, nil)
+	req, err := http.NewRequest("GET", userInfoGoogleURL, nil)
 	if err != nil {
 		return "", fmt.Errorf("failed to create request: %v", err)
 	}
@@ -151,12 +119,4 @@ func getGoogleUserInfo(accessToken string) (string, error) {
 	}
 
 	return string(body), nil
-}
-
-// Structure pour stocker le token OAuth2
-type OAuthToken struct {
-	AccessToken string `json:"access_token"`
-	TokenType   string `json:"token_type"`
-	ExpiresIn   int    `json:"expires_in"`
-	IdToken     string `json:"id_token"`
 }

@@ -40,6 +40,9 @@ func main() {
 	mux.HandleFunc("/api/google_login", providers.HandleGoogleLogin)
 	mux.HandleFunc("/api/google_callback", providers.HandleGoogleCallback)
 
+	mux.HandleFunc("/api/discord_login", providers.HandleDiscordLogin)
+	mux.HandleFunc("/api/discord_callback", providers.HandleDiscordCallback)
+
 	mux.HandleFunc("/api/post/fetchAllCategories", categories.FetchAllCategoriesHandler)
 
 	mux.HandleFunc("/api/users/fetchAllUsers", users.FetchAllUsersHandler)
