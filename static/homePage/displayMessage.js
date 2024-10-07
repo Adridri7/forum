@@ -94,15 +94,20 @@ export function DisplayMessages(post, isComment = false) {
     // Créer les boutons de réaction
     const reactionBtnContainer = document.createElement('div');
     reactionBtnContainer.classList.add('reaction-btn');
+    if (isComment) {
+        reactionBtnContainer.id = "reaction-btn";
+    } else {
+        reactionBtnContainer.id = "reaction-comment-btn";
+    }
 
     // Bouton Like avec SVG
     const likeButton = document.createElement('button');
-    likeButton.classList.add('like-btn');
-
     if (isComment) {
         likeButton.id = 'like-comment-btn';
+        likeButton.classList.add('like-comment-btn');
     } else {
         likeButton.id = 'like-btn';
+        likeButton.classList.add('like-btn');
     }
 
     likeButton.innerHTML = svgLike;
@@ -116,12 +121,13 @@ export function DisplayMessages(post, isComment = false) {
 
     // Bouton Dislike + compteur
     const dislikeButton = document.createElement('button');
-    dislikeButton.classList.add('dislike-btn');
 
     if (isComment) {
         dislikeButton.id = 'dislike-comment-btn';
+        dislikeButton.classList.add('dislike-comment-btn');
     } else {
         dislikeButton.id = 'dislike-btn';
+        dislikeButton.classList.add('dislike-btn');
     }
     dislikeButton.innerHTML = svgDislike;
 

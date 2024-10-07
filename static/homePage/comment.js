@@ -244,8 +244,8 @@ export function initEventListeners() {
         button.addEventListener('click', handleCommentClick);
     });
 
-    document.body.addEventListener('click', Reaction);
-    document.body.addEventListener('click', toggleCommentReaction);
+    // const reactionCommentButton = document.getElementById('reaction-comment-btn');
+    // reactionCommentButton.addEventListener('click', CommentReaction);
 
     // Sélectionne tous les boutons de menu (dans chaque message-item)
     const menuButtons = document.querySelectorAll('.menu-btn');

@@ -188,6 +188,7 @@ export async function deletePost(post_uuid) {
 }
 
 export function Reaction(event) {
+    console.log("ça passe dans react ?");
     const likeButton = event.target.closest('.like-btn');
     const dislikeButton = event.target.closest('.dislike-btn');
 
@@ -200,14 +201,40 @@ export function Reaction(event) {
     }
 }
 
+export function CommentReaction(event) {
+    console.log("ça passe dans la fonction commentReact");
+    const likeButton = event.target.closest('.like-comment-btn');
+    const dislikeButton = event.target.closest('.dislike-comment-btn');
+
+    console.log("ça trouve like button :", likeButton);
+    console.log("ça trouve dislike button :", dislikeButton);
+
+    if (likeButton || dislikeButton) {
+        const messageItem = (likeButton || dislikeButton).closest('.message-item');
+        if (messageItem) {
+            const postUuid = messageItem.getAttribute('post_uuid');
+            console.log("post_uuid :", postUuid);
+            toggleCommentReaction(event, postUuid);
+        }
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     fetchPosts();
     addButton.addEventListener('click', NewPost);
     fetchAllUsers();
     FetchMostUseCategories();
     FetchMostLikedPosts();
-    document.body.addEventListener('click', Reaction);
-    document.body.addEventListener('click', toggleCommentReaction);
 
+    // Gérer uniquement les événements sur les boutons de post
+    document.body.addEventListener('click', (event) => {
+        const isPostReaction = event.target.closest('.like-btn') || event.target.closest('.dislike-btn');
+        const isCommentReaction = event.target.closest('.like-comment-btn') || event.target.closest('.dislike-comment-btn');
 
+        if (isPostReaction) {
+            Reaction(event); // Appeler la fonction pour les réactions sur les posts
+        } else if (isCommentReaction) {
+            CommentReaction(event); // Appeler la fonction pour les réactions sur les commentaires
+        }
+    });
 });

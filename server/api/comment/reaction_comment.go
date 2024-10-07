@@ -48,14 +48,17 @@ func HandleLikeDislikeCommentAPI(w http.ResponseWriter, r *http.Request) {
 
 	err = reaction.HandleLikeDislike(server.Db, req.CommentID, userUUID, req.Action)
 	if err != nil {
+		fmt.Println("J'aimerai connaitre l'erreur :", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	// Récupérer les nouveaux compteurs
+	fmt.Println("Le post ID :", req.CommentID)
 	getCountsQuery := `SELECT likes, dislikes FROM comments WHERE post_uuid = ?`
 	rows, err := server.RunQuery(getCountsQuery, req.CommentID)
 	if err != nil || len(rows) == 0 {
+		fmt.Println("Erreur lors de la récup des compteurs :", err) // L'erreur est ici
 		http.Error(w, "Erreur lors de la récupération des compteurs", http.StatusInternalServerError)
 		return
 	}

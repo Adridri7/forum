@@ -11,6 +11,7 @@ func HandleLikeDislike(db *sql.DB, postID string, userID string, action string) 
 	checkQuery := `SELECT action FROM post_reactions WHERE post_uuid = ? AND user_uuid = ?`
 	rows, err := server.RunQuery(checkQuery, postID, userID)
 	if err != nil {
+		fmt.Println("Erreur lors de la verif :", err)
 		return fmt.Errorf("erreur lors de la vérification de la réaction: %v", err)
 	}
 
@@ -33,6 +34,7 @@ func HandleLikeDislike(db *sql.DB, postID string, userID string, action string) 
 
 	_, err = server.RunQuery(updateQuery, queryParams...)
 	if err != nil {
+		fmt.Println("erreur dans la query :", err)
 		return fmt.Errorf("erreur lors de la mise à jour de la réaction: %v", err)
 	}
 
@@ -44,6 +46,7 @@ func HandleLikeDislike(db *sql.DB, postID string, userID string, action string) 
         WHERE post_uuid = ?`
 	_, err = server.RunQuery(updateCountQuery, postID, postID, postID)
 	if err != nil {
+		fmt.Println("Erreur lors de la maj des react :", err)
 		return fmt.Errorf("erreur lors de la mise à jour du compte des réactions: %v", err)
 	}
 
