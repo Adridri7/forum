@@ -33,7 +33,16 @@ func main() {
 	mux.HandleFunc("/api/post/fetchAllPost", post.FetchAllPostHandler)
 	mux.HandleFunc("/api/post/fetchAllCategories", categories.FetchAllCategoriesHandler)
 	mux.HandleFunc("/api/post/fetchPostsByCategories", categories.FetchPostByCategoriesHandler)
+	mux.HandleFunc("/api/post/fetchAllCategories", categories.FetchAllCategoriesHandler)
+	mux.HandleFunc("/api/post/fetchTendance", categories.FetchTendanceCategoriesHandler)
+	mux.HandleFunc("/api/post/fetchPostMostLiked", post.FetchPostsMostLikedHandler)
 	mux.HandleFunc("/api/post/deletePost", post.DeletePostHandler)
+
+	mux.HandleFunc("/api/post/createComment", comments.CreateCommentHandler)
+	mux.HandleFunc("/api/post/fetchComment", comments.FetchCommentHandler)
+	mux.HandleFunc("/api/post/fetchAllComments", comments.FetchAllCommentsHandler)
+	mux.HandleFunc("/api/post/deleteComment", comments.DeleteCommentHandler)
+	mux.HandleFunc("/api/post/like-dislikeComment", comments.HandleLikeDislikeCommentAPI)
 
 	mux.HandleFunc("/api/post/createComment", comments.CreateCommentHandler)
 	mux.HandleFunc("/api/post/fetchComment", comments.FetchCommentHandler)

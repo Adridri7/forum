@@ -1,5 +1,6 @@
 import { DisplayMessages } from "./displayMessage.js";
 import { initEventListeners } from "./comment.js";
+import { resetUsersPost, startGradientAnimation } from "./utils.js";
 
 // Fonction pour récupérer toutes les catégories depuis l'API
 export async function fetchCategories() {
@@ -19,24 +20,40 @@ export async function fetchCategories() {
 
 // Fonction pour afficher les catégories dans la liste
 function displayCategories(categories) {
-    const categoriesList = document.getElementById('categories-list');
-    categoriesList.innerHTML = ''; // Vide la liste existante
+    const usersPost = document.getElementById('users-post');
+
+    // Vide le contenu existant de users-post
+    usersPost.innerHTML = '';
+
+    // Modifier le style de #users-post
+    usersPost.style.display = 'grid';
+    usersPost.style.gridTemplateColumns = 'repeat(2, 1fr)';
+    usersPost.style.gridAutoRows = 'min-content';
+    usersPost.style.rowGap = '10px';
+    usersPost.style.columnGap = '10px';
+    usersPost.style.border = 'none';
 
     categories.forEach(category => {
         const li = document.createElement('li');
         li.textContent = category;
         li.setAttribute('data-category', category); // Définit un attribut personnalisé pour la catégorie
+        li.classList.add('categorie'); // Ajoute la classe 'categorie'
+        li.style.cursor = 'pointer'
 
-        // Ajoute un écouteur d'événement pour gérer le clic sur chaque catégorie
+        // Démarre l'animation de dégradé
+        startGradientAnimation(li); // Appel à la fonction d'animation de dégradé
+
         li.addEventListener('click', () => {
-            fetchPostsByCategory(category); // Appelle la fonction pour récupérer les posts de cette catégorie
+            fetchPostsByCategory(category);
         });
 
-        categoriesList.appendChild(li);
+        // Ajoute l'élément à users-post
+        usersPost.appendChild(li);
     });
 }
 
 export async function fetchPostsByCategory(category) {
+    resetUsersPost();
 
     try {
         const response = await fetch(`/api/post/fetchPostsByCategories`, {

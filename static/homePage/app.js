@@ -1,12 +1,14 @@
 import { DisplayMessages } from "./displayMessage.js";
 import { initEventListeners } from "./comment.js";
 import { fetchCategories } from "./fetchcategories.js";
-import { getUserInfoFromCookie, getPPFromID } from "../utils.js";
+import { getUserInfoFromCookie, getPPFromID, resetUsersPost } from "../utils.js";
 import { fetchPostsByCategory } from './fetchcategories.js';
 import { NewPost } from "./newPost.js";
 import { handleLogout } from "./logout.js";
 import { fetchAllUsers } from "./displayUser.js";
-import { toggleReaction } from "./reaction.js";
+import { toggleCommentReaction, toggleReaction } from "./reaction.js";
+import { FetchMostLikedPosts } from "./postMostLiked.js";
+import { FetchMostUseCategories } from "./tendance.js";
 
 
 
@@ -123,6 +125,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             // Ajouter à nouveau le bouton à la place de la div
             profilMenu.appendChild(newLoginButton);
         }
+
+        addButton.style.display = 'none'
     }
 });
 
@@ -133,6 +137,7 @@ toggleButton.addEventListener('click', () => {
 
 let currentUser = ''
 export async function fetchPosts() {
+    resetUsersPost();
     const messagesList = document.getElementById('users-post');
     messagesList.innerHTML = '<p>Loading...</p>';
     try {
@@ -184,23 +189,27 @@ export async function deletePost(post_uuid) {
     }
 }
 
+export function Reaction(event) {
+    const likeButton = event.target.closest('.like-btn');
+    const dislikeButton = event.target.closest('.dislike-btn');
+
+    if (likeButton || dislikeButton) {
+        const messageItem = (likeButton || dislikeButton).closest('.message-item');
+        if (messageItem) {
+            const postUuid = messageItem.getAttribute('post_uuid');
+            toggleReaction(event, postUuid);
+        }
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     fetchPosts();
-    fetchCategories();
     addButton.addEventListener('click', NewPost);
     fetchAllUsers();
-    fetchPostsByCategory();
+    FetchMostUseCategories();
+    FetchMostLikedPosts();
+    document.body.addEventListener('click', Reaction);
+    document.body.addEventListener('click', toggleCommentReaction);
 
-    document.body.addEventListener('click', function (event) {
-        const likeButton = event.target.closest('.like-btn');
-        const dislikeButton = event.target.closest('.dislike-btn');
 
-        if (likeButton || dislikeButton) {
-            const messageItem = (likeButton || dislikeButton).closest('.message-item');
-            if (messageItem) {
-                const postUuid = messageItem.getAttribute('post_uuid');
-                toggleReaction(event, postUuid);
-            }
-        }
-    });
 });

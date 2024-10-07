@@ -89,4 +89,8 @@
         width: 100%;
         overflow: hidden;
     }
+
+    .categorie {
+        font-size: 24px;
+    }
 }

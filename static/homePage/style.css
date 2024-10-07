@@ -45,7 +45,6 @@ body {
 #sidebar #user-list-containers h3 {
     opacity: 1;
     height: auto;
-    overflow-x: hidden;
     transition: opacity 300ms ease-in-out, height 300ms ease-in-out;
 }
 
@@ -63,6 +62,15 @@ body {
 .logo-name {
     display: flex;
     align-items: center;
+    transition: color 0.3s ease;
+}
+
+.logo-name:hover>button>svg {
+    fill: var(--primary-color);
+}
+
+#sidebar .name:hover {
+    color: var(--primary-color);
 }
 
 #sidebar ul {
@@ -93,6 +101,7 @@ body {
 
 #sidebar #user-list-containers {
     flex-grow: 1;
+    max-height: 73vh;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -221,6 +230,13 @@ body {
     border-top-right-radius: 15px;
 }
 
+#users-post>li:last-child:nth-child(odd) {
+    grid-column: span 2;
+    /* Aide à visualiser */
+    box-sizing: border-box;
+}
+
+
 .message-item {
     display: flex;
     position: relative;
@@ -273,12 +289,15 @@ body {
 
 .reaction-btn {
     display: flex;
+    align-items: center;
     gap: 40px;
     /* Espacement entre les boutons */
     margin-top: 10px;
 }
 
 .reaction-btn button {
+    display: flex;
+    align-items: center;
     background: none;
     border: none;
     cursor: pointer;
@@ -303,18 +322,14 @@ body {
 }
 
 .reaction-btn button:first-child:hover {
-    background-color: var(--hover-color);
-
     >svg {
-        fill: red;
+        fill: var(--primary-color);
     }
 }
 
 .reaction-btn button:last-child:hover {
-    background-color: var(--hover-color);
-
     >svg {
-        fill: var(--primary-color);
+        fill: #00700c;
     }
 }
 
@@ -360,9 +375,9 @@ body {
     position: fixed;
     background-color: var(--background-message-color);
     top: 10%;
-    left: 26.5%;
+    left: 30%;
     border-radius: 8px;
-    width: 40%;
+    width: 50%;
     height: 260px;
     gap: 25px;
     display: none;
@@ -721,9 +736,8 @@ body {
     background-color: var(--hover-color);
 }
 
-#like-btn {
+.like-btn {
     display: flex;
-    align-items: center;
     justify-content: space-evenly;
 
     >div {
@@ -732,74 +746,45 @@ body {
     }
 }
 
-.like-btn,
+
+
 .dislike-btn {
-    background-color: transparent;
-    /* État par défaut */
-    border: 2px solid #ccc;
-    /* Bordure grise par défaut */
-    color: #ccc;
-    /* Couleur du texte par défaut */
-    cursor: pointer;
-    /* Curseur en forme de main */
-    padding: 10px 15px;
-    /* Espacement intérieur */
-    border-radius: 5px;
-    /* Coins arrondis */
-    transition: background-color 0.3s, color 0.3s;
-    /* Transition douce */
+    display: flex;
+    justify-content: space-evenly;
+
+    >div {
+        margin-top: 5px;
+        font-size: 18px;
+    }
 }
 
-.like-btn.active,
-.dislike-btn.active {
-    background-color: #007bff;
-    /* Couleur de fond lorsqu'il est actif */
-    border-color: #007bff;
-    /* Couleur de bordure lorsqu'il est actif */
-    color: white;
-    /* Couleur du texte lorsqu'il est actif */
+.dislike-btn:hover {
+    >svg {
+        fill: var(--error-color);
+    }
 }
 
-.like-count,
-.dislike-count {
-    margin-left: 5px;
-    /* Espacement entre le nombre et le bouton */
-    font-weight: bold;
-    /* Met le nombre en gras */
+.like-btn.active {
+    >svg {
+        fill: var(--primary-color);
+    }
 }
 
-.like-btn,
-.dislike-btn {
-    background-color: transparent;
-    /* État par défaut */
-    border: 2px solid #ccc;
-    /* Bordure grise par défaut */
-    color: #ccc;
-    /* Couleur du texte par défaut */
-    cursor: pointer;
-    /* Curseur en forme de main */
-    padding: 10px 15px;
-    /* Espacement intérieur */
-    border-radius: 5px;
-    /* Coins arrondis */
-    transition: background-color 0.3s, color 0.3s;
-    /* Transition douce */
+.categorie {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    font-size: 32px;
+    font-weight: 600;
+    height: 180px;
+    border-radius: 8px;
+    color: #FFFFFF;
 }
 
-.like-btn.active,
-.dislike-btn.active {
-    background-color: #007bff;
-    /* Couleur de fond lorsqu'il est actif */
-    border-color: #007bff;
-    /* Couleur de bordure lorsqu'il est actif */
-    color: white;
-    /* Couleur du texte lorsqu'il est actif */
-}
-
-.like-count,
-.dislike-count {
-    margin-left: 5px;
-    /* Espacement entre le nombre et le bouton */
-    font-weight: bold;
-    /* Met le nombre en gras */
+.certificate {
+    margin-top: 3px;
+    margin-left: -3px;
+    height: 18px;
+    width: 18px;
 }
