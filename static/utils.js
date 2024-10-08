@@ -35,10 +35,10 @@ export function getUserInfoFromCookie() {
         }
 
         userInfo = {
-            uuid: removeQuotes(parts[0]),          // UUID
-            username: parts[1],      // Nom d'utilisateur
-            email: parts[2],         // Email
-            role: parts[3]           // Rôle
+            uuid: removeQuotes(parts[0]),   // UUID
+            username: parts[1],             // Nom d'utilisateur
+            email: parts[2],                // Email
+            role: removeQuotes(parts[3])    // Rôle
         };
     }
 
