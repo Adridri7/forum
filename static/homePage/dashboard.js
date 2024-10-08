@@ -1,7 +1,7 @@
-import { deletePost } from "./app.js";
-import { initEventListeners } from "./comment.js";
+import { CommentReaction, deletePost, Reaction } from "./app.js";
+import { handleCommentClick, handleMenuClick, initEventListeners } from "./comment.js";
 import { toggleMenu } from "./displayMessage.js";
-import { getPPFromID, getUserInfoFromCookie, resetUsersPost } from "./utils.js";
+import { getUserInfoFromCookie, resetUsersPost } from "./utils.js";
 
 const commentSection = document.getElementById('personnal-comment');
 const postSection = document.getElementById('personnal-post');
@@ -130,6 +130,7 @@ export function DisplayPersonnalMessages(post, isComment = false) {
     countLike.textContent = post.likes;
 
     likeButton.appendChild(countLike);
+    likeButton.disabled = true;
 
 
     // Bouton Dislike + compteur
@@ -149,6 +150,7 @@ export function DisplayPersonnalMessages(post, isComment = false) {
     countDislike.textContent = post.dislikes;
 
     dislikeButton.appendChild(countDislike);
+    dislikeButton.disabled = true;
 
 
     // Bouton Comment avec SVG
@@ -168,6 +170,7 @@ export function DisplayPersonnalMessages(post, isComment = false) {
     const commentCount = document.createElement('div');
     commentCount.classList.add('comment-count');
     commentCount.textContent = post.comment_count;
+    commentButton.disabled = true;
 
     commentButton.appendChild(commentCount);
 
@@ -188,9 +191,6 @@ export function DisplayPersonnalMessages(post, isComment = false) {
     messagesList.appendChild(messageItem);
     messagesList.scrollTop = messagesList.scrollHeight;
 }
-
-const profilPicture = document.getElementById('profile-picture');
-getPPFromID(userInfo.uuid).then(img => {profilPicture.src = img})
 
 export async function fetchPersonnalPosts() {
     resetUsersPost();
@@ -222,7 +222,7 @@ export async function fetchPersonnalPosts() {
             });
         }
     } catch (error) {
-        messagesList.innerHTML = '<p>Error loading posts. Please try again.</p>';
+        messagesList.innerHTML = '<p>Error loading posts.</p>';
         console.error(error);
     }
     initEventListeners();
@@ -251,15 +251,14 @@ export async function fetchPersonnalComment() {
         if (posts.length === 0) {
             messagesList.innerHTML = '<p>No posts available.</p>';
         } else {
-            currentUser = posts?.username || 'Anonymous';
             posts.sort((b, a) => new Date(b.created_at) - new Date(a.created_at));
             console.log("comment : ", posts);
             posts.forEach(post => {
-                DisplayPersonnalMessages(post);
+                DisplayPersonnalMessages(post, true);
             });
         }
     } catch (error) {
-        messagesList.innerHTML = '<p>Error loading posts. Please try again.</p>';
+        messagesList.innerHTML = '<p>Error loading posts.</p>';
         console.error(error);
     }
     initEventListeners();
@@ -289,7 +288,6 @@ export async function fetchPersonnalResponse() {
         if (posts.length === 0) {
             messagesList.innerHTML = '<p>No posts available.</p>';
         } else {
-            currentUser = posts?.username || 'Anonymous';
             posts.sort((b, a) => new Date(b.created_at) - new Date(a.created_at));
             console.log("response : ", posts);
             posts.forEach(post => {
@@ -297,8 +295,31 @@ export async function fetchPersonnalResponse() {
             });
         }
     } catch (error) {
-        messagesList.innerHTML = '<p>Error loading posts. Please try again.</p>';
+        messagesList.innerHTML = '<p>Error loading posts.</p>';
         console.error(error);
     }
     initEventListeners();
+}
+
+function initReactionEventListeners() {
+    // Sélectionne tous les boutons de commentaire
+    const commentButtons = document.querySelectorAll('.comment-btn');
+
+    // Réinitialise les événements pour chaque bouton de commentaire
+    commentButtons.forEach(button => {
+        button.removeEventListener('click', handleCommentClick);
+        button.addEventListener('click', handleCommentClick);
+    });
+
+    // const reactionCommentButton = document.getElementById('reaction-comment-btn');
+    // reactionCommentButton.addEventListener('click', CommentReaction);
+
+    // Sélectionne tous les boutons de menu (dans chaque message-item)
+    const menuButtons = document.querySelectorAll('.menu-btn');
+
+    // Réinitialise les événements pour chaque bouton de menuÒ
+    menuButtons.forEach(button => {
+        button.removeEventListener('click', handleMenuClick);
+        button.addEventListener('click', handleMenuClick);
+    });
 }

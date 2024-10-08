@@ -17,8 +17,16 @@ import { fetchPersonnalComment, fetchPersonnalPosts, fetchPersonnalResponse } fr
 // Sélectionnez les éléments
 const toggleButton = document.getElementById('toggle-menu-btn');
 const sidebar = document.getElementById('sidebar');
-const darkModeToggle = document.getElementById('dark-mode-toggle');
+// const darkModeToggle = document.getElementById('dark-mode-toggle');
 const addButton = document.getElementById('add-button');
+
+const darkModeToggles = document.querySelectorAll('.dark-mode-toggle');
+
+darkModeToggles.forEach(button => {
+    button.addEventListener('click', () => {
+        console.log('Dark mode toggled');
+    });
+});
 
 
 // Fonction pour appliquer le mode
@@ -31,14 +39,14 @@ function applyMode(mode) {
         root.style.setProperty('--second-text-color', '#FFFFFF');
         root.style.setProperty('--border-color', '#5E5E5F');
         root.style.setProperty('--background-message-color', '#272727');
-        darkModeToggle.textContent = 'Light Mode';
+        darkModeToggles.textContent = 'Light Mode';
     } else {
         root.style.setProperty('--background-color', '#f5f5f5');
         root.style.setProperty('--text-color', '#FFFFFF');
         root.style.setProperty('--second-text-color', '#000000');
         root.style.setProperty('--border-color', '#9C9FA8');
         root.style.setProperty('--background-message-color', '#FFFFFF');
-        darkModeToggle.textContent = 'Dark Mode';
+        darkModeToggles.textContent = 'Dark Mode';
     }
 
     // Enregistrer la préférence dans le Local Storage
@@ -55,11 +63,16 @@ if (userPreference) {
 }
 
 // Écouteur d'événement pour le bouton de basculement
-darkModeToggle.addEventListener('click', () => {
-    const currentMode = localStorage.getItem('theme') || 'light';
-    const newMode = currentMode === 'dark' ? 'light' : 'dark';
-    applyMode(newMode);
+darkModeToggles.forEach(button => {
+    button.addEventListener('click', () => {
+        const currentMode = localStorage.getItem('theme') || 'light';
+        const newMode = currentMode === 'dark' ? 'light' : 'dark';
+        applyMode(newMode);
+        // Mettre à jour le texte du bouton
+        button.textContent = newMode === 'dark' ? 'Light Mode' : 'Dark Mode';
+    });
 });
+
 
 document.addEventListener('DOMContentLoaded', async () => {
     const loginButton = document.getElementById('login-btn');
@@ -67,7 +80,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Fonction pour récupérer les informations utilisateur depuis le cookie
     const userInfo = getUserInfoFromCookie(); // Assure-toi que cette fonction existe
-    console.log(userInfo)
+
+    // Vérifiez si les informations utilisateur sont valides
     if (isUserInfoValid()) {
         // Créer la div qui remplacera le bouton "Login"
         const profileDiv = document.createElement('div');
@@ -75,7 +89,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const profileImage = document.createElement('img');
         profileImage.src = await getPPFromID(userInfo.uuid);
-        
         profileImage.alt = 'User profile';
         profileImage.classList.add('profile-image'); // Ajoute une classe pour styliser l'image
 
@@ -86,9 +99,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // Créer le bouton "Logout"
         const logoutButton = document.createElement('button');
-        logoutButton.id = "logout-btn"
+        logoutButton.id = "logout-btn";
         logoutButton.textContent = 'Log Out';
-        logoutButton.addEventListener('click', handleLogout)
+        logoutButton.addEventListener('click', handleLogout);
 
         // Ajouter le bouton "Logout" au menu
         menu.appendChild(logoutButton);
@@ -100,11 +113,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Événement pour afficher/masquer le menu lorsque l'image est cliquée
         profileImage.addEventListener('click', () => {
             // Afficher ou masquer le menu
-            if (menu.style.display === 'none') {
-                menu.style.display = 'block';
-            } else {
-                menu.style.display = 'none';
-            }
+            menu.style.display = (menu.style.display === 'none') ? 'block' : 'none';
         });
 
         document.addEventListener('click', (event) => {
@@ -112,24 +121,28 @@ document.addEventListener('DOMContentLoaded', async () => {
                 menu.style.display = 'none';
             }
         });
+        addButton.style.display = 'block';
 
         // Remplacer le bouton "Login" par la div
         profilMenu.replaceChild(profileDiv, loginButton);
-    } else {
-        // Si l'utilisateur n'est pas connecté ou a perdu le cookie, s'assurer que le bouton "Login" est visible
-        if (!profilMenu.contains(loginButton)) {
-            // Créer un nouveau bouton "Login" si nécessaire
-            const newLoginButton = document.createElement('button');
-            newLoginButton.id = 'login-btn';
-            newLoginButton.textContent = 'Log in';
-
-            // Ajouter à nouveau le bouton à la place de la div
-            profilMenu.appendChild(newLoginButton);
-        }
-
-        addButton.style.display = 'none'
+        return; // Sortir de la fonction si l'utilisateur est connecté
     }
-});
+
+    // Si l'utilisateur n'est pas connecté ou a perdu le cookie
+    console.log("L'utilisateur n'est pas connecté.");
+    // Si le bouton "Login" n'est pas déjà dans le menu
+    if (!profilMenu.contains(loginButton)) {
+        // Créer un nouveau bouton "Login" si nécessaire
+        const newLoginButton = document.createElement('button');
+        newLoginButton.id = 'login-btn';
+        newLoginButton.textContent = 'Log in';
+
+        // Ajouter à nouveau le bouton à la place de la div
+        profilMenu.appendChild(newLoginButton);
+    }
+
+    console.log("Le bouton 'Login' est visible.");
+});;
 
 // Événement pour le menu
 toggleButton.addEventListener('click', () => {
@@ -242,6 +255,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
 const homeLink = document.getElementById('home-link');
 const dashboardLink = document.getElementById('dashboard-link');
+const searchLink = document.getElementById('search-link');
+
+searchLink.addEventListener('click', fetchCategories);
 
 // Sélectionne les sections
 const homeSection = document.getElementById('home-section');
@@ -289,6 +305,8 @@ dashboardLink.addEventListener('click', () => {
             default:
                 break;
         }
+        const profilPicture = document.getElementById('profile-picture');
+        getPPFromID(userInfo.uuid).then(img => { profilPicture.src = img });
     }
 
     const navItems = document.querySelectorAll('#nav-bar li');

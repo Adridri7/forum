@@ -335,6 +335,7 @@ body {
 
 
 #add-button {
+    display: none;
     position: fixed;
     bottom: 20px;
     right: 20px;
@@ -798,9 +799,11 @@ body {
 
 #remove-image {
     position: inherit;
-    
-    background-color: transparent;  /* No background */
-    color: red;  /* Red trash icon */
+
+    background-color: transparent;
+    /* No background */
+    color: red;
+    /* Red trash icon */
     border: none;
     cursor: pointer;
     border-radius: 50%;
@@ -810,9 +813,18 @@ body {
     line-height: 24px;
     text-align: center;
     padding: 0;
-    display: none;  /* Hidden by default */
+    display: none;
+    /* Hidden by default */
 }
 
 #remove-image:hover {
-    background-color: #d32f2f;  /* Darker red background on hover */
+    background-color: #d32f2f;
+    /* Darker red background on hover */
+}
+
+.image-message {
+    height: 450px;
+    width: 450px;
+    border-radius: 10px;
+    object-fit: contain;
 }

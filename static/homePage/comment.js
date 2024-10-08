@@ -16,10 +16,8 @@ let currentState = {
     data: null
 };
 
-let previousState = null;
-
 // Fonction pour gérer le clic sur le bouton de commentaire
-function handleCommentClick() {
+export function handleCommentClick() {
     const postId = this.closest('.message-item')?.getAttribute('post_uuid');
 
     if (postId) {
@@ -31,7 +29,7 @@ function handleCommentClick() {
 }
 
 
-function updateAppState(newState, pushState = true) {
+export function updateAppState(newState, pushState = true) {
     const title = document.getElementById('title');
     const userPostsContainer = document.getElementById('users-post');
 
@@ -76,7 +74,7 @@ function updateAppState(newState, pushState = true) {
 }
 
 
-function displaySinglePost(postId) {
+export function displaySinglePost(postId) {
     const userPostsContainer = document.getElementById('users-post');
     const postElement = userPostsContainer.querySelector(`.message-item[post_uuid="${postId}"]`);
 
@@ -111,8 +109,9 @@ window.addEventListener('popstate', function (event) {
     }
 });
 
-function createCommentInput() {
+export function createCommentInput() {
     const userInfo = getUserInfoFromCookie();
+    console.log("dans comment", userInfo);
 
     const commentInputContainer = document.createElement('div');
     commentInputContainer.classList.add('comment-input-container');
@@ -122,7 +121,11 @@ function createCommentInput() {
     profileImageContainer.classList.add('profile-image-container'); // Ajoutez une classe pour le style si nécessaire
 
     const profileImage = document.createElement('img');
-    getPPFromID(userInfo.uuid).then(img => {profileImage.src = img});
+    if (userInfo) {
+        getPPFromID(userInfo.uuid).then(img => { profileImage.src = img });
+    } else {
+        profileImage.src = "https://c.clc2l.com/t/d/i/discord-4OXyS2.png";
+    }
     profileImage.alt = 'Profil-picture';
     profileImage.classList.add('profile-image');
 
@@ -202,7 +205,7 @@ function createCommentInput() {
     return commentInputContainer;
 }
 
-async function createComment(post_uuid, user_uuid) {
+export async function createComment(post_uuid, user_uuid) {
     const form = document.getElementById("create-comment-form");
     const formData = new FormData(form);
 
@@ -269,7 +272,7 @@ export function initEventListeners() {
     });
 }
 
-function handleMenuClick(event) {
+export function handleMenuClick(event) {
     event.stopPropagation();
     const postElement = event.currentTarget.closest('.message-item');
     const postId = postElement.getAttribute('post_uuid');
