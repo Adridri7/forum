@@ -1,5 +1,5 @@
 import { createPost } from "./createdPost.js";
-import { getUserInfoFromCookie, isUserInfoValid, getPPFromID } from "../utils.js";
+import { getUserInfoFromCookie, isUserInfoValid, getPPFromID } from "./utils.js";
 
 
 const addButton = document.getElementById('add-button');
@@ -138,19 +138,19 @@ function CreatedModal() {
     // Ajout du formulaire dans le modal
     userPost.appendChild(createdPost);
 
-    postButton.addEventListener('click', () => {
+    postButton.addEventListener('click', (event) => {
         if (!isUserInfoValid()) {
             window.location.href = "/authenticate";
             return;
         }
         
-        createPost();
+        createPost(event);
     });
 
     inputField.addEventListener('keydown', (event) => {
         if (event.key === 'Enter') {
             event.preventDefault();
-            createPost(); // Appelle la fonction pour créer le post
+            createPost(event); // Appelle la fonction pour créer le post
         }
     });
 }

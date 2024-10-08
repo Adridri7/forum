@@ -8,6 +8,7 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300&display=swap"
         rel="stylesheet">
+    <script type="module" src="/static/authentification/authentification.js"></script>
     <title>Forum</title>
 </head>
 
@@ -50,13 +51,18 @@
                     <input type="email" id="new-email" placeholder="Email" required>
                     <input type="file" accept="image/*" id="profile-image-input" class="file-upload">
                     <label for="profile-image-input" class="file-upload-label"></label>
-                    <span id="file-name" class="file-name">No file selected</span>
+                    <!--span id="file-name" class="file-name">No file selected</span-->
+
+                    <div class="image-container">
+                        <img id="file-input" alt="profile-picture">
+                        <button id="remove-image" type="button">&times;</button>
+                    </div>
                 </div>
                 <button id="submit-register" class="submit-btn">Sign Up</button>
             </form>
             <p class="separator">Or Continue With</p>
             <div class="social-login">
-                <button class="social-btn google">
+                <button id="google-btn" class="social-btn google">
                     <img src="/static/authentification/google.png" alt="Google logo" width="24px" height="24px">
                 </button>
                 <button class="social-btn apple">

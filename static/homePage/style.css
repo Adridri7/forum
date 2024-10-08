@@ -406,6 +406,7 @@ body {
     /* Adapte la largeur de la barre de message à celle de .created-post */
     margin: 0;
     flex-shrink: 0;
+    flex-direction: column;
 }
 
 .message-input input {
@@ -793,4 +794,25 @@ body {
     margin-left: -3px;
     height: 18px;
     width: 18px;
+}
+
+#remove-image {
+    position: inherit;
+    
+    background-color: transparent;  /* No background */
+    color: red;  /* Red trash icon */
+    border: none;
+    cursor: pointer;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    font-size: 16px;
+    line-height: 24px;
+    text-align: center;
+    padding: 0;
+    display: none;  /* Hidden by default */
+}
+
+#remove-image:hover {
+    background-color: #d32f2f;  /* Darker red background on hover */
 }

@@ -17,11 +17,12 @@ export async function createPost(event) {
     const hashtags = extractHashtags(messageContent); // Extraire les hashtags
 
     const img = document.getElementById('embed-preview')
+    console.log(img);
 
     const data = {
         content: messageContent,
         hashtags: hashtags, // Ajouter les hashtags aux données envoyées
-        
+        post_image: img.src
     };
 
     try {

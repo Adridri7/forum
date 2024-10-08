@@ -1,4 +1,4 @@
-package users
+package user
 
 import (
 	"database/sql"
@@ -222,3 +222,5 @@ func FetchAllUsers(db *sql.DB) ([]User, error) {
 
 	return users, nil
 }
+
+//

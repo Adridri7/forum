@@ -33,7 +33,7 @@ func main() {
 
 	http.HandleFunc("/api/post/fetchAllCategories", categories.FetchAllCategoriesHandler)
 	http.HandleFunc("/api/post/fetchTendance", categories.FetchTendanceCategoriesHandler)
-
+	http.HandleFunc("/api/get-pp", authentification.PP_Handler)
 	http.HandleFunc("/api/users/fetchAllUsers", users.FetchAllUsersHandler)
 
 	http.HandleFunc("/logout", users.LogoutHandler)

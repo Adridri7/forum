@@ -1,7 +1,7 @@
 import { DisplayMessages } from "./displayMessage.js";
 import { initEventListeners } from "./comment.js";
 import { fetchCategories } from "./fetchcategories.js";
-import { getUserInfoFromCookie, resetUsersPost } from "./utils.js";
+import { getPPFromID, getUserInfoFromCookie, resetUsersPost } from "./utils.js";
 import { fetchPostsByCategory } from './fetchcategories.js';
 import { NewPost } from "./newPost.js";
 import { handleLogout } from "./logout.js";
@@ -9,6 +9,7 @@ import { fetchAllUsers } from "./displayUser.js";
 import { toggleCommentReaction, toggleReaction } from "./reaction.js";
 import { FetchMostLikedPosts } from "./postMostLiked.js";
 import { FetchMostUseCategories } from "./tendance.js";
+import { isUserInfoValid } from "./utils.js";
 
 
 
@@ -59,20 +60,21 @@ darkModeToggle.addEventListener('click', () => {
     applyMode(newMode);
 });
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     const loginButton = document.getElementById('login-btn');
     const profilMenu = document.querySelector('.profil-menu');
 
     // Fonction pour récupérer les informations utilisateur depuis le cookie
     const userInfo = getUserInfoFromCookie(); // Assure-toi que cette fonction existe
     console.log(userInfo)
-    if (userInfo && userInfo.profileImageURL) {
+    if (isUserInfoValid()) {
         // Créer la div qui remplacera le bouton "Login"
         const profileDiv = document.createElement('div');
         profileDiv.classList.add('profile-container');
 
         const profileImage = document.createElement('img');
-        profileImage.src = userInfo.profileImageURL;
+        profileImage.src = await getPPFromID(userInfo.uuid);
+        
         profileImage.alt = 'User profile';
         profileImage.classList.add('profile-image'); // Ajoute une classe pour styliser l'image
 
@@ -150,6 +152,7 @@ export async function fetchPosts() {
         if (posts.length === 0) {
             messagesList.innerHTML = '<p>No posts available.</p>';
         } else {
+            console.log(posts);
             currentUser = posts?.username || 'Anonymous';
             posts.sort((b, a) => new Date(b.created_at) - new Date(a.created_at));
             posts.forEach(post => {

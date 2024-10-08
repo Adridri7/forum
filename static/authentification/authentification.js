@@ -57,7 +57,7 @@ document.getElementById('submit-login').addEventListener('click', async (event) 
         if (response.ok) {
             window.location.href = "/";
         } else {
-            const error = await response.json();
+            //const error = await response.json();
             alert("Email or password not valid");
         }
     } catch (error) {
@@ -67,7 +67,6 @@ document.getElementById('submit-login').addEventListener('click', async (event) 
 
 document.getElementById('submit-register').addEventListener('click', async (event) => {
     event.preventDefault();
-
     // Vérifie si le formulaire est valide
     if (!signupForm.checkValidity()) {
         signupForm.reportValidity();
@@ -77,11 +76,18 @@ document.getElementById('submit-register').addEventListener('click', async (even
     const username = document.getElementById("new-username").value;
     const password = document.getElementById("new-password").value;
     const email = document.getElementById('new-email').value;
+    const profileImageSrc = document.getElementById('file-input').src;  // Get the image source from the <img> element
 
+    // Prepare data object to be sent
     const data = {
         username: username,
         password: password,
-        email: email
+        email: email,
+        profile_picture: ""
+    };
+
+    if (profileImageSrc) {
+        data.profile_picture = profileImageSrc;
     }
 
     try {
@@ -90,27 +96,59 @@ document.getElementById('submit-register').addEventListener('click', async (even
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify(data)
+            body: JSON.stringify(data)  // Send the data as JSON
         });
-        console.log(data)
+
         if (response.ok) {
-            window.location.href = "/"
+            window.location.href = "/";
         } else {
             const error = await response.json();
-            alert("Erreur lors du login", + error.message);
+            alert("Register error : email already used");
         }
     } catch (error) {
-        console.error("Erreur lors du login", error.message)
+        console.error("Register error");
     }
-});
 
+
+});
 document.getElementById('profile-image-input').addEventListener('change', function (event) {
-    const fileNameElement = document.getElementById('file-name');
+    const fileInput = document.getElementById('file-input');
+    const removeImageButton = document.getElementById('remove-image');
+    const imageContainer = document.querySelector('.image-container'); // Select the container
     const files = event.target.files;
 
     if (files.length > 0) {
-        fileNameElement.textContent = files[0].name;
+        const file = files[0];
+        const reader = new FileReader();
+
+        reader.onload = function (e) {
+            fileInput.src = e.target.result;
+            fileInput.style.display = 'block';  // Show the image
+            removeImageButton.style.display = 'block';  // Show the remove button
+            imageContainer.style.display = 'inline-block';  // Show the image container
+        }
+
+        reader.readAsDataURL(file);
+
     } else {
-        fileNameElement.textContent = "Aucun fichier choisi";
+        fileInput.src = "";  // Clear the image if no file is chosen
+        fileInput.style.display = 'none';  // Hide the image
+        removeImageButton.style.display = 'none';  // Hide the remove button
+        imageContainer.style.display = 'none';  // Hide the image container
     }
+});
+
+// Remove image button logic
+document.getElementById('remove-image').addEventListener('click', function () {
+    const fileInput = document.getElementById('file-input');
+    const removeImageButton = document.getElementById('remove-image');
+    const fileInputElement = document.getElementById('profile-image-input');
+    const imageContainer = document.querySelector('.image-container');
+
+    // Clear the file input value
+    fileInputElement.value = '';
+    fileInput.src = '';  // Remove the src attribute of the image
+    fileInput.style.display = 'none';  // Hide the image
+    removeImageButton.style.display = 'none';  // Hide the remove button
+    imageContainer.style.display = 'none';  // Hide the image container
 });

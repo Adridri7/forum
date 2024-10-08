@@ -29,6 +29,7 @@ func PP_Handler(w http.ResponseWriter, r *http.Request) {
 	if usr.ProfilePicture == "" {
 		fmt.Printf("User not found for ID \"%s\"\n", usr.UUID)
 	}
+	fmt.Println("nikoumouk")
 
 	json.NewEncoder(w).Encode(usr.ProfilePicture)
 }

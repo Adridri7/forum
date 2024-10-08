@@ -3,7 +3,7 @@ import { toggleMenu } from "./displayMessage.js";
 import { fetchCategories } from "./fetchcategories.js";
 import { toggleCommentReaction } from "./reaction.js";
 import { fetchAllcomments } from "./showComment.js";
-import { getUserInfoFromCookie } from "./utils.js";
+import { getUserInfoFromCookie, getPPFromID } from "./utils.js";
 
 const AppState = {
     HOME: 'home',
@@ -122,7 +122,7 @@ function createCommentInput() {
     profileImageContainer.classList.add('profile-image-container'); // Ajoutez une classe pour le style si nécessaire
 
     const profileImage = document.createElement('img');
-    profileImage.src = userInfo.profileImageURL;
+    getPPFromID(userInfo.uuid).then(img => {profileImage.src = img});
     profileImage.alt = 'Profil-picture';
     profileImage.classList.add('profile-image');
 

@@ -91,6 +91,10 @@ export function DisplayMessages(post, isComment = false) {
     messageContent.classList.add('message-content');
     messageContent.textContent = post.content;
 
+    const imageMessage = document.createElement('img');
+    imageMessage.classList.add('image-message');
+    imageMessage.src = post.post_image;
+
     // Créer les boutons de réaction
     const reactionBtnContainer = document.createElement('div');
     reactionBtnContainer.classList.add('reaction-btn');
@@ -167,6 +171,7 @@ export function DisplayMessages(post, isComment = false) {
     // Ajout des éléments au conteneur principal
     messageContainer.appendChild(messageHeader);
     messageContainer.appendChild(messageContent);
+    messageContainer.appendChild(imageMessage);
     messageContainer.appendChild(reactionBtnContainer);
     messageItem.appendChild(profileContainer);
     messageItem.appendChild(messageContainer);

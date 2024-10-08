@@ -1,9 +1,8 @@
-package users
+package user
 
 import (
 	"encoding/json"
 	"forum/server"
-	"forum/server/users"
 	"net/http"
 )
 
@@ -14,7 +13,7 @@ func FetchAllUsersHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Récupérer tous les posts
-	userData, err := users.FetchAllUsers(server.Db)
+	userData, err := FetchAllUsers(server.Db)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

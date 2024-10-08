@@ -3,7 +3,7 @@ package authentification
 import (
 	"encoding/json"
 	"fmt"
-	dbUser "forum/server/users"
+	dbUser "forum/server/api/user"
 	"io"
 	"net/http"
 	"os"

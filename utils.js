@@ -25,20 +25,21 @@ export async function getPPFromID(id) {
 }
 
 export function getUserInfoFromCookie() {
-    let userInfo = {};
+    let userInfo = null;
 
     if (document.cookie.substring(0, 10) === 'UserLogged') {
         const parts = document.cookie.substring(11).split('|');
 
-        if (parts.length >= 5) {
-            userInfo = {
-                uuid: removeQuotes(parts[0]),          // UUID
-                username: parts[1],      // Nom d'utilisateur
-                email: parts[2],         // Email
-                role: parts[3],          // Rôle
-                profileImageURL: removeQuotes(parts[4]) // URL de l'image de profil
-            };
+        if (parts.length < 4) {
+            return {};
         }
+
+        userInfo = {
+            uuid: removeQuotes(parts[0]),          // UUID
+            username: parts[1],      // Nom d'utilisateur
+            email: parts[2],         // Email
+            role: parts[3]           // Rôle
+        };
     }
 
     return userInfo;
