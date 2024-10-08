@@ -103,8 +103,6 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) {
             console.error("Erreur lors de l'inscription", error.message);
         }
-
-    
     });
 
 
@@ -148,5 +146,10 @@ document.addEventListener('DOMContentLoaded', () => {
         fileInput.style.display = 'none';  // Hide the image
         removeImageButton.style.display = 'none';  // Hide the remove button
         imageContainer.style.display = 'none';  // Hide the image container
+    });
+
+    // Providers buttons
+    document.getElementById('discord-btn').addEventListener('click', () => {
+        window.location.href = '/api/discord_login';
     });
 });

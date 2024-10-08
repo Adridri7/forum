@@ -10,12 +10,8 @@ import (
 )
 
 const (
-	OAuthState = "pseudo-random" // À sécuriser avec un état aléatoire en production
-
-	redirectGoogleURL = "http://localhost:8080/api/google_callback"
-	oauthGoogleURL    = "https://accounts.google.com/o/oauth2/auth"
-	tokenGoogleURL    = "https://oauth2.googleapis.com/token"
-	userInfoGoogleURL = "https://www.googleapis.com/oauth2/v2/userinfo"
+	GOOGLE_ID     = "54777063980-5g9u1tgobagtb6m7s60i50e64qn0v04t.apps.googleusercontent.com"
+	GOOGLE_SECRET = "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"
 )
 
 // Gestion du clic sur le bouton de connexion "Login with Google"

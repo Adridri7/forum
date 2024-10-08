@@ -1,5 +1,6 @@
 package providers
 
+/*
 import (
 	"context"
 	"fmt"
@@ -9,10 +10,8 @@ import (
 )
 
 const (
-	redirectGithubURL = "http://localhost:8080/api/github_callback"
-	//oauthGithubURL    = "https://accounts.google.com/o/oauth2/auth"
-	//tokenGithubURL    = "https://github.com/login/oauth/access_token"
-	//userInfoGithubURL = "https://api.github.com/user"
+	GITHUB_ID = "Ov23libnZpblLJfYUNV0"
+	GITHUB_SECRET = "ddb158a0782ac5c6d9b0141784df6f0c9b2d33de"
 )
 
 // Gestion du clic sur le bouton de connexion "Login with Github"
@@ -35,12 +34,12 @@ func HandleGithubCallback(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleGithubLogin(w http.ResponseWriter, r *http.Request) {
-	url := githubOauthConfig.AuthCodeURL(oauthStateString)
+	url := githubOauthConfig.AuthCodeURL(OAuthState)
 	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
 }
 
 func handleGithubCallback(w http.ResponseWriter, r *http.Request) {
-	if r.FormValue("state") != oauthStateString {
+	if r.FormValue("state") != OAuthState {
 		log.Println("Invalid OAuth state")
 		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 		return
@@ -66,3 +65,4 @@ func handleGithubCallback(w http.ResponseWriter, r *http.Request) {
 	defer resp.Body.Close()
 	fmt.Fprintf(w, "GitHub login successful!")
 }
+*/

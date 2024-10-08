@@ -172,7 +172,7 @@ func RegisterUser(params map[string]interface{}) error {
 	re := regexp.MustCompile(`(?i)<[^>]+>|(SELECT|UPDATE|DELETE|INSERT|DROP|FROM|COUNT|AS|WHERE|--)|^\s|^\s*$|<script.*?>.*?</script.*?>`)
 
 	for key, value := range params {
-		if (key == "username" || key == "email" || key == "password") && re.FindAllString(value.(string), -1) != nil {
+		if (key == "username" || key == "email" || (key == "password" && len(key) == 0)) && re.FindAllString(value.(string), -1) != nil {
 			return fmt.Errorf("injection detected")
 		}
 	}
@@ -196,14 +196,14 @@ func RegisterUser(params map[string]interface{}) error {
 func (u *User) UpdateUser(params map[string]interface{}) error {
 	re := regexp.MustCompile(`(?i)<[^>]+>|(SELECT|UPDATE|DELETE|INSERT|DROP|FROM|COUNT|AS|WHERE|--)|^\s|^\s*$|<script.*?>.*?</script.*?>`)
 
-	for _, value := range params {
-		if re.FindAllString(value.(string), -1) != nil {
+	for key, value := range params {
+		if (key == "username" || key == "email" || (key == "password" && len(key) == 0)) && re.FindAllString(value.(string), -1) != nil {
 			return fmt.Errorf("injection detected")
 		}
 	}
 
 	updateUserQuery := `UPDATE users SET username = ?, email = ?, password = ?, role = ?, profile_picture = ? WHERE user_uuid = ?`
-	_, err := server.RunQuery(updateUserQuery, params)
+	_, err := server.RunQuery(updateUserQuery, params["username"], params["email"], params["password"], params["role"], params["profile_picture"], params["user_uuid"])
 
 	if err != nil {
 		return err
