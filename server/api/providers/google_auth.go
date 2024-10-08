@@ -16,10 +16,9 @@ func HandleGoogleLogin(w http.ResponseWriter, r *http.Request) {
 		oauthGoogleURL,
 		os.Getenv("GOOGLE_ID"),
 		redirectGoogleURL,
-		"url:https://www.googleapis.com/auth/userinfo.email",
+		"openid email profile", // Chaine de caractères contenant les scopes
 		OAuthState,
 	)
-
 	http.Redirect(w, r, authURL, http.StatusTemporaryRedirect)
 }
 

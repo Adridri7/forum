@@ -116,14 +116,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const file = files[0];
             const reader = new FileReader();
 
-        reader.onload = function (e) {
-            fileInput.src = e.target.result;
-            fileInput.style.display = 'block';  // Show the image
-            removeImageButton.style.display = 'block';  // Show the remove button
-            imageContainer.style.display = 'inline-block';  // Show the image container
-        }
+            reader.onload = function (e) {
+                fileInput.src = e.target.result;
+                fileInput.style.display = 'block';  // Show the image
+                removeImageButton.style.display = 'block';  // Show the remove button
+                imageContainer.style.display = 'inline-block';  // Show the image container
+            }
 
-        reader.readAsDataURL(file);
+            reader.readAsDataURL(file);
 
         } else {
             fileInput.src = "";  // Clear the image if no file is chosen
@@ -151,5 +151,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Providers buttons
     document.getElementById('discord-btn').addEventListener('click', () => {
         window.location.href = '/api/discord_login';
+    });
+
+    document.getElementById('google-btn').addEventListener('click', () => {
+        window.location.href = '/api/google_login';
     });
 });
