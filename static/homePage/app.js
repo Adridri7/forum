@@ -1,22 +1,29 @@
 import { DisplayMessages } from "./displayMessage.js";
 import { initEventListeners } from "./comment.js";
-import { fetchCategories } from "./fetchcategories.js";
 import { getUserInfoFromCookie, resetUsersPost } from "./utils.js";
-import { fetchPostsByCategory } from './fetchcategories.js';
 import { NewPost } from "./newPost.js";
 import { handleLogout } from "./logout.js";
 import { fetchAllUsers } from "./displayUser.js";
 import { toggleCommentReaction, toggleReaction } from "./reaction.js";
 import { FetchMostLikedPosts } from "./postMostLiked.js";
 import { FetchMostUseCategories } from "./tendance.js";
+import { fetchPersonnalPosts } from "./dashboard.js";
 
 
 
 // Sélectionnez les éléments
 const toggleButton = document.getElementById('toggle-menu-btn');
 const sidebar = document.getElementById('sidebar');
-const darkModeToggle = document.getElementById('dark-mode-toggle');
+// const darkModeToggle = document.getElementById('dark-mode-toggle');
 const addButton = document.getElementById('add-button');
+
+const darkModeToggles = document.querySelectorAll('.dark-mode-toggle');
+
+darkModeToggles.forEach(button => {
+    button.addEventListener('click', () => {
+        console.log('Dark mode toggled');
+    });
+});
 
 
 // Fonction pour appliquer le mode
@@ -29,14 +36,14 @@ function applyMode(mode) {
         root.style.setProperty('--second-text-color', '#FFFFFF');
         root.style.setProperty('--border-color', '#5E5E5F');
         root.style.setProperty('--background-message-color', '#272727');
-        darkModeToggle.textContent = 'Light Mode';
+        darkModeToggles.textContent = 'Light Mode';
     } else {
         root.style.setProperty('--background-color', '#f5f5f5');
         root.style.setProperty('--text-color', '#FFFFFF');
         root.style.setProperty('--second-text-color', '#000000');
         root.style.setProperty('--border-color', '#9C9FA8');
         root.style.setProperty('--background-message-color', '#FFFFFF');
-        darkModeToggle.textContent = 'Dark Mode';
+        darkModeToggles.textContent = 'Dark Mode';
     }
 
     // Enregistrer la préférence dans le Local Storage
@@ -53,10 +60,14 @@ if (userPreference) {
 }
 
 // Écouteur d'événement pour le bouton de basculement
-darkModeToggle.addEventListener('click', () => {
-    const currentMode = localStorage.getItem('theme') || 'light';
-    const newMode = currentMode === 'dark' ? 'light' : 'dark';
-    applyMode(newMode);
+darkModeToggles.forEach(button => {
+    button.addEventListener('click', () => {
+        const currentMode = localStorage.getItem('theme') || 'light';
+        const newMode = currentMode === 'dark' ? 'light' : 'dark';
+        applyMode(newMode);
+        // Mettre à jour le texte du bouton
+        button.textContent = newMode === 'dark' ? 'Light Mode' : 'Dark Mode';
+    });
 });
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -236,5 +247,68 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (isCommentReaction) {
             CommentReaction(event); // Appeler la fonction pour les réactions sur les commentaires
         }
+    });
+});
+
+const homeLink = document.getElementById('home-link');
+const dashboardLink = document.getElementById('dashboard-link');
+
+// Sélectionne les sections
+const homeSection = document.getElementById('home-section');
+const dashboardSection = document.getElementById('dashboard-section');
+
+// Fonction pour masquer toutes les sections
+function hideAllSections() {
+    homeSection.style.display = 'none';
+    dashboardSection.style.display = 'none';
+}
+
+// Ajoute des événements pour chaque lien
+homeLink.addEventListener('click', () => {
+    hideAllSections();
+    homeSection.style.display = 'block';
+});
+
+dashboardLink.addEventListener('click', () => {
+    const userInfo = getUserInfoFromCookie(); // Récupère les informations utilisateur
+    const personnalPost = document.getElementById('personnal-post');
+
+    if (!userInfo) {
+        alert("You must be logged in to access the dashboard.");
+        return;
+    }
+
+    hideAllSections();
+    dashboardSection.style.display = 'flex';
+    const currentActiveItem = document.querySelector('#nav-bar li.active');
+    // Vérifier quel élément est actuellement actif et appeler la fonction correspondante
+    if (currentActiveItem) {
+        const activeId = currentActiveItem.id;
+
+        // Fetch basé sur l'élément actif
+        switch (activeId) {
+            case 'personnal-post':
+                fetchPersonnalPosts(); // Ou toute autre fonction que vous avez pour les posts
+                break;
+            case 'personnal-comment': // Si vous avez un élément avec id 'liked-posts'
+                fetchPersonnalComment(); // Appelez la fonction appropriée ici
+                break;
+            case 'personnal-reaction':
+                fetchPersonnalResponse();
+            // Ajoutez d'autres cas selon vos besoins
+            default:
+                break;
+        }
+    }
+
+    const navItems = document.querySelectorAll('#nav-bar li');
+
+    navItems.forEach(item => {
+        item.addEventListener('click', () => {
+            // Retirer la classe active de tous les éléments
+            navItems.forEach(nav => nav.classList.remove('active'));
+            // Ajouter la classe active à l'élément cliqué
+            item.classList.add('active');
+        });
     });
 });

@@ -1,0 +1,93 @@
+#dashboard-section {
+    flex-direction: column;
+}
+
+.dashboard-header {
+    position: relative;
+    border-bottom: 1px solid var(--border-color);
+    height: 180px;
+    background: linear-gradient(145deg, rgba(208, 194, 194, 0.8), rgba(255, 0, 0, 0%) 70.71%),
+        linear-gradient(127deg, rgba(95, 95, 95, 0.8), rgba(0, 255, 0, 0%) 70.71%),
+        linear-gradient(336deg, rgba(0, 0, 255, 0.8), rgba(0, 0, 255, 0%) 70.71%);
+    background-size: 200% 200%;
+    animation: gradient 8s ease infinite;
+    display: flex;
+    box-sizing: border-box;
+}
+
+@keyframes gradient {
+    0% {
+        background-position: 0% 0%;
+    }
+
+    50% {
+        background-position: 100% 100%;
+    }
+
+    100% {
+        background-position: 0% 0%;
+    }
+}
+
+.profil-menu {
+    display: flex;
+    align-items: flex-start;
+    gap: 25px;
+    margin-left: auto;
+}
+
+#nav-bar {
+    display: flex;
+    width: 100%;
+    /* Assure-toi que le nav-bar utilise toute la largeur */
+}
+
+#nav-bar ul {
+    display: flex;
+    justify-content: space-evenly;
+    width: 100%;
+    padding: 0;
+    margin-top: 15px;
+    list-style: none;
+    font-size: 18px;
+    font-weight: 600;
+    border-bottom: 1px solid var(--border-color);
+}
+
+#nav-bar li {
+    cursor: pointer;
+    transition: border-bottom 0.15s ease;
+}
+
+#nav-bar li.active {
+    border-bottom: 5px solid var(--primary-color);
+    border-radius: 2px;
+}
+
+#dashboard-center-box {
+    height: 70vh;
+    width: 100%;
+}
+
+#users-personnal-post {
+    overflow-y: auto;
+    max-height: 75vh;
+    scrollbar-width: none;
+}
+
+.dashboard-chat-center {
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+#profile-picture {
+    position: absolute;
+    top: 35px;
+    left: 40px;
+    height: 100px;
+    width: 100px;
+    object-fit: cover;
+    border-radius: 50%;
+}

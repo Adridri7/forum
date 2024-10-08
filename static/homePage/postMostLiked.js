@@ -7,8 +7,6 @@ export async function FetchMostLikedPosts() {
         }
         const mostLikedPosts = await response.json();
 
-        console.log("Post Ranking:", mostLikedPosts)
-
         // Affiche les posts dans la liste
         // displayMostLikedPost(mostLikedPosts);
     } catch (error) {

@@ -1,6 +1,6 @@
 export function getUserInfoFromCookie() {
     const cookies = document.cookie.split(';');
-    let userInfo = {};
+    let userInfo = null; // Commencer par null
 
     cookies.forEach(cookie => {
         const [name, value] = cookie.trim().split('=');

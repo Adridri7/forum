@@ -9,6 +9,7 @@
         rel="stylesheet">
     <link rel="stylesheet" href="/static/homePage/style.css">
     <link rel="stylesheet" href="/static/homePage/responsive.css">
+    <link rel="stylesheet" href="/static/homePage/dashboard.css">
     <title>Forum</title>
 </head>
 
@@ -39,7 +40,7 @@
                 </li>
 
                 <li>
-                    <a href="#Dashborad" id="dashborad-link">
+                    <a href="#Dashborad" id="dashboard-link">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" class="icon"
                             fill="currentcolor">
                             <path
@@ -66,30 +67,59 @@
 
             </ul>
         </nav>
+        <section id="home-section" class="section">
+            <div class="chat-box">
+                <header id="header">
+                    <h2 id="title">General</h2>
+                    <div class="profil-menu">
+                        <button id="dark-mode-toggle" class="dark-mode-toggle">Dark Mode</button>
+                        <button id="login-btn" class="login-btn">Log in</button>
+                    </div>
+                </header>
 
-        <div class="chat-box">
-            <header id="header">
-                <h2 id="title">General</h2>
-                <div class="profil-menu">
-                    <button id="dark-mode-toggle">Dark Mode</button>
-                    <button id="login-btn">Log in</button>
+
+                <div class="chat-center">
+
+                    <ul id="users-post">
+
+                        <!-- ici va se trouver les posts -->
+                    </ul>
+                    <div id="most-liked-posts" class="posts-container"></div>
+                    <div id="tendances" class="posts-container"></div>
+                    <div class="modal-post" id="modal-post">
+                    </div>
+                    <button id="add-button">+</button>
                 </div>
+            </div>
+        </section>
+
+        <section id="dashboard-section" class="section" style="display: none;">
+            <header class="dashboard-header">
+                <div class="profile-image">
+                    <img src="" alt="profile-picture" id="profile-picture">
+                </div>
+                <!-- <div class="profil-menu">
+                    <button id="dark-mode-toggle" class="dark-mode-toggle">Dark Mode</button>
+                </div> -->
             </header>
 
-
-            <div class="chat-center">
-
-                <ul id="users-post">
-
-                    <!-- ici va se trouver les posts -->
+            <nav id="nav-bar">
+                <ul>
+                    <li id="personnal-post" class="active">Post</li>
+                    <li id="personnal-comment">Comment</li>
+                    <li id="personnal-reaction">Reaction</li>
                 </ul>
-                <div id="most-liked-posts" class="posts-container"></div>
-                <div id="tendances" class="posts-container"></div>
-                <div class="modal-post" id="modal-post">
+            </nav>
+
+            <div id="dashboard-center-box">
+                <div class="dashboard-chat-center">
+
+                    <ul id="users-personnal-post">
+
+                        <!-- ici va se trouver les posts -->
+                    </ul>
                 </div>
-                <button id="add-button">+</button>
-            </div>
-        </div>
+        </section>
         <script type="module" src="/static/homePage/app.js"></script>
 </body>
 
