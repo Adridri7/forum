@@ -10,6 +10,7 @@ import { toggleCommentReaction, toggleReaction } from "./reaction.js";
 import { FetchMostLikedPosts } from "./postMostLiked.js";
 import { FetchMostUseCategories } from "./tendance.js";
 import { isUserInfoValid } from "./utils.js";
+import { fetchPersonnalComment, fetchPersonnalPosts, fetchPersonnalResponse } from "./dashboard.js";
 
 
 
@@ -135,7 +136,6 @@ toggleButton.addEventListener('click', () => {
     sidebar.classList.toggle('close');
 });
 
-let currentUser = ''
 export async function fetchPosts() {
     resetUsersPost();
     const messagesList = document.getElementById('users-post');
@@ -152,8 +152,6 @@ export async function fetchPosts() {
         if (posts.length === 0) {
             messagesList.innerHTML = '<p>No posts available.</p>';
         } else {
-            console.log(posts);
-            currentUser = posts?.username || 'Anonymous';
             posts.sort((b, a) => new Date(b.created_at) - new Date(a.created_at));
             posts.forEach(post => {
                 DisplayMessages(post);
@@ -239,5 +237,68 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (isCommentReaction) {
             CommentReaction(event); // Appeler la fonction pour les réactions sur les commentaires
         }
+    });
+});
+
+const homeLink = document.getElementById('home-link');
+const dashboardLink = document.getElementById('dashboard-link');
+
+// Sélectionne les sections
+const homeSection = document.getElementById('home-section');
+const dashboardSection = document.getElementById('dashboard-section');
+
+// Fonction pour masquer toutes les sections
+function hideAllSections() {
+    homeSection.style.display = 'none';
+    dashboardSection.style.display = 'none';
+}
+
+// Ajoute des événements pour chaque lien
+homeLink.addEventListener('click', () => {
+    hideAllSections();
+    homeSection.style.display = 'block';
+});
+
+dashboardLink.addEventListener('click', () => {
+    const userInfo = getUserInfoFromCookie(); // Récupère les informations utilisateur
+    const personnalPost = document.getElementById('personnal-post');
+
+    if (!userInfo) {
+        alert("You must be logged in to access the dashboard.");
+        return;
+    }
+
+    hideAllSections();
+    dashboardSection.style.display = 'flex';
+    const currentActiveItem = document.querySelector('#nav-bar li.active');
+    // Vérifier quel élément est actuellement actif et appeler la fonction correspondante
+    if (currentActiveItem) {
+        const activeId = currentActiveItem.id;
+
+        // Fetch basé sur l'élément actif
+        switch (activeId) {
+            case 'personnal-post':
+                fetchPersonnalPosts(); // Ou toute autre fonction que vous avez pour les posts
+                break;
+            case 'personnal-comment': // Si vous avez un élément avec id 'liked-posts'
+                fetchPersonnalComment(); // Appelez la fonction appropriée ici
+                break;
+            case 'personnal-reaction':
+                fetchPersonnalResponse();
+            // Ajoutez d'autres cas selon vos besoins
+            default:
+                break;
+        }
+    }
+
+    const navItems = document.querySelectorAll('#nav-bar li');
+
+    navItems.forEach(item => {
+        item.addEventListener('click', () => {
+            // Retirer la classe active de tous les éléments
+            navItems.forEach(nav => nav.classList.remove('active'));
+            // Ajouter la classe active à l'élément cliqué
+            item.classList.add('active');
+        });
     });
 });

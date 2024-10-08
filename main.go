@@ -21,12 +21,15 @@ func main() {
 	http.HandleFunc("/api/post/fetchAllPost", post.FetchAllPostHandler)
 	http.HandleFunc("/api/post/deletePost", post.DeletePostHandler)
 	http.HandleFunc("/api/post/fetchPostMostLiked", post.FetchPostsMostLikedHandler)
+	http.HandleFunc("/api/post/fetchPostByUser", post.FetchUserPostHandler)
 
 	http.HandleFunc("/api/post/createComment", comments.CreateCommentHandler)
 	http.HandleFunc("/api/post/fetchComment", comments.FetchCommentHandler)
 	http.HandleFunc("/api/post/fetchAllComments", comments.FetchAllCommentsHandler)
 	http.HandleFunc("/api/post/deleteComment", comments.DeleteCommentHandler)
 	http.HandleFunc("/api/post/like-dislikeComment", comments.HandleLikeDislikeCommentAPI)
+	http.HandleFunc("/api/post/fetchCommentByUser", comments.FetchUserCommentsHandler)
+	http.HandleFunc("/api/post/fetchResponseUser", comments.FetchResponseUserHandler)
 
 	http.HandleFunc("/api/login", authentification.LoginHandler)
 	http.HandleFunc("/api/registration", authentification.RegisterHandler)

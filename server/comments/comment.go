@@ -199,3 +199,103 @@ func DeleteComment(db *sql.DB, params map[string]interface{}) error {
 
 	return nil
 }
+
+func FetchUserComments(db *sql.DB, user_uuid string) ([]Comment, error) {
+	// Préparer la requête SQL pour récupérer les commentaires de l'utilisateur spécifié
+	fetchUserCommentsQuery := `
+        SELECT c.comment_id, c.content, c.post_uuid, u.user_uuid, u.username, u.profile_picture, c.created_at, c.likes, c.dislikes
+        FROM comments c
+        JOIN users u ON c.user_uuid = u.user_uuid
+        WHERE c.user_uuid = ?  -- Filtrer par user_uuid
+        ORDER BY c.created_at DESC`
+
+	// Exécuter la requête
+	rows, err := server.RunQuery(fetchUserCommentsQuery, user_uuid)
+	if err != nil {
+		return nil, fmt.Errorf("database query failed: %v", err)
+	}
+
+	var comments []Comment
+	// Parcourir les résultats et remplir la structure Comment
+	for _, row := range rows {
+		comment := Comment{
+			Comment_id:     row["comment_id"].(string),
+			Post_uuid:      row["post_uuid"].(string),
+			User_uuid:      row["user_uuid"].(string),
+			Content:        row["content"].(string),
+			Created_at:     row["created_at"].(time.Time),
+			Username:       row["username"].(string),
+			ProfilePicture: row["profile_picture"].(string),
+			Likes:          (row["likes"].(int64)),
+			Dislikes:       (row["dislikes"].(int64)),
+		}
+		comments = append(comments, comment)
+	}
+
+	return comments, nil
+}
+
+func FetchUserResponse(db *sql.DB, user_uuid string) ([]Comment, error) {
+	// fetchUserCommentReactionsQuery := `
+	// SELECT c.comment_id, c.content, c.post_uuid, u.user_uuid, u.username, u.profile_picture, c.created_at, c.likes, c.dislikes
+	// FROM comment_reactions cr
+	// JOIN comments c ON cr.comment_id = c.comment_id
+	// JOIN users u ON c.user_uuid = u.user_uuid
+	// WHERE cr.user_uuid = ?  -- Filtrer par user_uuid de la réaction
+	// AND cr.action = 'like'  -- Ne prendre en compte que les likes
+	// ORDER BY c.created_at DESC`
+
+	fetchUserLikePost := `
+    SELECT p.post_uuid, p.content, u.user_uuid, u.username, u.profile_picture, p.created_at, p.likes, p.dislikes
+    FROM post_reactions pr
+    JOIN posts p ON pr.post_uuid = p.post_uuid
+    JOIN users u ON p.user_uuid = u.user_uuid
+    WHERE pr.user_uuid = ?  -- Filtrer par user_uuid de la réaction
+    ORDER BY p.created_at DESC`
+	// AND pr.action = 'like'  -- Ne prendre en compte que les likes
+
+	// Exécuter la requête
+	rows, err := server.RunQuery(fetchUserLikePost, user_uuid)
+	if err != nil {
+		return nil, fmt.Errorf("database query failed: %v", err)
+	}
+
+	var comments []Comment
+	// Parcourir les résultats et remplir la structure Comment
+	for _, row := range rows {
+		comment := Comment{}
+
+		// Extraire et vérifier chaque champ avec gestion d'erreurs potentielles
+		if commentID, ok := row["comment_id"].(string); ok {
+			comment.Comment_id = commentID
+		}
+		if postUUID, ok := row["post_uuid"].(string); ok {
+			comment.Post_uuid = postUUID
+		}
+		if userUUID, ok := row["user_uuid"].(string); ok {
+			comment.User_uuid = userUUID
+		}
+		if content, ok := row["content"].(string); ok {
+			comment.Content = content
+		}
+		if createdAt, ok := row["created_at"].(time.Time); ok {
+			comment.Created_at = createdAt
+		}
+		if username, ok := row["username"].(string); ok {
+			comment.Username = username
+		}
+		if profilePicture, ok := row["profile_picture"].(string); ok {
+			comment.ProfilePicture = profilePicture
+		}
+		if likes, ok := row["likes"].(int64); ok {
+			comment.Likes = likes
+		}
+		if dislikes, ok := row["dislikes"].(int64); ok {
+			comment.Dislikes = dislikes
+		}
+
+		comments = append(comments, comment)
+	}
+
+	return comments, nil
+}

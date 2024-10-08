@@ -1,11 +1,11 @@
 export function getUserInfoFromCookie() {
-    let userInfo = {};
+    let userInfo = null;
 
     if (document.cookie.substring(0, 10) === 'UserLogged') {
         const parts = document.cookie.substring(11).split('|');
 
         if (parts.length < 4) {
-            return {};
+            return null;
         }
 
         userInfo = {
