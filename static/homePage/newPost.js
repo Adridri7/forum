@@ -86,20 +86,29 @@ function CreatedModal() {
     imageUploadInput.type = 'file';
     imageUploadInput.setAttribute('accept', 'image/*');
     imageUploadInput.style.display = 'none';
-
+    
     imageUploadInput.addEventListener('change', () => {
+        const maxFileSize = 20 * 1024 * 1024; // 20 Mo en octets
+        const selectedFile = imageUploadInput.files[0];
+    
+        if (selectedFile.size > maxFileSize) {
+            alert('Le fichier est trop volumineux. La taille maximale est de 20 Mo.');
+            imageUploadInput.value = ''; // Réinitialise l'input pour permettre un nouveau choix
+            return;
+        }
+    
         createdPost.style.height = '580px';
-
+    
         var fr = new FileReader();
         fr.onload = () => {
             embedPreview.src = fr.result;
         };
-        fr.readAsDataURL(imageUploadInput.files[0]);
-
-        embedPreview.alt = imageUploadInput.files.item(0).name;
-
+        fr.readAsDataURL(selectedFile);
+    
+        embedPreview.alt = selectedFile.name;
+    
         removeImg.style.display = 'block';
-    });
+    });    
 
     imageUpload.addEventListener('click', () => {
         imageUploadInput.click();
