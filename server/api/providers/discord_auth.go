@@ -70,6 +70,7 @@ func HandleDiscordCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// ... puis on vérifie que l'utilisateur n'existe pas déjà
 	var usr dbUser.User
 	if usr, err = dbUser.FetchUserByEmail(discordUsr.Email); err != nil {
 		http.Error(w, "{\"Error\": \"Fatal error fetching\"}", http.StatusInternalServerError)

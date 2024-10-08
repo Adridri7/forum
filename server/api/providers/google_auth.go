@@ -1,6 +1,10 @@
 package providers
 
 import (
+	dbUser "forum/server/api/user"
+	utils "forum/server/utils"
+	"strings"
+
 	"encoding/json"
 	"fmt"
 	"io"
@@ -8,6 +12,13 @@ import (
 	"net/url"
 	"os"
 )
+
+type GoogleUser struct {
+	Name    string `json:"name"`
+	Picture string `json:"picture"`
+	Email   string `json:"email"`
+	//EmailVerified string `json:"verified_email"`
+}
 
 // Gestion du clic sur le bouton de connexion "Login with Google"
 func HandleGoogleLogin(w http.ResponseWriter, r *http.Request) {
@@ -19,6 +30,7 @@ func HandleGoogleLogin(w http.ResponseWriter, r *http.Request) {
 		"openid email profile", // Chaine de caractères contenant les scopes
 		OAuthState,
 	)
+
 	http.Redirect(w, r, authURL, http.StatusTemporaryRedirect)
 }
 
@@ -51,8 +63,77 @@ func HandleGoogleCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Afficher les informations utilisateur
-	fmt.Fprintf(w, "User Info: %s", userInfo)
+	// Décoder les infos utilisateur renvoyées...
+	var googUsr GoogleUser
+	if err = json.Unmarshal([]byte(userInfo), &googUsr); err != nil {
+		http.Error(w, "Failed to decode user info", http.StatusInternalServerError)
+		return
+	}
+
+	// ... puis on vérifie que l'utilisateur n'existe pas déjà
+	var usr dbUser.User
+	if usr, err = dbUser.FetchUserByEmail(googUsr.Email); err != nil {
+		http.Error(w, "{\"Error\": \"Fatal error fetching\"}", http.StatusInternalServerError)
+		fmt.Fprintln(os.Stderr, err.Error())
+		return
+	}
+
+	if usr == (dbUser.User{}) {
+		if usr.UUID, err = utils.GenerateUUID(); err != nil {
+			http.Error(w, "{\"Error\": \"Fatal error gen\"}", http.StatusInternalServerError)
+			fmt.Fprintln(os.Stderr, err.Error())
+			return
+		}
+
+		if strings.Contains(googUsr.Picture[8:], "lh3.googleusercontent.com/a/") {
+			usr.ProfilePicture = dbUser.RandomProfilPicture()
+		} else {
+			usr.ProfilePicture = googUsr.Picture
+		}
+
+		usr.Username = googUsr.Name[:strings.IndexByte(googUsr.Name, '(')-1]
+		usr.Email = googUsr.Email
+		usr.EncryptedPassword = ""
+		usr.Role = "user"
+
+		if err = dbUser.RegisterUser(usr.ToMap()); err != nil {
+			http.Error(w, "{\"Error\": \"Fatal error add\"}", http.StatusInternalServerError)
+			fmt.Fprintln(os.Stderr, err.Error())
+			return
+		}
+	} else {
+		usr.Username = googUsr.Name[:strings.IndexByte(googUsr.Name, '(')-1]
+
+		if strings.Contains(googUsr.Picture[8:], "lh3.googleusercontent.com/a/") {
+			usr.ProfilePicture = dbUser.RandomProfilPicture()
+		} else {
+			usr.ProfilePicture = googUsr.Picture
+		}
+
+		if err = usr.UpdateUser(map[string]interface{}{
+			"email":           usr.Email,
+			"password":        "",
+			"profile_picture": usr.ProfilePicture,
+			"role":            "user",
+			"username":        usr.Username,
+			"user_uuid":       usr.UUID,
+		}); err != nil {
+			http.Error(w, "{\"Error\": \"Fatal error update\"}", http.StatusInternalServerError)
+			fmt.Fprintln(os.Stderr, err.Error())
+			return
+		}
+	}
+
+	http.SetCookie(w, &http.Cookie{
+		Name:   "UserLogged",
+		Value:  usr.ToCookieValue(),
+		Path:   "/",
+		MaxAge: 300, // 5 minutes
+	})
+
+	fmt.Printf("User logged in: %s -> %s (%s)\n", usr.UUID, usr.Username, usr.Email)
+
+	http.Redirect(w, r, "/", http.StatusPermanentRedirect)
 }
 
 // Récupère le token OAuth2 en échangeant le code d'autorisation
