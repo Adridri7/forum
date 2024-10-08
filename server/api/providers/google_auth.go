@@ -9,11 +9,6 @@ import (
 	"os"
 )
 
-const (
-	GOOGLE_ID     = "54777063980-5g9u1tgobagtb6m7s60i50e64qn0v04t.apps.googleusercontent.com"
-	GOOGLE_SECRET = "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"
-)
-
 // Gestion du clic sur le bouton de connexion "Login with Google"
 func HandleGoogleLogin(w http.ResponseWriter, r *http.Request) {
 	// Construire l'URL d'authentification Google manuellement

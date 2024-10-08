@@ -9,11 +9,6 @@ import (
 	"os"
 )
 
-const (
-	GITHUB_ID = "Ov23libnZpblLJfYUNV0"
-	GITHUB_SECRET = "ddb158a0782ac5c6d9b0141784df6f0c9b2d33de"
-)
-
 // Gestion du clic sur le bouton de connexion "Login with Github"
 func HandleGithubLogin(w http.ResponseWriter, r *http.Request) {
 	// Construire l'URL d'authentification Github manuellement

@@ -57,12 +57,14 @@ func LoadEnvVariables() error {
 			return fmt.Errorf("reading Env variables: %v", err)
 		}
 
+		line = []byte(strings.TrimSpace(string(line)))
+
 		if err = os.Setenv(string(line)[:strings.Index(string(line), "=")], string(line)[strings.Index(string(line), "=")+1:]); err != nil {
 			return fmt.Errorf("setting Env variables: %v", err)
 		}
 
 		// Debug
-		//fmt.Printf("New env variable: %s = %s", string(line)[:strings.Index(string(line), "=")], os.Getenv(string(line)[:strings.Index(string(line), "=")]))
+		fmt.Printf("New env variable: %s = %s\n", string(line)[:strings.Index(string(line), "=")], os.Getenv(string(line)[:strings.Index(string(line), "=")]))
 	}
 
 	return nil
