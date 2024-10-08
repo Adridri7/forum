@@ -81,25 +81,33 @@ function CreatedModal() {
     <svg xmlns="http://www.w3.org/2000/svg" height="28px" viewBox="0 -960 960 960" width="28px" fill="currentcolor">
         <path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm0-80h560v-560H200v560Zm40-80h480L570-480 450-320l-90-120-120 160Zm-40 80v-560 560Z" />
     </svg>`;
-
     const imageUploadInput = document.createElement('input');
     imageUploadInput.type = 'file';
     imageUploadInput.setAttribute('accept', 'image/*');
     imageUploadInput.style.display = 'none';
-
+    
     imageUploadInput.addEventListener('change', () => {
+        const maxFileSize = 20 * 1024 * 1024; // 20 Mo en octets
+        const selectedFile = imageUploadInput.files[0];
+    
+        if (selectedFile.size > maxFileSize) {
+            alert('Le fichier est trop volumineux. La taille maximale est de 20 Mo.');
+            imageUploadInput.value = ''; // Réinitialise l'input pour permettre un nouveau choix
+            return;
+        }
+    
         createdPost.style.height = '580px';
-
+    
         var fr = new FileReader();
         fr.onload = () => {
             embedPreview.src = fr.result;
         };
-        fr.readAsDataURL(imageUploadInput.files[0]);
-
-        embedPreview.alt = imageUploadInput.files.item(0).name;
-
+        fr.readAsDataURL(selectedFile);
+    
+        embedPreview.alt = selectedFile.name;
+    
         removeImg.style.display = 'block';
-    });
+    });    
 
     imageUpload.addEventListener('click', () => {
         imageUploadInput.click();
