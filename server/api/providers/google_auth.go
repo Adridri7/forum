@@ -13,6 +13,11 @@ import (
 	"os"
 )
 
+const (
+	GOOGLE_ID     = "54777063980-5g9u1tgobagtb6m7s60i50e64qn0v04t.apps.googleusercontent.com"
+	GOOGLE_SECRET = "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"
+)
+
 type GoogleUser struct {
 	Name    string `json:"name"`
 	Picture string `json:"picture"`
@@ -25,11 +30,13 @@ func HandleGoogleLogin(w http.ResponseWriter, r *http.Request) {
 	// Construire l'URL d'authentification Google manuellement
 	authURL := fmt.Sprintf("%s?client_id=%s&redirect_uri=%s&response_type=code&scope=%s&state=%s",
 		oauthGoogleURL,
-		os.Getenv("GOOGLE_ID"),
+		GOOGLE_ID,
 		redirectGoogleURL,
-		"openid email profile", // Chaine de caractères contenant les scopes
+		"openid+email+profile", // Chaine de caractères contenant les scopes
 		OAuthState,
 	)
+
+	fmt.Println(authURL)
 
 	http.Redirect(w, r, authURL, http.StatusTemporaryRedirect)
 }
@@ -56,12 +63,16 @@ func HandleGoogleCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	fmt.Println("Token :", token)
+
 	// Utiliser le token pour récupérer les informations utilisateur
 	userInfo, err := getGoogleUserInfo(token.AccessToken)
 	if err != nil {
 		http.Error(w, "Failed to get user info", http.StatusInternalServerError)
 		return
 	}
+
+	fmt.Println("User info :", userInfo)
 
 	// Décoder les infos utilisateur renvoyées...
 	var googUsr GoogleUser
@@ -91,7 +102,12 @@ func HandleGoogleCallback(w http.ResponseWriter, r *http.Request) {
 			usr.ProfilePicture = googUsr.Picture
 		}
 
-		usr.Username = googUsr.Name[:strings.IndexByte(googUsr.Name, '(')-1]
+		if strings.IndexByte(googUsr.Name, '(') == -1 {
+			usr.Username = googUsr.Name
+		} else {
+			usr.Username = googUsr.Name[:strings.IndexByte(googUsr.Name, '(')-1]
+		}
+
 		usr.Email = googUsr.Email
 		usr.EncryptedPassword = ""
 		usr.Role = "user"
@@ -102,7 +118,11 @@ func HandleGoogleCallback(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	} else {
-		usr.Username = googUsr.Name[:strings.IndexByte(googUsr.Name, '(')-1]
+		if strings.IndexByte(googUsr.Name, '(') == -1 {
+			usr.Username = googUsr.Name
+		} else {
+			usr.Username = googUsr.Name[:strings.IndexByte(googUsr.Name, '(')-1]
+		}
 
 		if strings.Contains(googUsr.Picture[8:], "lh3.googleusercontent.com/a/") {
 			usr.ProfilePicture = dbUser.RandomProfilPicture()
@@ -141,10 +161,12 @@ func getGoogleOauthToken(code string) (*OAuthToken, error) {
 	// Préparer la requête POST pour obtenir le token
 	data := url.Values{}
 	data.Set("code", code)
-	data.Set("client_id", os.Getenv("GOOGLE_ID"))
-	data.Set("client_secret", os.Getenv("GOOGLE_SECRET"))
+	data.Set("client_id", GOOGLE_ID)
+	data.Set("client_secret", GOOGLE_SECRET)
 	data.Set("redirect_uri", redirectGoogleURL)
 	data.Set("grant_type", "authorization_code")
+
+	fmt.Println("Data for token :", data)
 
 	// Faire la requête POST pour obtenir le token
 	response, err := http.PostForm(tokenGoogleURL, data)
@@ -158,6 +180,8 @@ func getGoogleOauthToken(code string) (*OAuthToken, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to read token response: %v", err)
 	}
+
+	fmt.Println("Token response :", string(body))
 
 	var token OAuthToken
 	if err := json.Unmarshal(body, &token); err != nil {
