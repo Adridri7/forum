@@ -19,7 +19,6 @@ export async function fetchAllcomments(postUuid) {
         comments.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
         comments.forEach(comment => {
-            console.log("contenu du commentaire :", comment)
             DisplayMessages(comment, true);
         });
 

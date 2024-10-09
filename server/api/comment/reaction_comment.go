@@ -2,7 +2,6 @@ package comments
 
 import (
 	"encoding/json"
-	"fmt"
 	"forum/server"
 	"forum/server/posts/reaction"
 	posts "forum/server/utils"
@@ -48,17 +47,14 @@ func HandleLikeDislikeCommentAPI(w http.ResponseWriter, r *http.Request) {
 
 	err = reaction.HandleLikeDislikeComment(server.Db, req.CommentID, userUUID, req.Action)
 	if err != nil {
-		fmt.Println("J'aimerai connaitre l'erreur :", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	// Récupérer les nouveaux compteurs
-	fmt.Println("Le Comment ID :", req.CommentID)
 	getCountsQuery := `SELECT likes, dislikes FROM comments WHERE comment_id = ?`
 	rows, err := server.RunQuery(getCountsQuery, req.CommentID)
 	if err != nil || len(rows) == 0 {
-		fmt.Println("Erreur lors de la récup des compteurs :", err) // L'erreur est ici
 		http.Error(w, "Erreur lors de la récupération des compteurs", http.StatusInternalServerError)
 		return
 	}
@@ -72,7 +68,6 @@ func HandleLikeDislikeCommentAPI(w http.ResponseWriter, r *http.Request) {
 	err = server.Db.QueryRow(userReactionQuery, req.CommentID, userUUID, req.CommentID, userUUID).Scan(&hasLiked, &hasDisliked)
 	if err != nil {
 		http.Error(w, "Erreur lors de la vérification de la réaction de l'utilisateur", http.StatusInternalServerError)
-		fmt.Println("Erreur lors de la vérif de la réac : ", err)
 		return
 	}
 
@@ -86,7 +81,6 @@ func HandleLikeDislikeCommentAPI(w http.ResponseWriter, r *http.Request) {
 		},
 	}
 
-	fmt.Println(response)
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(response)
 }

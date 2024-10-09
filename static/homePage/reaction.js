@@ -1,9 +1,7 @@
 
 export async function toggleReaction(event, postUuid) {
-    console.log('toggleReaction called', postUuid);
     const button = event.target.closest('.like-btn, .dislike-btn');
     const action = button.classList.contains('like-btn') ? 'like' : 'dislike';
-    console.log('Action:', action);
 
     try {
         const response = await fetch('/api/like-dislike', {
@@ -20,11 +18,8 @@ export async function toggleReaction(event, postUuid) {
         }
 
         const result = await response.json();
-        console.log(result);
         updateReactionUI(postUuid, result.likes, result.dislikes, result.userReaction);
 
-        // Optionnel : Rafraîchir tous les posts si nécessaire
-        // fetchPosts();
     } catch (error) {
         console.error('Erreur :', error);
     }
@@ -42,12 +37,6 @@ function updateReactionUI(postUuid, likes, dislikes, userReaction) {
     // Mettre à jour les compteurs
     if (likeCount) likeCount.textContent = likes;
     if (dislikeCount) dislikeCount.textContent = dislikes;
-
-    console.log('Message item:', messageItem);
-    console.log('Like button:', likeBtn);
-    console.log('Dislike button:', dislikeBtn);
-    console.log('User has liked:', userReaction.hasLiked);
-    console.log('User has disliked:', userReaction.hasDisliked);
 
     // Mettre à jour l'apparence des boutons
     likeBtn.classList.toggle('active', userReaction.hasLiked);
@@ -77,14 +66,12 @@ function displayPosts(posts) {
 
 
 export async function toggleCommentReaction(event, commentID,) {
-    console.log('toggleReactionComment:', commentID);
     const button = event.target.closest('.like-comment-btn, .dislike-comment-btn');
     if (!button) {
         console.error('Button not found');
         return;
     }
     const action = button.classList.contains('like-comment-btn') ? 'like' : 'dislike';
-    console.log('Action:', action);
 
     try {
         const response = await fetch('/api/post/like-dislikeComment', {
@@ -102,7 +89,6 @@ export async function toggleCommentReaction(event, commentID,) {
         }
 
         const result = await response.json();
-        console.log("Résultat:", result);
         updateReactionCommentUI(commentID, result.likes, result.dislikes, result.userReaction);
 
     } catch (error) {
@@ -122,12 +108,6 @@ function updateReactionCommentUI(postUuid, likes, dislikes, userReaction) {
     // Mettre à jour les compteurs
     if (likeCount) likeCount.textContent = likes;
     if (dislikeCount) dislikeCount.textContent = dislikes;
-
-    console.log('Message item:', messageItem);
-    console.log('Like button:', likeBtn);
-    console.log('Dislike button:', dislikeBtn);
-    console.log('User has liked:', userReaction.hasLiked);
-    console.log('User has disliked:', userReaction.hasDisliked);
 
     // Mettre à jour l'apparence des boutons
     likeBtn.classList.toggle('active', userReaction.hasLiked);

@@ -14,10 +14,9 @@ export async function createPost(event) {
         return hashtags;
     }
 
-    const hashtags = extractHashtags(messageContent); // Extraire les hashtags
+    const hashtags = extractHashtags(messageContent);
 
     const img = document.getElementById('embed-preview')
-    console.log(img);
 
     const data = {
         content: messageContent,
@@ -33,7 +32,6 @@ export async function createPost(event) {
             },
             body: JSON.stringify(data)
         });
-        //console.log(data)
         if (response.ok) {
             alert("Post créé avec succès!");
             messageInput.value = '';

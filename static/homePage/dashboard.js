@@ -1,5 +1,5 @@
-import { CommentReaction, deletePost, Reaction } from "./app.js";
-import { handleCommentClick, handleMenuClick, initEventListeners } from "./comment.js";
+import { deletePost } from "./app.js";
+import { initEventListeners } from "./comment.js";
 import { toggleMenu } from "./displayMessage.js";
 import { getUserInfoFromCookie, resetUsersPost } from "./utils.js";
 
@@ -81,8 +81,8 @@ export function DisplayPersonnalMessages(post, isComment = false) {
     // Créer le menu dans messageItem
     const menu = document.createElement('ul');
     menu.classList.add('menu');
-    menu.style.display = 'none'; // caché par défaut
-    menu.setAttribute('data-post-uuid', post.post_uuid); // Ajouter un attribut data pour identifier le menu
+    menu.style.display = 'none';
+    menu.setAttribute('data-post-uuid', post.post_uuid);
 
     const deleteMenuItem = document.createElement('li');
     deleteMenuItem.classList.add('menu-item');
@@ -97,7 +97,7 @@ export function DisplayPersonnalMessages(post, isComment = false) {
     messageHeader.appendChild(roleDiv);
     messageHeader.appendChild(timeStampSpan);
     messageHeader.appendChild(menuButton);
-    messageHeader.appendChild(menu); // Ajout du menu à l'en-tête
+    messageHeader.appendChild(menu);
 
     // Créer le contenu du message
     const messageContent = document.createElement('div');
@@ -124,6 +124,7 @@ export function DisplayPersonnalMessages(post, isComment = false) {
     }
 
     likeButton.innerHTML = svgLike;
+    likeButton.style.opacity = '0.2';
 
     const countLike = document.createElement('div');
     countLike.classList.add('like-count');
@@ -148,6 +149,7 @@ export function DisplayPersonnalMessages(post, isComment = false) {
     const countDislike = document.createElement('div');
     countDislike.classList.add('dislike-count');
     countDislike.textContent = post.dislikes;
+    dislikeButton.style.opacity = '0.2';
 
     dislikeButton.appendChild(countDislike);
     dislikeButton.disabled = true;
@@ -171,6 +173,7 @@ export function DisplayPersonnalMessages(post, isComment = false) {
     commentCount.classList.add('comment-count');
     commentCount.textContent = post.comment_count;
     commentButton.disabled = true;
+    commentButton.style.opacity = '0.2';
 
     commentButton.appendChild(commentCount);
 
@@ -196,7 +199,6 @@ export async function fetchPersonnalPosts() {
     resetUsersPost();
     const messagesList = document.getElementById('users-personnal-post');
     messagesList.innerHTML = '<p>Loading...</p>';
-    console.log(userInfo.uuid);
     try {
         const response = await fetch("http://localhost:8080/api/post/fetchPostByUser", {
             method: "POST",
@@ -216,7 +218,6 @@ export async function fetchPersonnalPosts() {
             messagesList.innerHTML = '<p>No posts available.</p>';
         } else {
             posts.sort((b, a) => new Date(b.created_at) - new Date(a.created_at));
-            console.log("post : ", posts);
             posts.forEach(post => {
                 DisplayPersonnalMessages(post);
             });
@@ -252,7 +253,6 @@ export async function fetchPersonnalComment() {
             messagesList.innerHTML = '<p>No posts available.</p>';
         } else {
             posts.sort((b, a) => new Date(b.created_at) - new Date(a.created_at));
-            console.log("comment : ", posts);
             posts.forEach(post => {
                 DisplayPersonnalMessages(post, true);
             });
@@ -269,7 +269,6 @@ export async function fetchPersonnalResponse() {
     const messagesList = document.getElementById('users-personnal-post');
     const userInfo = getUserInfoFromCookie();
     messagesList.innerHTML = '<p>Loading...</p>';
-    console.log(userInfo.uuid);
     try {
         const response = await fetch("http://localhost:8080/api/post/fetchResponseUser", {
             method: "POST",
@@ -289,7 +288,6 @@ export async function fetchPersonnalResponse() {
             messagesList.innerHTML = '<p>No posts available.</p>';
         } else {
             posts.sort((b, a) => new Date(b.created_at) - new Date(a.created_at));
-            console.log("response : ", posts);
             posts.forEach(post => {
                 DisplayPersonnalMessages(post);
             });
@@ -299,27 +297,4 @@ export async function fetchPersonnalResponse() {
         console.error(error);
     }
     initEventListeners();
-}
-
-function initReactionEventListeners() {
-    // Sélectionne tous les boutons de commentaire
-    const commentButtons = document.querySelectorAll('.comment-btn');
-
-    // Réinitialise les événements pour chaque bouton de commentaire
-    commentButtons.forEach(button => {
-        button.removeEventListener('click', handleCommentClick);
-        button.addEventListener('click', handleCommentClick);
-    });
-
-    // const reactionCommentButton = document.getElementById('reaction-comment-btn');
-    // reactionCommentButton.addEventListener('click', CommentReaction);
-
-    // Sélectionne tous les boutons de menu (dans chaque message-item)
-    const menuButtons = document.querySelectorAll('.menu-btn');
-
-    // Réinitialise les événements pour chaque bouton de menuÒ
-    menuButtons.forEach(button => {
-        button.removeEventListener('click', handleMenuClick);
-        button.addEventListener('click', handleMenuClick);
-    });
 }

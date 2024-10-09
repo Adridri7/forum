@@ -44,7 +44,7 @@ function CreatedModal() {
 
     const image = document.createElement('img');
 
-    getPPFromID(userInfo.uuid).then(img => {image.src = img});
+    getPPFromID(userInfo.uuid).then(img => { image.src = img });
 
     profile_picture.appendChild(image)
 
@@ -85,41 +85,54 @@ function CreatedModal() {
     imageUploadInput.type = 'file';
     imageUploadInput.setAttribute('accept', 'image/*');
     imageUploadInput.style.display = 'none';
-    
+
+    // Associer le bouton d'upload au champ input pour l'upload d'image
+    imageUpload.addEventListener('click', (event) => {
+        event.preventDefault();
+        imageUploadInput.click();
+    });
+
+
     imageUploadInput.addEventListener('change', () => {
         const maxFileSize = 20 * 1024 * 1024; // 20 Mo en octets
         const selectedFile = imageUploadInput.files[0];
-    
+
+        if (!selectedFile) {
+            return;
+        }
+
         if (selectedFile.size > maxFileSize) {
             alert('Le fichier est trop volumineux. La taille maximale est de 20 Mo.');
             imageUploadInput.value = ''; // Réinitialise l'input pour permettre un nouveau choix
             return;
         }
-    
+
         createdPost.style.height = '580px';
-    
-        var fr = new FileReader();
+
+        const fr = new FileReader();
         fr.onload = () => {
             embedPreview.src = fr.result;
+            embedPreview.style.display = 'block';  // Rendre l'aperçu visible à nouveau
+            removeImg.style.display = 'block';  // Affiche le bouton de suppression
         };
         fr.readAsDataURL(selectedFile);
-    
-        embedPreview.alt = selectedFile.name;
-    
-        removeImg.style.display = 'block';
-    });    
 
-    imageUpload.addEventListener('click', () => {
-        imageUploadInput.click();
+        embedPreview.alt = selectedFile.name;  // Mettre à jour l'attribut alt de l'aperçu
     });
-    imageUpload.appendChild(imageUploadInput);
 
-    // Remove image button logic
-    removeImg.addEventListener('click', function () {
-        embedPreview.src = '';  // Remove the src attribute of the image
-        embedPreview.style.display = 'none';  // Hide the image
-        removeImg.style.display = 'none';  // Hide the remove button
-        createdPost.style.height = '260px';
+    removeImg.addEventListener('click', function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        // Réinitialiser l'image
+        embedPreview.src = '';  // Vide la source de l'image
+        embedPreview.alt = '';  // Réinitialise l'attribut alt
+        embedPreview.style.display = 'none';  // Masquer l'image
+        removeImg.style.display = 'none';  // Masquer le bouton de suppression
+
+        // Réinitialiser l'input de fichier
+        imageUploadInput.value = '';  // Vide la sélection d'image
+        createdPost.style.height = '260px';  // Réduire la taille de la boîte
     });
 
     const postButton = document.createElement('button');
@@ -151,14 +164,14 @@ function CreatedModal() {
             window.location.href = "/authenticate";
             return;
         }
-        
+
         createPost(event);
     });
 
     inputField.addEventListener('keydown', (event) => {
         if (event.key === 'Enter') {
             event.preventDefault();
-            createPost(event); // Appelle la fonction pour créer le post
+            createPost(event);
         }
     });
 }
@@ -169,17 +182,20 @@ function closeModal(event) {
     console.log("ya un appel");
     const newpost = document.getElementById('created-post');
     const modalpost = document.getElementById('modal-post');
-    // Vérifie si le clic a eu lieu en dehors de 'created-post'
-    if (!newpost.contains(event.target) && event.target !== addButton && isModal) {
+
+    // Vérifie si l'élément cliqué est la croix ou un enfant du modal
+    const isClickInsideModal = newpost.contains(event.target);
+    const isClickOnRemoveImg = event.target.id === 'remove-image';  // Ajoute une vérification pour la croix
+
+    if (!isClickInsideModal && event.target !== addButton && isModal && !isClickOnRemoveImg) {
         console.log("il ferme");
-        newpost.style.display = 'none'; // Ferme le post
-        modalpost.style.display = 'none'; // Ferme aussi le fond modal
+        newpost.style.display = 'none';
+        modalpost.style.display = 'none';
         isModal = false;
 
         document.removeEventListener('click', closeModal);
     }
 }
-
 loginBtn.addEventListener('click', () => {
     window.location.href = "/authenticate"
 })

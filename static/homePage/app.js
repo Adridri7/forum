@@ -2,7 +2,6 @@ import { DisplayMessages } from "./displayMessage.js";
 import { initEventListeners } from "./comment.js";
 import { fetchCategories } from "./fetchcategories.js";
 import { getPPFromID, getUserInfoFromCookie, resetUsersPost } from "./utils.js";
-import { fetchPostsByCategory } from './fetchcategories.js';
 import { NewPost } from "./newPost.js";
 import { handleLogout } from "./logout.js";
 import { fetchAllUsers } from "./displayUser.js";
@@ -17,7 +16,6 @@ import { fetchPersonnalComment, fetchPersonnalPosts, fetchPersonnalResponse } fr
 // Sélectionnez les éléments
 const toggleButton = document.getElementById('toggle-menu-btn');
 const sidebar = document.getElementById('sidebar');
-// const darkModeToggle = document.getElementById('dark-mode-toggle');
 const addButton = document.getElementById('add-button');
 
 const darkModeToggles = document.querySelectorAll('.dark-mode-toggle');
@@ -79,7 +77,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const profilMenu = document.querySelector('.profil-menu');
 
     // Fonction pour récupérer les informations utilisateur depuis le cookie
-    const userInfo = getUserInfoFromCookie(); // Assure-toi que cette fonction existe
+    const userInfo = getUserInfoFromCookie();
 
     // Vérifiez si les informations utilisateur sont valides
     if (isUserInfoValid()) {
@@ -90,23 +88,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         const profileImage = document.createElement('img');
         profileImage.src = await getPPFromID(userInfo.uuid);
         profileImage.alt = 'User profile';
-        profileImage.classList.add('profile-image'); // Ajoute une classe pour styliser l'image
+        profileImage.classList.add('profile-image');
 
         // Créer le menu contextuel
         const menu = document.createElement('div');
-        menu.classList.add('profile-menu'); // Classe pour styliser le menu
-        menu.style.display = 'none'; // Masquer le menu par défaut
+        menu.classList.add('profile-menu');
+        menu.style.display = 'none';
 
-        // Créer le bouton "Logout"
         const logoutButton = document.createElement('button');
         logoutButton.id = "logout-btn";
         logoutButton.textContent = 'Log Out';
         logoutButton.addEventListener('click', handleLogout);
 
-        // Ajouter le bouton "Logout" au menu
         menu.appendChild(logoutButton);
 
-        // Ajouter l'image et le menu dans la div
         profileDiv.appendChild(profileImage);
         profileDiv.appendChild(menu);
 
@@ -128,8 +123,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         return; // Sortir de la fonction si l'utilisateur est connecté
     }
 
-    // Si l'utilisateur n'est pas connecté ou a perdu le cookie
-    console.log("L'utilisateur n'est pas connecté.");
     // Si le bouton "Login" n'est pas déjà dans le menu
     if (!profilMenu.contains(loginButton)) {
         // Créer un nouveau bouton "Login" si nécessaire
@@ -246,9 +239,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const isCommentReaction = event.target.closest('.like-comment-btn') || event.target.closest('.dislike-comment-btn');
 
         if (isPostReaction) {
-            Reaction(event); // Appeler la fonction pour les réactions sur les posts
+            Reaction(event);
         } else if (isCommentReaction) {
-            CommentReaction(event); // Appeler la fonction pour les réactions sur les commentaires
+            CommentReaction(event);
         }
     });
 });
@@ -276,7 +269,7 @@ homeLink.addEventListener('click', () => {
 });
 
 dashboardLink.addEventListener('click', () => {
-    const userInfo = getUserInfoFromCookie(); // Récupère les informations utilisateur
+    const userInfo = getUserInfoFromCookie();
     const personnalPost = document.getElementById('personnal-post');
 
     if (!userInfo) {
@@ -287,21 +280,19 @@ dashboardLink.addEventListener('click', () => {
     hideAllSections();
     dashboardSection.style.display = 'flex';
     const currentActiveItem = document.querySelector('#nav-bar li.active');
-    // Vérifier quel élément est actuellement actif et appeler la fonction correspondante
     if (currentActiveItem) {
         const activeId = currentActiveItem.id;
 
         // Fetch basé sur l'élément actif
         switch (activeId) {
             case 'personnal-post':
-                fetchPersonnalPosts(); // Ou toute autre fonction que vous avez pour les posts
+                fetchPersonnalPosts();
                 break;
-            case 'personnal-comment': // Si vous avez un élément avec id 'liked-posts'
-                fetchPersonnalComment(); // Appelez la fonction appropriée ici
+            case 'personnal-comment':
+                fetchPersonnalComment();
                 break;
             case 'personnal-reaction':
                 fetchPersonnalResponse();
-            // Ajoutez d'autres cas selon vos besoins
             default:
                 break;
         }
@@ -313,9 +304,7 @@ dashboardLink.addEventListener('click', () => {
 
     navItems.forEach(item => {
         item.addEventListener('click', () => {
-            // Retirer la classe active de tous les éléments
             navItems.forEach(nav => nav.classList.remove('active'));
-            // Ajouter la classe active à l'élément cliqué
             item.classList.add('active');
         });
     });

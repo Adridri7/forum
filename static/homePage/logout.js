@@ -15,13 +15,11 @@ export async function handleLogout(event) {
             });
 
             if (response.ok) {
-                window.location.href = '/'; // Redirige vers la page d'accueil après la déconnexion
+                window.location.href = '/';
             } else {
-                // Gérer les erreurs de réponse ici
                 console.error('Erreur lors de la déconnexion');
             }
         } catch (error) {
-            // Gérer les erreurs de réseau ici
             console.error('Erreur réseau :', error);
         }
     }

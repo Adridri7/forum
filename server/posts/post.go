@@ -44,8 +44,6 @@ func CreatePost(db *sql.DB, r *http.Request, params map[string]interface{}) (*Po
 
 	image, imageOK := params["post_image"].(string)
 
-	fmt.Println(image)
-
 	if !imageOK {
 		image = ""
 	}

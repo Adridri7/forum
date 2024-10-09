@@ -26,8 +26,6 @@ func CreateComment(db *sql.DB, params map[string]interface{}) (*Comment, error) 
 
 	comment_UUID, _ := posts.GenerateUUID()
 
-	fmt.Println(comment_UUID)
-
 	post_UUID, postOK := params["post_uuid"].(string)
 
 	// !userOK
@@ -92,9 +90,9 @@ func FetchAllComments(db *sql.DB) ([]Comment, error) {
 		if username, ok := row["username"].(string); ok {
 			comment.Username = username
 		}
-		if profilePicture, ok := row["profile_picture"].(string); ok {
-			comment.ProfilePicture = profilePicture
-		}
+		// if profilePicture, ok := row["profile_picture"].(string); ok {
+		// 	comment.ProfilePicture = profilePicture
+		// }
 		comments = append(comments, comment)
 	}
 

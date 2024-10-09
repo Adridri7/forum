@@ -1,6 +1,6 @@
 export async function fetchAllUsers() {
     try {
-        const response = await fetch('/api/users/fetchAllUsers'); // Remplace par l'URL de ton API
+        const response = await fetch('/api/users/fetchAllUsers');
         if (!response.ok) {
             throw new Error('Erreur lors de la récupération des utilisateurs');
         }
@@ -15,33 +15,29 @@ export async function fetchAllUsers() {
 // Fonction pour afficher les utilisateurs dans la liste
 function displayUsers(users) {
     const usersList = document.getElementById('user-list');
-    usersList.innerHTML = ''; // Vide la liste existante
+    usersList.innerHTML = '';
 
     users.forEach(user => {
-        // Création de l'élément <li> pour chaque utilisateur
         const li = document.createElement('li');
-        li.style.display = 'flex'; // Pour aligner l'image et le texte
+        li.style.display = 'flex';
         li.style.alignItems = 'center';
-        li.style.marginBottom = '10px'; // Espacement entre les éléments
+        li.style.marginBottom = '10px';
 
         // Ajout de l'image de profil
         const img = document.createElement('img');
-        img.src = user.profile_picture || 'default-profile.png'; // Utilise une image par défaut si aucune n'est fournie
+        img.src = user.profile_picture || "https://koreus.cdn.li/media/201404/90-insolite-34.jpg";
         img.alt = `${user.username}'s profile picture`;
-        img.style.width = '40px'; // Définir la taille de l'image
+        img.style.width = '40px';
         img.style.height = '40px';
-        img.style.borderRadius = '50%'; // Forme circulaire
-        img.style.marginRight = '10px'; // Espacement entre l'image et le texte
+        img.style.borderRadius = '50%';
+        img.style.marginRight = '10px';
 
-        // Ajout du nom d'utilisateur
         const username = document.createElement('span');
         username.textContent = user.username || 'Nom d\'utilisateur inconnu';
 
-        // Ajout de l'image et du nom d'utilisateur dans l'élément <li>
         li.appendChild(img);
         li.appendChild(username);
 
-        // Ajout de l'élément <li> dans la liste <ul>
         usersList.appendChild(li);
     });
 }

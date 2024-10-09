@@ -7,8 +7,6 @@ export async function FetchMostUseCategories() {
         }
         const tendances = await response.json();
 
-        console.log("Trend:", tendances)
-
         // Affiche les posts dans la liste
         // displayTendance(tendances);
     } catch (error) {

@@ -1,7 +1,6 @@
-import { fetchPosts, Reaction } from "./app.js";
+import { fetchPosts } from "./app.js";
 import { toggleMenu } from "./displayMessage.js";
 import { fetchCategories } from "./fetchcategories.js";
-import { toggleCommentReaction } from "./reaction.js";
 import { fetchAllcomments } from "./showComment.js";
 import { getUserInfoFromCookie, getPPFromID } from "./utils.js";
 
@@ -11,10 +10,6 @@ const AppState = {
     SEARCH: 'search'
 };
 
-let currentState = {
-    type: AppState.HOME,
-    data: null
-};
 
 // Fonction pour gérer le clic sur le bouton de commentaire
 export function handleCommentClick() {
@@ -31,7 +26,6 @@ export function handleCommentClick() {
 
 export function updateAppState(newState, pushState = true) {
     const title = document.getElementById('title');
-    const userPostsContainer = document.getElementById('users-post');
 
     switch (newState.type) {
         case AppState.HOME:
@@ -47,7 +41,7 @@ export function updateAppState(newState, pushState = true) {
             fetchCategories();
             break;
         default:
-            // Si l'état n'est pas reconnu, revenez à l'accueil
+            // Si l'état n'est pas reconnu, retour à l'accueil
             newState.type = AppState.HOME;
             title.textContent = 'General';
             fetchPosts();
@@ -116,9 +110,8 @@ export function createCommentInput() {
     const commentInputContainer = document.createElement('div');
     commentInputContainer.classList.add('comment-input-container');
 
-    // Créer un conteneur pour l'image de profil
     const profileImageContainer = document.createElement('div');
-    profileImageContainer.classList.add('profile-image-container'); // Ajoutez une classe pour le style si nécessaire
+    profileImageContainer.classList.add('profile-image-container');
 
     const profileImage = document.createElement('img');
     if (userInfo) {
@@ -129,7 +122,6 @@ export function createCommentInput() {
     profileImage.alt = 'Profil-picture';
     profileImage.classList.add('profile-image');
 
-    // Ajouter l'image de profil au conteneur
     profileImageContainer.appendChild(profileImage);
 
     const form = document.createElement('form');
@@ -171,7 +163,7 @@ export function createCommentInput() {
     }
 
 
-    // Ajouter le conteneur de l'image et les autres éléments au formulaire
+
     form.appendChild(profileImageContainer);
     form.appendChild(commentInput);
     form.appendChild(submitButton);
@@ -227,9 +219,8 @@ export async function createComment(post_uuid, user_uuid) {
         });
 
         if (response.ok) {
-            console.log(data)
             alert("Commentaire ajouté avec succès!");
-            // Vous pourriez vouloir actualiser la liste des commentaires ici
+            fetchAllcomments(post_uuid);
         } else {
             const error = await response.json();
             alert("Erreur lors de l'ajout du commentaire: " + error.message);
@@ -239,14 +230,6 @@ export async function createComment(post_uuid, user_uuid) {
         alert("Une erreur s'est produite lors de l'envoi du commentaire. Veuillez réessayer.");
     }
 }
-
-// Fonction pour supprimer tous les messages sauf le post créé
-// function removeAllMessagesExceptCreatedPost() {
-//     const messageItems = document.querySelectorAll('.message-item');
-//     messageItems.forEach(item => {
-//         item.remove();
-//     });
-// }
 
 // Fonction pour initialiser les événements des boutons
 export function initEventListeners() {
@@ -259,8 +242,6 @@ export function initEventListeners() {
         button.addEventListener('click', handleCommentClick);
     });
 
-    // const reactionCommentButton = document.getElementById('reaction-comment-btn');
-    // reactionCommentButton.addEventListener('click', CommentReaction);
 
     // Sélectionne tous les boutons de menu (dans chaque message-item)
     const menuButtons = document.querySelectorAll('.menu-btn');
@@ -281,13 +262,10 @@ export function handleMenuClick(event) {
 }
 
 
-// Initialisation des événements des boutons au chargement de la page
 document.addEventListener("DOMContentLoaded", () => {
-    // Toujours commencer par la page d'accueil
     updateAppState({ type: AppState.HOME });
 });
 
-// Gestion du lien #home pour revenir à la page principale avec tous les posts
 document.getElementById('home-link').addEventListener('click', function (e) {
     e.preventDefault();
     updateAppState({ type: AppState.HOME });

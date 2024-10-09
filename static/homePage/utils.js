@@ -25,15 +25,13 @@ function removeQuotes(uuid) {
 export async function getPPFromID(id) {
     var pp = "";
 
-    console.log("caca: ", id)
-
     try {
         const response = await fetch("/api/get-pp", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({user_uuid: id})  // Send the data as JSON
+            body: JSON.stringify({ user_uuid: id })  // Send the data as JSON
         });
 
         const data = await response.json();
