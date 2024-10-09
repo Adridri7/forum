@@ -152,3 +152,16 @@ document.getElementById('remove-image').addEventListener('click', function () {
     removeImageButton.style.display = 'none';  // Hide the remove button
     imageContainer.style.display = 'none';  // Hide the image container
 });
+
+// Providers buttons
+document.getElementById('discord-btn').addEventListener('click', () => {
+    window.location.href = '/api/discord_login';
+});
+
+document.getElementById('github-btn').addEventListener('click', () => {
+    window.location.href = '/api/github_login';
+});
+
+document.getElementById('google-btn').addEventListener('click', () => {
+    window.location.href = '/api/google_login';
+});

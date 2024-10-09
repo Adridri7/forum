@@ -3,6 +3,7 @@ package server
 import (
 	"database/sql"
 	"log"
+	"time"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -21,14 +22,30 @@ func init() {
 	// Open database
 	// Magie on peut voir les tables avec les columns er rows
 
-	Db, err = sql.Open("sqlite3", "./forumdatabase.db")
-	if err != nil {
-		log.Fatalf("Erreur lors de l'ouverture de la base de données : %v", err)
+	// Db, err = sql.Open("sqlite3", "./forumdatabase.db")
+	// if err != nil {
+	// 	log.Fatalf("Erreur lors de l'ouverture de la base de données : %v", err)
+	// }
+
+	// // Vérifie la connexion
+	// if err = Db.Ping(); err != nil {
+	// 	log.Fatalf("Erreur lors de la connexion à la base de données : %v", err)
+	// }
+	maxRetries := 5
+	for i := 0; i < maxRetries; i++ {
+		Db, err = sql.Open("sqlite3", "./forumdatabase.db")
+		if err == nil {
+			err = Db.Ping()
+			if err == nil {
+				break
+			}
+		}
+		log.Printf("Tentative de connexion à la base de données échouée (%d/%d). Nouvelle tentative dans 5 secondes...", i+1, maxRetries)
+		time.Sleep(5 * time.Second)
 	}
 
-	// Vérifie la connexion
-	if err = Db.Ping(); err != nil {
-		log.Fatalf("Erreur lors de la connexion à la base de données : %v", err)
+	if err != nil {
+		log.Fatalf("Impossible de se connecter à la base de données après %d tentatives : %v", maxRetries, err)
 	}
 
 	log.Println("Connexion à la base de données réussie")

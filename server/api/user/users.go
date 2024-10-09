@@ -95,6 +95,26 @@ func FetchUserByEmail(email string) (User, error) {
 	return newUser, nil
 }
 
+// Savoir si un utilisateur existe par son nom d'utilisateur ( pour register )
+
+func IsUsernameTaken(username string) (bool, error) {
+	re := regexp.MustCompile(`(?i)<[^>]+>|(SELECT|UPDATE|DELETE|INSERT|DROP|FROM|COUNT|AS|WHERE|--)|^\s|^\s*$|<script.*?>.*?</script.*?>`)
+
+	if re.FindAllString(username, -1) != nil {
+		return false, fmt.Errorf("injection detected")
+	}
+
+	fetchUserQuery := `SELECT * FROM users WHERE username= ?`
+	params := []interface{}{username}
+
+	rows, err := server.RunQuery(fetchUserQuery, params...)
+	if err != nil {
+		return false, fmt.Errorf("erreur lors de la récupération du formulaire: %v", err)
+	}
+
+	return len(rows) >= 1, nil
+}
+
 // Trouver l'image de profil utilisateur avec ID
 func FetchPPByID(id string) (string, error) {
 	fetchUserQuery := `SELECT profile_picture FROM users WHERE user_uuid= ?`
@@ -152,7 +172,7 @@ func RegisterUser(params map[string]interface{}) error {
 	re := regexp.MustCompile(`(?i)<[^>]+>|(SELECT|UPDATE|DELETE|INSERT|DROP|FROM|COUNT|AS|WHERE|--)|^\s|^\s*$|<script.*?>.*?</script.*?>`)
 
 	for key, value := range params {
-		if (key == "username" || key == "email" || key == "password") && re.FindAllString(value.(string), -1) != nil {
+		if (key == "username" || key == "email" || (key == "password" && len(key) == 0)) && re.FindAllString(value.(string), -1) != nil {
 			return fmt.Errorf("injection detected")
 		}
 	}
@@ -176,14 +196,14 @@ func RegisterUser(params map[string]interface{}) error {
 func (u *User) UpdateUser(params map[string]interface{}) error {
 	re := regexp.MustCompile(`(?i)<[^>]+>|(SELECT|UPDATE|DELETE|INSERT|DROP|FROM|COUNT|AS|WHERE|--)|^\s|^\s*$|<script.*?>.*?</script.*?>`)
 
-	for _, value := range params {
-		if re.FindAllString(value.(string), -1) != nil {
+	for key, value := range params {
+		if (key == "username" || key == "email" || (key == "password" && len(key) > 0)) && re.FindAllString(value.(string), -1) != nil {
 			return fmt.Errorf("injection detected")
 		}
 	}
 
 	updateUserQuery := `UPDATE users SET username = ?, email = ?, password = ?, role = ?, profile_picture = ? WHERE user_uuid = ?`
-	_, err := server.RunQuery(updateUserQuery, params)
+	_, err := server.RunQuery(updateUserQuery, params["username"], params["email"], params["password"], params["role"], params["profile_picture"], params["user_uuid"])
 
 	if err != nil {
 		return err
@@ -222,5 +242,3 @@ func FetchAllUsers(db *sql.DB) ([]User, error) {
 
 	return users, nil
 }
-
-//

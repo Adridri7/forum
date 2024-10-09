@@ -6,59 +6,85 @@ import (
 	comments "forum/server/api/comment"
 	authentification "forum/server/api/login"
 	"forum/server/api/post"
+	"forum/server/api/providers"
 	users "forum/server/api/user"
 	"html/template"
 	"net/http"
 	"os"
+	"time"
 )
 
 func main() {
 
-	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
+	// if err := providers.LoadEnvVariables(); err != nil {
+	// 	fmt.Fprintf(os.Stderr, "Error %v\n", err)
+	// 	return
+	// }
 
-	http.HandleFunc("/api/post/createPost", post.CreatePostHandler)
-	http.HandleFunc("/api/post/fetchPost", post.FetchPostHandler)
-	http.HandleFunc("/api/post/fetchAllPost", post.FetchAllPostHandler)
-	http.HandleFunc("/api/post/deletePost", post.DeletePostHandler)
-	http.HandleFunc("/api/post/fetchPostMostLiked", post.FetchPostsMostLikedHandler)
-	http.HandleFunc("/api/post/fetchPostByUser", post.FetchUserPostHandler)
+	mux := http.NewServeMux()
 
-	http.HandleFunc("/api/post/createComment", comments.CreateCommentHandler)
-	http.HandleFunc("/api/post/fetchComment", comments.FetchCommentHandler)
-	http.HandleFunc("/api/post/fetchAllComments", comments.FetchAllCommentsHandler)
-	http.HandleFunc("/api/post/deleteComment", comments.DeleteCommentHandler)
-	http.HandleFunc("/api/post/like-dislikeComment", comments.HandleLikeDislikeCommentAPI)
-	http.HandleFunc("/api/post/fetchCommentByUser", comments.FetchUserCommentsHandler)
-	http.HandleFunc("/api/post/fetchResponseUser", comments.FetchResponseUserHandler)
+	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 
-	http.HandleFunc("/api/login", authentification.LoginHandler)
-	http.HandleFunc("/api/registration", authentification.RegisterHandler)
+	mux.HandleFunc("/api/post/createPost", post.CreatePostHandler)
+	mux.HandleFunc("/api/post/fetchPost", post.FetchPostHandler)
+	mux.HandleFunc("/api/post/fetchAllPost", post.FetchAllPostHandler)
+	mux.HandleFunc("/api/post/deletePost", post.DeletePostHandler)
+	mux.HandleFunc("/api/post/fetchPostMostLiked", post.FetchPostsMostLikedHandler)
+	mux.HandleFunc("/api/post/fetchPostByUser", post.FetchUserPostHandler)
 
-	http.HandleFunc("/api/post/fetchAllCategories", categories.FetchAllCategoriesHandler)
-	http.HandleFunc("/api/post/fetchTendance", categories.FetchTendanceCategoriesHandler)
-	http.HandleFunc("/api/get-pp", authentification.PP_Handler)
-	http.HandleFunc("/api/users/fetchAllUsers", users.FetchAllUsersHandler)
+	mux.HandleFunc("/api/post/createComment", comments.CreateCommentHandler)
+	mux.HandleFunc("/api/post/fetchComment", comments.FetchCommentHandler)
+	mux.HandleFunc("/api/post/fetchAllComments", comments.FetchAllCommentsHandler)
+	mux.HandleFunc("/api/post/deleteComment", comments.DeleteCommentHandler)
+	mux.HandleFunc("/api/post/like-dislikeComment", comments.HandleLikeDislikeCommentAPI)
+	mux.HandleFunc("/api/post/fetchCommentByUser", comments.FetchUserCommentsHandler)
+	mux.HandleFunc("/api/post/fetchResponseUser", comments.FetchResponseUserHandler)
 
-	http.HandleFunc("/logout", users.LogoutHandler)
+	mux.HandleFunc("/api/login", authentification.LoginHandler)
+	mux.HandleFunc("/api/registration", authentification.RegisterHandler)
 
-	http.HandleFunc("/api/post/fetchPostsByCategories", categories.FetchPostByCategoriesHandler)
+	mux.HandleFunc("/api/post/fetchAllCategories", categories.FetchAllCategoriesHandler)
+	mux.HandleFunc("/api/post/fetchTendance", categories.FetchTendanceCategoriesHandler)
+	mux.HandleFunc("/api/get-pp", authentification.PP_Handler)
+	mux.HandleFunc("/api/google_login", providers.HandleGoogleLogin)
+	mux.HandleFunc("/api/google_callback", providers.HandleGoogleCallback)
 
-	http.HandleFunc("/api/like-dislike", post.HandleLikeDislikeAPI)
+	mux.HandleFunc("/api/github_login", providers.HandleGithubLogin)
+	mux.HandleFunc("/api/github_callback", providers.HandleGithubCallback)
 
-	http.HandleFunc("/authenticate", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/discord_login", providers.HandleDiscordLogin)
+	mux.HandleFunc("/api/discord_callback", providers.HandleDiscordCallback)
+	mux.HandleFunc("/api/users/fetchAllUsers", users.FetchAllUsersHandler)
+
+	mux.HandleFunc("/logout", users.LogoutHandler)
+
+	mux.HandleFunc("/api/post/fetchPostsByCategories", categories.FetchPostByCategoriesHandler)
+
+	mux.HandleFunc("/api/like-dislike", post.HandleLikeDislikeAPI)
+
+	mux.HandleFunc("/authenticate", func(w http.ResponseWriter, r *http.Request) {
 		if _, err := r.Cookie("UserLogged"); err == nil {
 			renderTemplate(w, "./static/homePage/index.html", nil)
 		}
 		renderTemplate(w, "./static/authentification/authentification.html", nil)
 	})
 
-	// A faire pour tester : ajouter une route pour la page createPost.html
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		renderTemplate(w, "./static/homePage/index.html", nil)
 	})
 
+	ourServer := http.Server{
+		Addr:              ":8080",
+		Handler:           mux,
+		MaxHeaderBytes:    1 << 26, // 4 MB
+		ReadTimeout:       30 * time.Second,
+		ReadHeaderTimeout: 30 * time.Second,
+		WriteTimeout:      45 * time.Second,
+		IdleTimeout:       3 * time.Minute,
+	}
+
 	fmt.Println("Serveur démarré : http://localhost:8080/")
-	fmt.Fprintln(os.Stderr, http.ListenAndServe(":8080", nil))
+	fmt.Fprintln(os.Stderr, ourServer.ListenAndServe())
 }
 
 func renderTemplate(w http.ResponseWriter, tmpl string, data interface{}) {
