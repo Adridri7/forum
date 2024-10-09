@@ -145,6 +145,8 @@ func FetchPPByID(id string) (string, error) {
 func (u *User) ToMap() map[string]interface{} {
 	usrMap := make(map[string]interface{}, 0)
 
+	fmt.Println("user: ", u.EncryptedPassword)
+
 	usrMap["user_uuid"] = u.UUID
 	usrMap["username"] = u.Username
 	usrMap["email"] = u.Email
@@ -171,11 +173,14 @@ func RegisterUser(params map[string]interface{}) error {
 
 	re := regexp.MustCompile(`(?i)<[^>]+>|(SELECT|UPDATE|DELETE|INSERT|DROP|FROM|COUNT|AS|WHERE|--)|^\s|^\s*$|<script.*?>.*?</script.*?>`)
 
-	for key, value := range params {
-		if (key == "username" || key == "email" || (key == "password" && len(key) == 0)) && re.FindAllString(value.(string), -1) != nil {
-			return fmt.Errorf("injection detected")
+	if params["password"] != "" {
+		for key, value := range params {
+			if (key == "username" || key == "email" || key == "password") && re.FindAllString(value.(string), -1) != nil {
+				return fmt.Errorf("injection detected")
+			}
 		}
 	}
+
 	if profile_picture == "" {
 		profile_picture = RandomProfilPicture()
 	}
@@ -196,9 +201,12 @@ func RegisterUser(params map[string]interface{}) error {
 func (u *User) UpdateUser(params map[string]interface{}) error {
 	re := regexp.MustCompile(`(?i)<[^>]+>|(SELECT|UPDATE|DELETE|INSERT|DROP|FROM|COUNT|AS|WHERE|--)|^\s|^\s*$|<script.*?>.*?</script.*?>`)
 
-	for key, value := range params {
-		if (key == "username" || key == "email" || (key == "password" && len(key) > 0)) && re.FindAllString(value.(string), -1) != nil {
-			return fmt.Errorf("injection detected")
+	if params["password"] != "" {
+
+		for key, value := range params {
+			if (key == "username" || key == "email" || key == "password") && re.FindAllString(value.(string), -1) != nil {
+				return fmt.Errorf("injection detected")
+			}
 		}
 	}
 

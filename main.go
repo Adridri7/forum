@@ -8,18 +8,33 @@ import (
 	"forum/server/api/post"
 	"forum/server/api/providers"
 	users "forum/server/api/user"
+	"forum/server/middleware"
 	"html/template"
+	"log"
 	"net/http"
 	"os"
 	"time"
 )
 
 func main() {
+	// HTTPS
+	/*cert, err := tls.LoadX509KeyPair("server.crt", "server.key")
+	if err != nil {
+		log.Fatalf("Error loading certificate: %v", err)
+	}
 
-	// if err := providers.LoadEnvVariables(); err != nil {
-	// 	fmt.Fprintf(os.Stderr, "Error %v\n", err)
-	// 	return
-	// }
+	// Configuration des cipher suites
+	tlsConfig := &tls.Config{
+		Certificates: []tls.Certificate{cert},
+		MinVersion:   tls.VersionTLS13, // Utilise TLS 1.3 comme version minimum
+		CipherSuites: []uint16{
+			tls.TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,
+			tls.TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,
+			tls.TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,
+			tls.TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,
+			// Ajoute d'autres cipher suites selon tes besoins
+		},
+	}*/
 
 	mux := http.NewServeMux()
 
@@ -42,6 +57,7 @@ func main() {
 
 	mux.HandleFunc("/api/login", authentification.LoginHandler)
 	mux.HandleFunc("/api/registration", authentification.RegisterHandler)
+	mux.HandleFunc("/api/getSession", authentification.GetSession)
 
 	mux.HandleFunc("/api/post/fetchAllCategories", categories.FetchAllCategoriesHandler)
 	mux.HandleFunc("/api/post/fetchTendance", categories.FetchTendanceCategoriesHandler)
@@ -57,23 +73,18 @@ func main() {
 	mux.HandleFunc("/api/users/fetchAllUsers", users.FetchAllUsersHandler)
 
 	mux.HandleFunc("/logout", users.LogoutHandler)
-
 	mux.HandleFunc("/api/post/fetchPostsByCategories", categories.FetchPostByCategoriesHandler)
-
 	mux.HandleFunc("/api/like-dislike", post.HandleLikeDislikeAPI)
-
-	mux.HandleFunc("/authenticate", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/authenticate", middleware.RateLimiterMiddleware(func(w http.ResponseWriter, r *http.Request) {
 		if _, err := r.Cookie("UserLogged"); err == nil {
 			renderTemplate(w, "./static/homePage/index.html", nil)
 		}
 		renderTemplate(w, "./static/authentification/authentification.html", nil)
-	})
+	}))
 
-	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		renderTemplate(w, "./static/homePage/index.html", nil)
-	})
+	mux.HandleFunc("/", middleware.RateLimiterMiddleware(authentification.HomeHandler))
 
-	ourServer := http.Server{
+	server := http.Server{
 		Addr:              ":8080",
 		Handler:           mux,
 		MaxHeaderBytes:    1 << 26, // 4 MB
@@ -81,10 +92,25 @@ func main() {
 		ReadHeaderTimeout: 30 * time.Second,
 		WriteTimeout:      45 * time.Second,
 		IdleTimeout:       3 * time.Minute,
+		//TLSConfig:         tlsConfig,
 	}
 
-	fmt.Println("Serveur démarré : http://localhost:8080/")
-	fmt.Fprintln(os.Stderr, ourServer.ListenAndServe())
+	// Lance une goroutine pour réinitialiser les compteurs périodiquement
+	go func() {
+		for {
+			time.Sleep(middleware.Rl.Window)
+			middleware.Rl.Cleanup()
+		}
+	}()
+
+	log.Println("Server started on http://localhost:8080")
+
+	// HTTPS
+	//err = server.ListenAndServeTLS("", "") // "" car les certificats sont chargés via TLSConfig
+	err := server.ListenAndServe()
+	if err != nil {
+		log.Fatalf("failed to start server: %s", err)
+	}
 }
 
 func renderTemplate(w http.ResponseWriter, tmpl string, data interface{}) {

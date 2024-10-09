@@ -4,10 +4,15 @@ import (
 	"encoding/json"
 	"fmt"
 	dbUser "forum/server/api/user"
+	utils "forum/server/utils"
 	"io"
 	"net/http"
 	"os"
 )
+
+func HomeHandler(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, "./static/homePage/index.html")
+}
 
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
@@ -70,12 +75,13 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Printf("User logged in: %s -> %s (%s)\n", usr.UUID, usr.Username, usr.Email)
 
+	sessionID, _ := utils.GenerateUUID() // Génère un UUID unique
 	http.SetCookie(w, &http.Cookie{
-		Name:   "UserLogged",
-		Path:   "/",
-		Value:  usr.ToCookieValue(),
-		MaxAge: 3600, // temporairement changer en 1h pour dev
+		Name:  "session_token",
+		Value: sessionID,
+		Path:  "/",
 	})
+	Sessions[sessionID] = usr
 
 	w.WriteHeader(http.StatusOK)
 }

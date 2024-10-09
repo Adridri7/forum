@@ -84,12 +84,13 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Printf("New user registered: %s -> %s (%s)\n", newUser.UUID, newUser.Username, newUser.Email)
 
+	sessionID, _ := generator.GenerateUUID() // Génère un UUID unique
 	http.SetCookie(w, &http.Cookie{
-		Name:   "UserLogged",
-		Value:  newUser.ToCookieValue(),
-		Path:   "/",
-		MaxAge: 300, // 5 minutes
+		Name:  "session_token",
+		Value: sessionID,
+		Path:  "/",
 	})
+	Sessions[sessionID] = newUser
 
 	w.WriteHeader(http.StatusOK)
 }
