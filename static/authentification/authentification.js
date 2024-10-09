@@ -153,6 +153,10 @@ document.addEventListener('DOMContentLoaded', () => {
         window.location.href = '/api/discord_login';
     });
 
+    document.getElementById('github-btn').addEventListener('click', () => {
+        window.location.href = '/api/github_login';
+    });
+
     document.getElementById('google-btn').addEventListener('click', () => {
         window.location.href = '/api/google_login';
     });

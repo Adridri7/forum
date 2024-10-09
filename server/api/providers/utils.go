@@ -20,9 +20,9 @@ const (
 	getPPDiscordURL       = "https://cdn.discordapp.com/avatars/"
 
 	redirectGithubURL = "http://localhost:8080/api/github_callback"
-	//oauthGithubURL    = "https://accounts.google.com/o/oauth2/auth"
-	//tokenGithubURL    = "https://github.com/login/oauth/access_token"
-	//userInfoGithubURL = "https://api.github.com/user"
+	oauthGithubURL    = "https://github.com/login/oauth/authorize"
+	tokenGithubURL    = "https://github.com/login/oauth/access_token"
+	userInfoGithubURL = "https://api.github.com/user"
 
 	redirectGoogleURL = "http://localhost:8080/api/google_callback"
 	oauthGoogleURL    = "https://accounts.google.com/o/oauth2/auth"
