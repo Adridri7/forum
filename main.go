@@ -15,10 +15,6 @@ import (
 )
 
 func main() {
-	if err := providers.LoadEnvVariables(); err != nil {
-		fmt.Fprintf(os.Stderr, "Error %v\n", err)
-		return
-	}
 	mux := http.NewServeMux()
 
 	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))

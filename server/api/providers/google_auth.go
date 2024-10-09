@@ -92,11 +92,7 @@ func HandleGoogleCallback(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		if strings.Contains(googUsr.Picture[8:], "lh3.googleusercontent.com/a/") {
-			usr.ProfilePicture = dbUser.RandomProfilPicture()
-		} else {
-			usr.ProfilePicture = googUsr.Picture
-		}
+		usr.ProfilePicture = googUsr.Picture
 
 		if strings.IndexByte(googUsr.Name, '(') == -1 {
 			usr.Username = googUsr.Name
@@ -120,15 +116,11 @@ func HandleGoogleCallback(w http.ResponseWriter, r *http.Request) {
 			usr.Username = googUsr.Name[:strings.IndexByte(googUsr.Name, '(')-1]
 		}
 
-		if strings.Contains(googUsr.Picture[8:], "lh3.googleusercontent.com/a/") {
-			usr.ProfilePicture = dbUser.RandomProfilPicture()
-		} else {
-			usr.ProfilePicture = googUsr.Picture
-		}
+		usr.ProfilePicture = googUsr.Picture
 
 		if err = usr.UpdateUser(map[string]interface{}{
 			"email":           usr.Email,
-			"password":        nil,
+			"password":        "",
 			"profile_picture": usr.ProfilePicture,
 			"role":            "user",
 			"username":        usr.Username,
