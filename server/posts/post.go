@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"forum/server"
+	authentification "forum/server/api/login"
 	posts "forum/server/utils"
 	"net/http"
 	"strings"
@@ -29,7 +30,7 @@ func CreatePost(db *sql.DB, r *http.Request, params map[string]interface{}) (*Po
 	post_UUID, _ := posts.GenerateUUID()
 
 	// extraire le uuid du cookie
-	user_UUID, err := posts.GetUserFromCookie(r)
+	user_UUID, err := authentification.GetUserFromCookie(r)
 
 	if err != nil {
 		return nil, fmt.Errorf("{erreur lors de la génération du uuid: %v}", err)

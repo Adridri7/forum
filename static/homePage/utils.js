@@ -1,26 +1,26 @@
-export function getUserInfoFromCookie() {
-    let userInfo = null;
+// export function getUserInfoFromCookie() {
+//     let userInfo = null;
 
-    if (document.cookie.substring(0, 10) === 'UserLogged') {
-        const parts = document.cookie.substring(11).split('|');
+//     if (document.cookie.substring(0, 10) === 'UserLogged') {
+//         const parts = document.cookie.substring(11).split('|');
 
-        if (parts.length < 4) {
-            return null;
-        }
+//         if (parts.length < 4) {
+//             return null;
+//         }
 
-        userInfo = {
-            uuid: removeQuotes(parts[0]),   // UUID
-            username: parts[1],             // Nom d'utilisateur
-            email: parts[2],                // Email
-            role: removeQuotes(parts[3])    // Rôle
-        };
-    }
+//         userInfo = {
+//             uuid: removeQuotes(parts[0]),   // UUID
+//             username: parts[1],             // Nom d'utilisateur
+//             email: parts[2],                // Email
+//             role: removeQuotes(parts[3])    // Rôle
+//         };
+//     }
 
-    return userInfo;
-}
-function removeQuotes(uuid) {
-    return uuid.replace(/"/g, '');
-}
+//     return userInfo;
+// }
+// function removeQuotes(uuid) {
+//     return uuid.replace(/"/g, '');
+// }
 
 export async function getPPFromID(id) {
     var pp = "";
@@ -48,33 +48,33 @@ export async function getPPFromID(id) {
     return pp;
 }
 
-export function isUserInfoValid() {
-    var userInfo = getUserInfoFromCookie();
-    var uuidRegex = /([0-9a-f]{8})-([0-9a-f]{4})-([0-9a-f]{4})-([0-9a-f]{4})-([0-9a-f]{12})/;
-    var emailRegex = /([0-9A-Za-z]+[\.-]*)+@([0-9A-Za-z]+-*)+.(com|org|fr)/;
+// export function isUserInfoValid() {
+//     var userInfo = getUserInfoFromCookie();
+//     var uuidRegex = /([0-9a-f]{8})-([0-9a-f]{4})-([0-9a-f]{4})-([0-9a-f]{4})-([0-9a-f]{12})/;
+//     var emailRegex = /([0-9A-Za-z]+[\.-]*)+@([0-9A-Za-z]+-*)+.(com|org|fr)/;
 
-    // Is UUID valid?
-    if (!uuidRegex.test(userInfo.uuid)) {
-        return false;
-    }
+//     // Is UUID valid?
+//     if (!uuidRegex.test(userInfo.uuid)) {
+//         return false;
+//     }
 
-    // Is email valid?
-    if (!emailRegex.test(userInfo.email)) {
-        return false;
-    }
+//     // Is email valid?
+//     if (!emailRegex.test(userInfo.email)) {
+//         return false;
+//     }
 
-    // Is role valid?
-    switch (userInfo.role) {
-        case "user":
-        case "mod":
-        case "admin":
-            break;
-        default:
-            return false;
-    }
+//     // Is role valid?
+//     switch (userInfo.role) {
+//         case "user":
+//         case "mod":
+//         case "admin":
+//             break;
+//         default:
+//             return false;
+//     }
 
-    return true;
-}
+//     return true;
+// }
 
 export function resetUsersPost() {
     const usersPost = document.getElementById('users-post');

@@ -77,9 +77,10 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	sessionID, _ := utils.GenerateUUID() // Génère un UUID unique
 	http.SetCookie(w, &http.Cookie{
-		Name:  "session_token",
-		Value: sessionID,
-		Path:  "/",
+		Name:   "session_token",
+		Value:  sessionID,
+		Path:   "/",
+		MaxAge: 3600,
 	})
 	Sessions[sessionID] = usr
 

@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"forum/server"
+	authentification "forum/server/api/login"
 	"forum/server/posts/reaction"
-	posts "forum/server/utils"
 
 	"net/http"
 )
@@ -40,8 +40,9 @@ func HandleLikeDislikeAPI(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userUUID, err := posts.GetUserFromCookie(r)
+	userUUID, err := authentification.GetUserFromCookie(r)
 	if err != nil {
+		fmt.Println("Erreur utilisateur non authentifié :", err)
 		http.Error(w, "Utilisateur non authentifié", http.StatusUnauthorized)
 		return
 	}

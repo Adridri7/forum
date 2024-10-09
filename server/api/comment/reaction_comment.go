@@ -2,9 +2,10 @@ package comments
 
 import (
 	"encoding/json"
+	"fmt"
 	"forum/server"
+	authentification "forum/server/api/login"
 	"forum/server/posts/reaction"
-	posts "forum/server/utils"
 
 	"net/http"
 )
@@ -28,6 +29,7 @@ type UserReaction struct {
 
 func HandleLikeDislikeCommentAPI(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
+		fmt.Println("Méthode non autorisé")
 		http.Error(w, "Méthode non autorisée", http.StatusMethodNotAllowed)
 		return
 	}
@@ -35,18 +37,21 @@ func HandleLikeDislikeCommentAPI(w http.ResponseWriter, r *http.Request) {
 	var req LikeDislikeRequest
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
+		fmt.Println("Erreur lors du décode")
 		http.Error(w, "Erreur de décodage JSON", http.StatusBadRequest)
 		return
 	}
 
-	userUUID, err := posts.GetUserFromCookie(r)
+	userUUID, err := authentification.GetUserFromCookie(r)
 	if err != nil {
+		fmt.Println("Utilisateur non trouvé :", err)
 		http.Error(w, "Utilisateur non authentifié", http.StatusUnauthorized)
 		return
 	}
 
 	err = reaction.HandleLikeDislikeComment(server.Db, req.CommentID, userUUID, req.Action)
 	if err != nil {
+		fmt.Println("Go voir dans la fonction")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

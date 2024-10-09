@@ -13,15 +13,20 @@ export async function toggleReaction(event, postUuid) {
             credentials: 'same-origin'
         });
 
+        // Vérifie si la réponse est un succès
         if (!response.ok) {
-            throw new Error('Erreur lors de la mise à jour de la réaction');
+            // Tente de récupérer l'erreur sous forme de texte ou JSON
+            const errorMessage = await response.text();
+            throw new Error(`Erreur lors de la mise à jour de la réaction: ${errorMessage}`);
         }
 
+        // Si tout est ok, traite la réponse
         const result = await response.json();
         updateReactionUI(postUuid, result.likes, result.dislikes, result.userReaction);
 
     } catch (error) {
-        console.error('Erreur :', error);
+        // Affiche l'erreur complète ici
+        console.error(error);
     }
 }
 

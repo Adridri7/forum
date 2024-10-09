@@ -1,6 +1,7 @@
 package providers
 
 import (
+	authentification "forum/server/api/login"
 	dbUser "forum/server/api/user"
 	utils "forum/server/utils"
 
@@ -140,12 +141,14 @@ func HandleGoogleCallback(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	sessionID, _ := utils.GenerateUUID() // Génère un UUID unique
 	http.SetCookie(w, &http.Cookie{
-		Name:   "UserLogged",
-		Value:  usr.ToCookieValue(),
+		Name:   "session_token",
+		Value:  sessionID,
 		Path:   "/",
-		MaxAge: 300, // 5 minutes
+		MaxAge: 3600,
 	})
+	authentification.Sessions[sessionID] = usr
 
 	fmt.Printf("User logged in: %s -> %s (%s)\n", usr.UUID, usr.Username, usr.Email)
 

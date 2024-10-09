@@ -7,7 +7,7 @@ import (
 
 func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 	cookie := &http.Cookie{
-		Name:    "UserLogged",
+		Name:    "session_token",
 		Value:   "",
 		Path:    "/",
 		Expires: time.Unix(0, 0),

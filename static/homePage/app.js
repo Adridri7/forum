@@ -1,15 +1,37 @@
 import { DisplayMessages } from "./displayMessage.js";
 import { initEventListeners } from "./comment.js";
 import { fetchCategories } from "./fetchcategories.js";
-import { getPPFromID, getUserInfoFromCookie, resetUsersPost } from "./utils.js";
+import { getPPFromID, resetUsersPost } from "./utils.js";
 import { NewPost } from "./newPost.js";
 import { handleLogout } from "./logout.js";
 import { fetchAllUsers } from "./displayUser.js";
 import { toggleCommentReaction, toggleReaction } from "./reaction.js";
 import { FetchMostLikedPosts } from "./postMostLiked.js";
 import { FetchMostUseCategories } from "./tendance.js";
-import { isUserInfoValid } from "./utils.js";
 import { fetchPersonnalComment, fetchPersonnalPosts, fetchPersonnalResponse } from "./dashboard.js";
+
+document.addEventListener('DOMContentLoaded', () => {
+    fetchUserInfo();
+})
+export let UserInfo = null
+export async function fetchUserInfo() {
+    console.log("appel pour avoir les infos du user");
+    try {
+        const response = await fetch("http://localhost:8080/api/getSession");
+        if (!response.ok) {
+            document.cookie = "session_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+            throw new Error("Error retrieving user data");
+        }
+
+        const data = await response.json();
+
+        console.log("info du user recu depuis l'api", data);
+
+        UserInfo = data;
+    } catch (error) {
+        console.error(error);
+    }
+}
 
 
 
@@ -73,20 +95,21 @@ darkModeToggles.forEach(button => {
 
 
 document.addEventListener('DOMContentLoaded', async () => {
+    await fetchUserInfo();  // Assure-toi que les infos sont récupérées avant de continuer
+
     const loginButton = document.getElementById('login-btn');
     const profilMenu = document.querySelector('.profil-menu');
+    console.log("ici", UserInfo)
 
-    // Fonction pour récupérer les informations utilisateur depuis le cookie
-    const userInfo = getUserInfoFromCookie();
 
     // Vérifiez si les informations utilisateur sont valides
-    if (isUserInfoValid()) {
+    if (UserInfo) {
         // Créer la div qui remplacera le bouton "Login"
         const profileDiv = document.createElement('div');
         profileDiv.classList.add('profile-container');
 
         const profileImage = document.createElement('img');
-        profileImage.src = await getPPFromID(userInfo.uuid);
+        profileImage.src = await getPPFromID(UserInfo.user_uuid);
         profileImage.alt = 'User profile';
         profileImage.classList.add('profile-image');
 
@@ -269,10 +292,9 @@ homeLink.addEventListener('click', () => {
 });
 
 dashboardLink.addEventListener('click', () => {
-    const userInfo = getUserInfoFromCookie();
     const personnalPost = document.getElementById('personnal-post');
 
-    if (!userInfo) {
+    if (!UserInfo) {
         alert("You must be logged in to access the dashboard.");
         return;
     }
@@ -297,7 +319,7 @@ dashboardLink.addEventListener('click', () => {
                 break;
         }
         const profilPicture = document.getElementById('profile-picture');
-        getPPFromID(userInfo.uuid).then(img => { profilPicture.src = img });
+        getPPFromID(UserInfo.user_uuid).then(img => { profilPicture.src = img });
     }
 
     const navItems = document.querySelectorAll('#nav-bar li');

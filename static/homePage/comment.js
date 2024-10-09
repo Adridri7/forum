@@ -1,8 +1,8 @@
-import { fetchPosts } from "./app.js";
+import { fetchPosts, fetchUserInfo, UserInfo } from "./app.js";
 import { toggleMenu } from "./displayMessage.js";
 import { fetchCategories } from "./fetchcategories.js";
 import { fetchAllcomments } from "./showComment.js";
-import { getUserInfoFromCookie, getPPFromID } from "./utils.js";
+import { getPPFromID } from "./utils.js";
 
 const AppState = {
     HOME: 'home',
@@ -104,8 +104,8 @@ window.addEventListener('popstate', function (event) {
 });
 
 export function createCommentInput() {
-    const userInfo = getUserInfoFromCookie();
-    console.log("dans comment", userInfo);
+    fetchUserInfo();
+    console.log("dans comment", UserInfo);
 
     const commentInputContainer = document.createElement('div');
     commentInputContainer.classList.add('comment-input-container');
@@ -114,8 +114,8 @@ export function createCommentInput() {
     profileImageContainer.classList.add('profile-image-container');
 
     const profileImage = document.createElement('img');
-    if (userInfo) {
-        getPPFromID(userInfo.uuid).then(img => { profileImage.src = img });
+    if (UserInfo) {
+        getPPFromID(UserInfo.user_uuid).then(img => { profileImage.src = img });
     } else {
         profileImage.src = "https://c.clc2l.com/t/d/i/discord-4OXyS2.png";
     }
@@ -150,7 +150,7 @@ export function createCommentInput() {
     });
 
     // Vérifiez si l'utilisateur est connecté
-    if (!userInfo || !userInfo.uuid) {
+    if (!UserInfo || !UserInfo.user_uuid) {
         // Désactivez le champ d'entrée et le bouton si l'utilisateur n'est pas connecté
         commentInput.disabled = true;
         submitButton.disabled = true;
@@ -182,10 +182,10 @@ export function createCommentInput() {
     form.addEventListener('submit', async (event) => {
         event.preventDefault();
 
-        console.log(userInfo.uuid);
+        console.log(UserInfo.user_uuid);
 
         if (postUuid) {
-            await createComment(postUuid, userInfo.uuid);
+            await createComment(postUuid, UserInfo.user_uuid);
             commentInput.value = '';
         } else {
             console.error("post_uuid est introuvable, le commentaire ne peut pas être créé.");

@@ -14,6 +14,7 @@ func GetSession(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		w.Write([]byte("Session not found"))
+		cookie.MaxAge = -1
 		return
 	}
 
@@ -21,6 +22,7 @@ func GetSession(w http.ResponseWriter, r *http.Request) {
 	if !exists {
 		w.WriteHeader(http.StatusUnauthorized)
 		w.Write([]byte("Invalid session"))
+		cookie.MaxAge = -1
 		return
 	}
 

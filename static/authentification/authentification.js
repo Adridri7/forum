@@ -96,21 +96,24 @@ document.getElementById('submit-register').addEventListener('click', async (even
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify(data)  // Send the data as JSON
+            body: JSON.stringify(data)
         });
 
         if (response.ok) {
             window.location.href = "/";
         } else {
-            const error = await response.json();
-            alert("Register error : email already used");
+            // Récupérer le message d'erreur du serveur
+            const errorData = await response.json();
+
+            // Afficher le message d'erreur
+            alert(`Erreur d'inscription : ${errorData.error || 'Email or Username already used'}`);
         }
     } catch (error) {
-        console.error("Register error");
+        console.error('Erreur lors de l\'inscription:', error);
+        alert(`Une erreur s'est produite : ${error.message || 'Veuillez réessayer plus tard.'}`);
     }
-
-
 });
+
 document.getElementById('profile-image-input').addEventListener('change', function (event) {
     const fileInput = document.getElementById('file-input');
     const removeImageButton = document.getElementById('remove-image');

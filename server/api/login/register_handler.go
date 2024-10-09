@@ -53,7 +53,43 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if usrFound != (dbUser.User{}) {
-			http.Error(w, "{\"Error\": \"User already exists with this email address. Please try with another.\"}", http.StatusUnauthorized)
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusConflict) // Utilisation de 409 Conflict
+
+			// Crée une structure d'erreur pour le JSON
+			errorResponse := map[string]string{
+				"error": "User already exists with this email address. Please try with another.",
+			}
+
+			// Encode la réponse en JSON
+			if err := json.NewEncoder(w).Encode(errorResponse); err != nil {
+				http.Error(w, "{\"error\": \"Failed to encode error response.\"}", http.StatusInternalServerError)
+				return
+			}
+
+			fmt.Println("Email existe déjà :", err)
+			return
+		}
+
+		UsernameFound, err := dbUser.IsUsernameTaken(newUser.Username)
+		fmt.Println(UsernameFound)
+		if UsernameFound {
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusConflict) // Utilisation de 409 Conflict
+
+			// Crée une structure d'erreur pour le JSON
+			errorResponse := map[string]string{
+				"error": "User already exists with this Username. Please try with another.",
+			}
+
+			// Encode la réponse en JSON
+			if err := json.NewEncoder(w).Encode(errorResponse); err != nil {
+				http.Error(w, "{\"error\": \"Failed to encode error response.\"}", http.StatusInternalServerError)
+				return
+			}
+
+			// Log l'erreur sur stderr pour le suivi
+			fmt.Println("Username existe déjà :", err)
 			return
 		}
 	}
@@ -86,9 +122,10 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 
 	sessionID, _ := generator.GenerateUUID() // Génère un UUID unique
 	http.SetCookie(w, &http.Cookie{
-		Name:  "session_token",
-		Value: sessionID,
-		Path:  "/",
+		Name:   "session_token",
+		Value:  sessionID,
+		Path:   "/",
+		MaxAge: 3600,
 	})
 	Sessions[sessionID] = newUser
 

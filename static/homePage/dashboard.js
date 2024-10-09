@@ -1,7 +1,7 @@
-import { deletePost } from "./app.js";
+import { deletePost, fetchUserInfo, UserInfo } from "./app.js";
 import { initEventListeners } from "./comment.js";
 import { toggleMenu } from "./displayMessage.js";
-import { getUserInfoFromCookie, resetUsersPost } from "./utils.js";
+import { resetUsersPost } from "./utils.js";
 
 const commentSection = document.getElementById('personnal-comment');
 const postSection = document.getElementById('personnal-post');
@@ -9,7 +9,6 @@ const reactionSection = document.getElementById('personnal-reaction');
 commentSection.addEventListener('click', fetchPersonnalComment);
 postSection.addEventListener('click', fetchPersonnalPosts);
 reactionSection.addEventListener('click', fetchPersonnalResponse);
-const userInfo = getUserInfoFromCookie();
 
 
 
@@ -205,7 +204,7 @@ export async function fetchPersonnalPosts() {
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({ user_uuid: userInfo.uuid })
+            body: JSON.stringify({ user_uuid: UserInfo.user_uuid })
         });
         if (!response.ok) {
             throw new Error("Error retrieving posts");
@@ -232,7 +231,7 @@ export async function fetchPersonnalPosts() {
 export async function fetchPersonnalComment() {
     resetUsersPost();
     const messagesList = document.getElementById('users-personnal-post');
-    const userInfo = getUserInfoFromCookie();
+    await fetchUserInfo();
     messagesList.innerHTML = '<p>Loading...</p>';
     try {
         const response = await fetch("http://localhost:8080/api/post/fetchCommentByUser", {
@@ -240,7 +239,7 @@ export async function fetchPersonnalComment() {
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({ user_uuid: userInfo.uuid })
+            body: JSON.stringify({ user_uuid: UserInfo.user_uuid })
         });
         if (!response.ok) {
             throw new Error("Error retrieving posts");
@@ -267,7 +266,7 @@ export async function fetchPersonnalComment() {
 export async function fetchPersonnalResponse() {
     resetUsersPost();
     const messagesList = document.getElementById('users-personnal-post');
-    const userInfo = getUserInfoFromCookie();
+    await fetchUserInfo();
     messagesList.innerHTML = '<p>Loading...</p>';
     try {
         const response = await fetch("http://localhost:8080/api/post/fetchResponseUser", {
@@ -275,7 +274,7 @@ export async function fetchPersonnalResponse() {
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({ user_uuid: userInfo.uuid })
+            body: JSON.stringify({ user_uuid: UserInfo.user_uuid })
         });
         if (!response.ok) {
             throw new Error("Error retrieving posts");

@@ -1,5 +1,6 @@
+import { UserInfo } from "./app.js";
 import { createPost } from "./createdPost.js";
-import { getUserInfoFromCookie, isUserInfoValid, getPPFromID } from "./utils.js";
+import { getPPFromID } from "./utils.js";
 
 
 const addButton = document.getElementById('add-button');
@@ -23,7 +24,6 @@ export function NewPost() {
 }
 
 function CreatedModal() {
-    const userInfo = getUserInfoFromCookie();
     const createdPost = document.createElement('div');
     createdPost.classList.add('created-post');
     createdPost.id = 'created-post';
@@ -37,14 +37,14 @@ function CreatedModal() {
 
     const userNameSpan = document.createElement('div');
     userNameSpan.classList.add('user-name');
-    userNameSpan.textContent = userInfo.username;
+    userNameSpan.textContent = UserInfo.username;
 
     const profile_picture = document.createElement('div');
     profile_picture.classList.add('profile-picture');
 
     const image = document.createElement('img');
 
-    getPPFromID(userInfo.uuid).then(img => { image.src = img });
+    getPPFromID(UserInfo.user_uuid).then(img => { image.src = img });
 
     profile_picture.appendChild(image)
 
@@ -160,10 +160,6 @@ function CreatedModal() {
     userPost.appendChild(createdPost);
 
     postButton.addEventListener('click', (event) => {
-        if (!isUserInfoValid()) {
-            window.location.href = "/authenticate";
-            return;
-        }
 
         createPost(event);
     });
