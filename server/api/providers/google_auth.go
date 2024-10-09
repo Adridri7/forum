@@ -63,16 +63,12 @@ func HandleGoogleCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Println("Token :", token)
-
 	// Utiliser le token pour récupérer les informations utilisateur
 	userInfo, err := getGoogleUserInfo(token.AccessToken)
 	if err != nil {
 		http.Error(w, "Failed to get user info", http.StatusInternalServerError)
 		return
 	}
-
-	fmt.Println("User info :", userInfo)
 
 	// Décoder les infos utilisateur renvoyées...
 	var googUsr GoogleUser
@@ -166,8 +162,6 @@ func getGoogleOauthToken(code string) (*OAuthToken, error) {
 	data.Set("redirect_uri", redirectGoogleURL)
 	data.Set("grant_type", "authorization_code")
 
-	fmt.Println("Data for token :", data)
-
 	// Faire la requête POST pour obtenir le token
 	response, err := http.PostForm(tokenGoogleURL, data)
 	if err != nil {
@@ -180,8 +174,6 @@ func getGoogleOauthToken(code string) (*OAuthToken, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to read token response: %v", err)
 	}
-
-	fmt.Println("Token response :", string(body))
 
 	var token OAuthToken
 	if err := json.Unmarshal(body, &token); err != nil {
