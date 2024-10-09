@@ -107,7 +107,7 @@ func HandleDiscordCallback(w http.ResponseWriter, r *http.Request) {
 
 		if err = usr.UpdateUser(map[string]interface{}{
 			"email":           usr.Email,
-			"password":        "",
+			"password":        nil,
 			"profile_picture": usr.ProfilePicture,
 			"role":            "user",
 			"username":        usr.Username,

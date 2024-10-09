@@ -148,7 +148,13 @@ func (u *User) ToMap() map[string]interface{} {
 	usrMap["user_uuid"] = u.UUID
 	usrMap["username"] = u.Username
 	usrMap["email"] = u.Email
-	usrMap["password"] = u.EncryptedPassword
+
+	if len(usrMap["password"].(string)) == 0 {
+		usrMap["password"] = nil
+	} else {
+		usrMap["password"] = u.EncryptedPassword
+	}
+
 	usrMap["created_at"] = u.CreatedAt.Format("2006-01-02")
 	usrMap["role"] = u.Role
 	usrMap["profile_picture"] = u.ProfilePicture
