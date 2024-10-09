@@ -3,7 +3,6 @@ package providers
 import (
 	dbUser "forum/server/api/user"
 	utils "forum/server/utils"
-	"strings"
 
 	"encoding/json"
 	"fmt"
@@ -11,6 +10,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"strings"
 )
 
 const (

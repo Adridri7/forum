@@ -12,6 +12,11 @@ import (
 	"os"
 )
 
+const (
+	DISCORD_ID     = "1291820270390083695"
+	DISCORD_SECRET = "KCd_XBnsU6yUPkCM4HCx0BWhEznQzGza"
+)
+
 type DiscordUser struct {
 	ID         string `json:"id"`
 	Username   string `json:"username"`
@@ -25,7 +30,7 @@ type DiscordUser struct {
 func HandleDiscordLogin(w http.ResponseWriter, r *http.Request) {
 	authURL := fmt.Sprintf("%s?client_id=%s&redirect_uri=%s&response_type=code&scope=%s&state=%s&prompt=consent",
 		oauthDiscordURL,
-		os.Getenv("DISCORD_ID"),
+		DISCORD_ID,
 		redirectDiscordURL,
 		"identify%20email",
 		OAuthState,
@@ -131,8 +136,8 @@ func getDiscordOauthToken(code string) (*OAuthToken, error) {
 	// Préparer la requête POST pour obtenir le token
 	data := url.Values{}
 	data.Set("code", code)
-	data.Set("client_id", os.Getenv("DISCORD_ID"))
-	data.Set("client_secret", os.Getenv("DISCORD_SECRET"))
+	data.Set("client_id", DISCORD_ID)
+	data.Set("client_secret", DISCORD_SECRET)
 	data.Set("redirect_uri", redirectDiscordURL)
 	data.Set("grant_type", "authorization_code")
 

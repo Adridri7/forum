@@ -1,12 +1,20 @@
 package providers
 
 import (
+	//dbUser "forum/server/api/user"
+	//utils "forum/server/utils"
+
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
 	"net/url"
-	"os"
+	//"os"
+)
+
+const (
+	GITHUB_ID     = "Ov23libnZpblLJfYUNV0"
+	GITHUB_SECRET = "ddb158a0782ac5c6d9b0141784df6f0c9b2d33de"
 )
 
 // Gestion du clic sur le bouton de connexion "Login with Github"
@@ -14,7 +22,7 @@ func HandleGithubLogin(w http.ResponseWriter, r *http.Request) {
 	// Construire l'URL d'authentification Github manuellement
 	authURL := fmt.Sprintf("%s?client_id=%s&redirect_uri=%s&response_type=code&scope=%s&state=%s",
 		oauthGithubURL,
-		os.Getenv("GITHUB_ID"),
+		GITHUB_ID,
 		redirectGithubURL,
 		"user:email",
 		OAuthState,
@@ -53,6 +61,89 @@ func HandleGithubCallback(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Write([]byte(userInfo))
+
+	/*
+		// Décoder les infos utilisateur renvoyées...
+		var githUsr GithubUser
+		if err = json.Unmarshal([]byte(userInfo), &githUsr); err != nil {
+			http.Error(w, "Failed to decode user info", http.StatusInternalServerError)
+			return
+		}
+
+		// ... puis on vérifie que l'utilisateur n'existe pas déjà
+		var usr dbUser.User
+		if usr, err = dbUser.FetchUserByEmail(githUsr.Email); err != nil {
+			http.Error(w, "{\"Error\": \"Fatal error fetching\"}", http.StatusInternalServerError)
+			fmt.Fprintln(os.Stderr, err.Error())
+			return
+		}
+
+		if usr == (dbUser.User{}) {
+			if usr.UUID, err = utils.GenerateUUID(); err != nil {
+				http.Error(w, "{\"Error\": \"Fatal error gen\"}", http.StatusInternalServerError)
+				fmt.Fprintln(os.Stderr, err.Error())
+				return
+			}
+
+			if strings.Contains(githUsr.Picture[8:], "lh3.googleusercontent.com/a/") {
+				usr.ProfilePicture = dbUser.RandomProfilPicture()
+			} else {
+				usr.ProfilePicture = githUsr.Picture
+			}
+
+			if strings.IndexByte(githUsr.Name, '(') == -1 {
+				usr.Username = githUsr.Name
+			} else {
+				usr.Username = githUsr.Name[:strings.IndexByte(githUsr.Name, '(')-1]
+			}
+
+			usr.Email = githUsr.Email
+			usr.EncryptedPassword = ""
+			usr.Role = "user"
+
+			if err = dbUser.RegisterUser(usr.ToMap()); err != nil {
+				http.Error(w, "{\"Error\": \"Fatal error add\"}", http.StatusInternalServerError)
+				fmt.Fprintln(os.Stderr, err.Error())
+				return
+			}
+		} else {
+			if strings.IndexByte(githUsr.Name, '(') == -1 {
+				usr.Username = githUsr.Name
+			} else {
+				usr.Username = githUsr.Name[:strings.IndexByte(githUsr.Name, '(')-1]
+			}
+
+			if strings.Contains(githUsr.Picture[8:], "lh3.googleusercontent.com/a/") {
+				usr.ProfilePicture = dbUser.RandomProfilPicture()
+			} else {
+				usr.ProfilePicture = githUsr.Picture
+			}
+
+			if err = usr.UpdateUser(map[string]interface{}{
+				"email":           usr.Email,
+				"password":        "",
+				"profile_picture": usr.ProfilePicture,
+				"role":            "user",
+				"username":        usr.Username,
+				"user_uuid":       usr.UUID,
+			}); err != nil {
+				http.Error(w, "{\"Error\": \"Fatal error update\"}", http.StatusInternalServerError)
+				fmt.Fprintln(os.Stderr, err.Error())
+				return
+			}
+		}
+
+		http.SetCookie(w, &http.Cookie{
+			Name:   "UserLogged",
+			Value:  usr.ToCookieValue(),
+			Path:   "/",
+			MaxAge: 300, // 5 minutes
+		})
+
+		fmt.Printf("User logged in: %s -> %s (%s)\n", usr.UUID, usr.Username, usr.Email)
+
+		http.Redirect(w, r, "/", http.StatusPermanentRedirect)
+	*/
 }
 
 // Récupère le token OAuth2 en échangeant le code d'autorisation
@@ -60,8 +151,8 @@ func getGithubOauthToken(code string) (*OAuthToken, error) {
 	// Préparer la requête POST pour obtenir le token
 	data := url.Values{}
 	data.Set("code", code)
-	data.Set("client_id", os.Getenv("GITHUB_ID"))
-	data.Set("client_secret", os.Getenv("GITHUB_SECRET"))
+	data.Set("client_id", GITHUB_ID)
+	data.Set("client_secret", GITHUB_SECRET)
 	data.Set("redirect_uri", redirectGithubURL)
 	data.Set("grant_type", "authorization_code")
 
