@@ -129,8 +129,6 @@ func HandleDiscordCallback(w http.ResponseWriter, r *http.Request) {
 	})
 	authentification.Sessions[sessionID] = usr
 
-	fmt.Printf("User logged in: %s -> %s (%s)\n", usr.UUID, usr.Username, usr.Email)
-
 	http.Redirect(w, r, "/", http.StatusPermanentRedirect)
 }
 

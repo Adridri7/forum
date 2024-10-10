@@ -36,9 +36,6 @@ func HandleGoogleLogin(w http.ResponseWriter, r *http.Request) {
 		"openid+email+profile", // Chaine de caractères contenant les scopes
 		OAuthState,
 	)
-
-	fmt.Println(authURL)
-
 	http.Redirect(w, r, authURL, http.StatusTemporaryRedirect)
 }
 
@@ -149,8 +146,6 @@ func HandleGoogleCallback(w http.ResponseWriter, r *http.Request) {
 		MaxAge: 3600,
 	})
 	authentification.Sessions[sessionID] = usr
-
-	fmt.Printf("User logged in: %s -> %s (%s)\n", usr.UUID, usr.Username, usr.Email)
 
 	http.Redirect(w, r, "/", http.StatusPermanentRedirect)
 }

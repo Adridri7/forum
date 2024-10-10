@@ -202,7 +202,6 @@ func (u *User) UpdateUser(params map[string]interface{}) error {
 	re := regexp.MustCompile(`(?i)<[^>]+>|(SELECT|UPDATE|DELETE|INSERT|DROP|FROM|COUNT|AS|WHERE|--)|^\s|^\s*$|<script.*?>.*?</script.*?>`)
 
 	if params["password"] != "" {
-
 		for key, value := range params {
 			if (key == "username" || key == "email" || key == "password") && re.FindAllString(value.(string), -1) != nil {
 				return fmt.Errorf("injection detected")

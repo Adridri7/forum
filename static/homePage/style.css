@@ -101,7 +101,7 @@ body {
 
 #sidebar #user-list-containers {
     flex-grow: 1;
-    max-height: 73vh;
+    max-height: 66vh;
     display: flex;
     flex-direction: column;
     align-items: flex-start;

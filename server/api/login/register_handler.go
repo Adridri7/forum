@@ -67,11 +67,10 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-			fmt.Println("Email existe déjà :", err)
 			return
 		}
 
-		UsernameFound, err := dbUser.IsUsernameTaken(newUser.Username)
+		UsernameFound, _ := dbUser.IsUsernameTaken(newUser.Username)
 		fmt.Println(UsernameFound)
 		if UsernameFound {
 			w.Header().Set("Content-Type", "application/json")
@@ -88,8 +87,6 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-			// Log l'erreur sur stderr pour le suivi
-			fmt.Println("Username existe déjà :", err)
 			return
 		}
 	}
