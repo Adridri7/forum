@@ -39,6 +39,7 @@ export async function fetchUserInfo() {
 const toggleButton = document.getElementById('toggle-menu-btn');
 const sidebar = document.getElementById('sidebar');
 const addButton = document.getElementById('add-button');
+const trend = document.getElementById('trend-link');
 
 const darkModeToggles = document.querySelectorAll('.dark-mode-toggle');
 
@@ -250,11 +251,10 @@ export function CommentReaction(event) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    fetchPosts();
+    fetchPosts();  // Charge les posts à l'accueil
     addButton.addEventListener('click', NewPost);
     fetchAllUsers();
     FetchMostUseCategories();
-    FetchMostLikedPosts();
 
     // Gérer uniquement les événements sur les boutons de post
     document.body.addEventListener('click', (event) => {

@@ -42,7 +42,6 @@ func HandleLikeDislikeAPI(w http.ResponseWriter, r *http.Request) {
 
 	userUUID, err := authentification.GetUserFromCookie(r)
 	if err != nil {
-		fmt.Println("Erreur utilisateur non authentifié :", err)
 		http.Error(w, "Utilisateur non authentifié", http.StatusUnauthorized)
 		return
 	}

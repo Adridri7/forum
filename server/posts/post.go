@@ -428,3 +428,37 @@ func FetchUserPosts(db *sql.DB, user_uuid string) ([]Post, error) {
 
 	return posts, nil
 }
+
+func FetchPostsWithLikes(db *sql.DB) ([]Post, error) {
+	// Requête SQL pour récupérer uniquement les posts avec au moins 1 like
+	fetchPostsWithLikesQuery := `
+        SELECT p.*, u.username, u.profile_picture
+        FROM posts p
+        JOIN users u ON p.user_uuid = u.user_uuid
+        WHERE p.likes > 0
+        ORDER BY p.likes ASC`
+
+	rows, err := server.RunQuery(fetchPostsWithLikesQuery)
+	if err != nil {
+		return nil, fmt.Errorf("database query failed: %v", err)
+	}
+
+	var posts []Post
+	for _, row := range rows {
+		post := Post{
+			Post_uuid:      row["post_uuid"].(string),
+			User_uuid:      row["user_uuid"].(string),
+			Username:       row["username"].(string),
+			ProfilePicture: row["profile_picture"].(string),
+			Content:        row["content"].(string),
+			Category:       strings.Split(row["categories"].(string), ","),
+			Likes:          int(row["likes"].(int64)),
+			Dislikes:       int(row["dislikes"].(int64)),
+			Created_at:     row["created_at"].(time.Time),
+		}
+		posts = append(posts, post)
+	}
+
+	return posts, nil
+
+}

@@ -92,6 +92,33 @@ function CreatedModal() {
         imageUploadInput.click();
     });
 
+    const postButton = document.createElement('button');
+    postButton.id = 'post-btn';
+    postButton.textContent = 'Post';
+    postButton.type = 'submit';
+    postButton.style.opacity = '0.3'
+
+    postButton.disabled = true; // Désactiver le bouton au départ
+
+    // Fonction pour vérifier si le bouton doit être activé ou désactivé
+    function checkPostButtonState() {
+        const messageContent = inputField.value.trim();
+        const imageSrc = embedPreview.src;
+
+        if (messageContent !== "" || imageSrc !== "") {
+            postButton.disabled = false;
+            postButton.style.opacity = '1'
+        } else {
+            postButton.disabled = true;
+            postButton.style.opacity = '0.3'
+        }
+    }
+
+    // Écouter les changements dans le champ de message
+    inputField.addEventListener('input', () => {
+        checkPostButtonState();
+    });
+
 
     imageUploadInput.addEventListener('change', () => {
         const maxFileSize = 20 * 1024 * 1024; // 20 Mo en octets
@@ -133,12 +160,9 @@ function CreatedModal() {
         // Réinitialiser l'input de fichier
         imageUploadInput.value = '';  // Vide la sélection d'image
         createdPost.style.height = '260px';  // Réduire la taille de la boîte
-    });
 
-    const postButton = document.createElement('button');
-    postButton.id = 'post-btn';
-    postButton.textContent = 'Post';
-    postButton.type = 'submit';
+        checkPostButtonState();
+    });
 
     // Ajout de l'élément au formulaire
     form.appendChild(inputField);
@@ -175,7 +199,6 @@ function CreatedModal() {
 
 // Fonction pour fermer le modal si on clique à l'extérieur de 'created-post'
 function closeModal(event) {
-    console.log("ya un appel");
     const newpost = document.getElementById('created-post');
     const modalpost = document.getElementById('modal-post');
 
@@ -184,7 +207,6 @@ function closeModal(event) {
     const isClickOnRemoveImg = event.target.id === 'remove-image';  // Ajoute une vérification pour la croix
 
     if (!isClickInsideModal && event.target !== addButton && isModal && !isClickOnRemoveImg) {
-        console.log("il ferme");
         newpost.style.display = 'none';
         modalpost.style.display = 'none';
         isModal = false;

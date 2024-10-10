@@ -2,6 +2,7 @@ package server
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 	"time"
 
@@ -47,6 +48,100 @@ func init() {
 	if err != nil {
 		log.Fatalf("Impossible de se connecter à la base de données après %d tentatives : %v", maxRetries, err)
 	}
+	createTables(Db)
 
 	log.Println("Connexion à la base de données réussie")
+}
+
+func createTables(db *sql.DB) {
+	// Requête pour créer la table users
+	createUsersTable := `
+    CREATE TABLE IF NOT EXISTS users (
+        user_uuid TEXT PRIMARY KEY,
+        username TEXT,
+        email TEXT,
+        password TEXT,
+        role TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        profil_picture TEXT
+    );`
+
+	// Requête pour créer la table posts
+	createPostsTable := `
+    CREATE TABLE IF NOT EXISTS posts (
+        post_uuid TEXT PRIMARY KEY,
+        user_uuid TEXT,
+        content TEXT,
+        categories TEXT,
+        likes INTEGER DEFAULT 0,
+        dislikes INTEGER DEFAULT 0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        post_image TEXT,
+        FOREIGN KEY (user_uuid) REFERENCES users(user_uuid)
+    );`
+
+	// Requête pour créer la table comments
+	createCommentsTable := `
+    CREATE TABLE IF NOT EXISTS comments (
+        comment_id TEXT PRIMARY KEY,
+        post_uuid TEXT,
+        user_uuid TEXT,
+        content TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        likes INTEGER DEFAULT 0,
+        dislikes INTEGER DEFAULT 0,
+        FOREIGN KEY (post_uuid) REFERENCES posts(post_uuid),
+        FOREIGN KEY (user_uuid) REFERENCES users(user_uuid)
+    );`
+
+	// Requête pour créer la table post_reactions
+	createPostsReactionsTable := `
+    CREATE TABLE IF NOT EXISTS post_reactions (
+        post_uuid TEXT,
+        user_uuid TEXT,
+        action TEXT CHECK(action IN ('like', 'dislike')),
+        PRIMARY KEY (post_uuid, user_uuid),
+        FOREIGN KEY (post_uuid) REFERENCES posts(post_uuid),
+        FOREIGN KEY (user_uuid) REFERENCES users(user_uuid)
+    );`
+
+	// Requête pour créer la table comment_reactions
+	createCommentReactionsTable := `
+    CREATE TABLE IF NOT EXISTS comment_reactions (
+        comment_id TEXT,
+        user_uuid TEXT,
+        action TEXT CHECK(action IN ('like', 'dislike')),
+        PRIMARY KEY (comment_id, user_uuid),
+        FOREIGN KEY (comment_id) REFERENCES comments(comment_id),
+        FOREIGN KEY (user_uuid) REFERENCES users(user_uuid)
+    );`
+
+	// Exécution des requêtes pour créer les tables
+	statements := []struct {
+		name      string
+		statement string
+	}{
+		{"users", createUsersTable},
+		{"posts", createPostsTable},
+		{"comments", createCommentsTable},
+		{"post_reactions", createPostsReactionsTable},
+		{"comment_reactions", createCommentReactionsTable},
+	}
+
+	var createdTables []string
+
+	for _, stmt := range statements {
+		_, err := db.Exec(stmt.statement)
+		if err != nil {
+			log.Fatalf("Erreur lors de la création de la table %s: %v", stmt.name, err)
+		}
+		// Ajoute le nom de la table créée
+		createdTables = append(createdTables, stmt.name)
+	}
+
+	if len(createdTables) > 0 {
+		fmt.Printf("Tables créées avec succès : %s\n", createdTables)
+	} else {
+		fmt.Println("Aucune table n'a été créée.")
+	}
 }

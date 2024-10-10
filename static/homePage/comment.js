@@ -1,13 +1,15 @@
 import { fetchPosts, fetchUserInfo, UserInfo } from "./app.js";
 import { toggleMenu } from "./displayMessage.js";
 import { fetchCategories } from "./fetchcategories.js";
+import { FetchMostLikedPosts } from "./postMostLiked.js";
 import { fetchAllcomments } from "./showComment.js";
 import { getPPFromID } from "./utils.js";
 
 const AppState = {
     HOME: 'home',
     POST: 'post',
-    SEARCH: 'search'
+    SEARCH: 'search',
+    TREND: "trending"
 };
 
 
@@ -40,6 +42,10 @@ export function updateAppState(newState, pushState = true) {
             title.textContent = 'Search';
             fetchCategories();
             break;
+        case AppState.TREND:
+            title.textContent = 'Trending';
+            FetchMostLikedPosts();
+            break
         default:
             // Si l'état n'est pas reconnu, retour à l'accueil
             newState.type = AppState.HOME;
@@ -57,6 +63,9 @@ export function updateAppState(newState, pushState = true) {
             case AppState.SEARCH:
                 url = '#search';
                 break;
+            case AppState.TREND:
+                url = '#trending'
+                break
             default:
                 url = '#home';
         }
@@ -97,6 +106,8 @@ window.addEventListener('popstate', function (event) {
             updateAppState({ type: AppState.POST, data: { postId } }, false);
         } else if (hash === '#search') {
             updateAppState({ type: AppState.SEARCH }, false);
+        } else if (hash === '#trend') {
+            updateAppState({ type: AppState.TREND }, false)
         } else {
             updateAppState({ type: AppState.HOME }, false);
         }
@@ -105,7 +116,6 @@ window.addEventListener('popstate', function (event) {
 
 export function createCommentInput() {
     fetchUserInfo();
-    console.log("dans comment", UserInfo);
 
     const commentInputContainer = document.createElement('div');
     commentInputContainer.classList.add('comment-input-container');
@@ -174,15 +184,11 @@ export function createCommentInput() {
     let postUuid = null;
     if (firstPostItem) {
         postUuid = firstPostItem.getAttribute('post_uuid');
-        console.log("post_uuid:", postUuid);
-    } else {
-        console.log("Aucun post trouvé.");
     }
 
     form.addEventListener('submit', async (event) => {
         event.preventDefault();
 
-        console.log(UserInfo.user_uuid);
 
         if (postUuid) {
             await createComment(postUuid, UserInfo.user_uuid);
@@ -206,8 +212,6 @@ export async function createComment(post_uuid, user_uuid) {
 
     data.post_uuid = post_uuid;
     data.user_uuid = user_uuid;
-
-    console.log("Données envoyées:", data);
 
     try {
         const response = await fetch("/api/post/createComment", {
@@ -275,3 +279,8 @@ document.getElementById('search-link').addEventListener('click', function (e) {
     e.preventDefault();
     updateAppState({ type: AppState.SEARCH });
 });
+
+document.getElementById('trend-link').addEventListener('click', function (e) {
+    e.preventDefault();
+    updateAppState({ type: AppState.TREND })
+})
