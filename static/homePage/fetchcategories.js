@@ -23,13 +23,23 @@ function displayCategories(categories) {
 
     usersPost.innerHTML = '';
 
-    // Modifier le style de #users-post
-    usersPost.style.display = 'grid';
-    usersPost.style.gridTemplateColumns = 'repeat(2, 1fr)';
-    usersPost.style.gridAutoRows = 'min-content';
-    usersPost.style.rowGap = '10px';
-    usersPost.style.columnGap = '10px';
-    usersPost.style.border = 'none';
+    const updateUsersPostStyle = () => {
+        usersPost.style.display = 'grid';
+        if (window.innerWidth < 500) {
+            usersPost.style.gridTemplateColumns = '1fr';
+        } else {
+            usersPost.style.gridTemplateColumns = 'repeat(2, 1fr)';
+        }
+        usersPost.style.gridAutoRows = 'min-content';
+        usersPost.style.rowGap = '10px';
+        usersPost.style.columnGap = '10px';
+        usersPost.style.border = 'none';
+    };
+
+    updateUsersPostStyle();
+
+    window.addEventListener('resize', updateUsersPostStyle);
+
 
     categories.forEach(category => {
         const li = document.createElement('li');

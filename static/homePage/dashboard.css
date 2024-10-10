@@ -13,6 +13,7 @@
     animation: gradient 8s ease infinite;
     display: flex;
     box-sizing: border-box;
+    max-width: 100%;
 }
 
 @keyframes gradient {

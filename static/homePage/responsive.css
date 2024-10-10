@@ -6,6 +6,10 @@
         width: 100%;
     }
 
+    .timestamp {
+        display: none;
+    }
+
     body {
         overflow: hidden;
     }
@@ -39,6 +43,12 @@
         /* 60px est la hauteur du sidebar */
         display: flex;
         justify-content: center;
+    }
+
+    #container {
+        display: grid;
+        grid-template-columns: auto;
+        overflow: hidden;
     }
 
     .chat-box {
