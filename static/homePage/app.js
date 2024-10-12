@@ -182,6 +182,7 @@ export async function fetchPosts() {
         if (posts.length === 0) {
             messagesList.innerHTML = '<p>No posts available.</p>';
         } else {
+            console.log(posts);
             posts.sort((b, a) => new Date(b.created_at) - new Date(a.created_at));
             posts.forEach(post => {
                 DisplayMessages(post);
@@ -194,29 +195,6 @@ export async function fetchPosts() {
     initEventListeners();
 }
 
-export async function deletePost(post_uuid) {
-    const confirmDelete = confirm("Êtes-vous sûr de vouloir supprimer ce post ?");
-    if (!confirmDelete) return;
-
-    try {
-        const response = await fetch("http://localhost:8080/api/post/deletePost", {
-            method: "DELETE",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ post_uuid: post_uuid }),
-        });
-
-        if (!response.ok) {
-            throw new Error("Erreur lors de la suppression du post");
-        }
-
-        // Recharger les posts après suppression
-        fetchPosts();
-    } catch (error) {
-        console.error(error);
-    }
-}
 
 export function Reaction(event) {
     console.log("ça passe dans react ?");

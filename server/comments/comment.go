@@ -19,6 +19,7 @@ type Comment struct {
 	Created_at     time.Time `json:"created_at"`
 	Likes          int64     `json:"likes"`
 	Dislikes       int64     `json:"dislikes"`
+	Updated_at     time.Time `json:"update_at"`
 }
 
 // CreateComment crée un nouveau commentaire et l'insère dans la base de données
@@ -61,7 +62,7 @@ func CreateComment(db *sql.DB, params map[string]interface{}) (*Comment, error) 
 
 // FetchAllComments récupère tous les commentaires de la base de données
 func FetchAllComments(db *sql.DB) ([]Comment, error) {
-	results, err := server.RunQuery("SELECT comment_id, post_uuid, user_uuid, content, created_at FROM comments")
+	results, err := server.RunQuery("SELECT comment_id, post_uuid, user_uuid, content, created_at, updated_at FROM comments")
 	if err != nil {
 		return nil, err
 	}
@@ -93,6 +94,9 @@ func FetchAllComments(db *sql.DB) ([]Comment, error) {
 		// if profilePicture, ok := row["profile_picture"].(string); ok {
 		// 	comment.ProfilePicture = profilePicture
 		// }
+		if updated_at, ok := row["updated_at"].(time.Time); ok {
+			comment.Updated_at = updated_at
+		}
 		comments = append(comments, comment)
 	}
 
@@ -114,7 +118,7 @@ func FetchComment(db *sql.DB, params map[string]interface{}) ([]Comment, error) 
 	if post_UUIDOK {
 
 		fetchCommentquery = `
-    SELECT c.comment_id, c.content, c.post_uuid, u.user_uuid, u.username, u.profile_picture, c.created_at, likes, dislikes
+    SELECT c.comment_id, c.content, c.post_uuid, u.user_uuid, u.username, u.profile_picture, c.created_at, likes, dislikes, c.updated_at
     FROM comments AS c
     JOIN users AS u ON c.user_uuid = u.user_uuid
     WHERE c.post_uuid = ?`
@@ -174,6 +178,9 @@ func FetchComment(db *sql.DB, params map[string]interface{}) ([]Comment, error) 
 			comment.Dislikes = dislike
 		}
 
+		if updated_at, ok := row["updated_at"].(time.Time); ok {
+			comment.Updated_at = updated_at
+		}
 		comments = append(comments, comment)
 	}
 
@@ -182,7 +189,7 @@ func FetchComment(db *sql.DB, params map[string]interface{}) ([]Comment, error) 
 }
 
 func DeleteComment(db *sql.DB, params map[string]interface{}) error {
-	comment_ID, comment_IDOK := params["comment_id"].(int)
+	comment_ID, comment_IDOK := params["comment_id"].(string)
 
 	if !comment_IDOK {
 		return errors.New("informations manquantes")
@@ -226,6 +233,7 @@ func FetchUserComments(db *sql.DB, user_uuid string) ([]Comment, error) {
 			ProfilePicture: row["profile_picture"].(string),
 			Likes:          (row["likes"].(int64)),
 			Dislikes:       (row["dislikes"].(int64)),
+			Updated_at:     row["update_at"].(time.Time),
 		}
 		comments = append(comments, comment)
 	}
@@ -292,8 +300,33 @@ func FetchUserResponse(db *sql.DB, user_uuid string) ([]Comment, error) {
 			comment.Dislikes = dislikes
 		}
 
+		if updated_at, ok := row["updated_at"].(time.Time); ok {
+			comment.Updated_at = updated_at
+		}
+
 		comments = append(comments, comment)
 	}
 
 	return comments, nil
+}
+
+func UpdateComment(db *sql.DB, params map[string]interface{}) error {
+	commentID, ok1 := params["comment_id"].(string)
+	updatedMessage, ok2 := params["content"].(string)
+
+	if !ok1 || !ok2 {
+		return fmt.Errorf("invalid parameters")
+	}
+
+	updatePostQuery := `
+		UPDATE comments 
+		SET content = ?, updated_at = CURRENT_TIMESTAMP 
+		WHERE comment_id = ?`
+
+	_, err := server.RunQuery(updatePostQuery, updatedMessage, commentID)
+	if err != nil {
+		return fmt.Errorf("failed to update post: %v", err)
+	}
+
+	return nil
 }

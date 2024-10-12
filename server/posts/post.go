@@ -23,6 +23,7 @@ type Post struct {
 	Dislikes       int       `json:"dislikes"`
 	Created_at     time.Time `json:"created_at"`
 	Post_image     string    `json:"post_image"`
+	IsUpdated      bool      `json:"isUpdated"`
 }
 
 func CreatePost(db *sql.DB, r *http.Request, params map[string]interface{}) (*Post, error) {
@@ -119,6 +120,7 @@ func FetchPost(db *sql.DB, params map[string]interface{}) ([]Post, error) {
 			Likes:          int(row["likes"].(int64)),
 			Dislikes:       int(row["dislikes"].(int64)),
 			Created_at:     row["created_at"].(time.Time),
+			IsUpdated:      row["isUpdated"].(bool),
 		}
 
 		if val, ok := row["post_uuid"].(string); ok {
@@ -159,6 +161,7 @@ func FetchAllPosts(db *sql.DB) ([]Post, error) {
 			Likes:          int(row["likes"].(int64)),
 			Dislikes:       int(row["dislikes"].(int64)),
 			Created_at:     row["created_at"].(time.Time),
+			IsUpdated:      row["isUpdated"].(bool),
 		}
 
 		if data, ok := row["post_image"]; ok && data != nil {
@@ -355,6 +358,7 @@ func FetchPostsByCategory(db *sql.DB, category string) ([]Post, error) {
 			Likes:          int(row["likes"].(int64)),
 			Dislikes:       int(row["dislikes"].(int64)),
 			Created_at:     row["created_at"].(time.Time),
+			IsUpdated:      row["isUpdated"].(bool),
 		}
 
 		if data, ok := row["post_image"]; ok && data != nil {
@@ -422,6 +426,7 @@ func FetchUserPosts(db *sql.DB, user_uuid string) ([]Post, error) {
 			Likes:          int(row["likes"].(int64)),
 			Dislikes:       int(row["dislikes"].(int64)),
 			Created_at:     row["created_at"].(time.Time),
+			IsUpdated:      row["isUpdated"].(bool),
 		}
 		posts = append(posts, post)
 	}
@@ -455,10 +460,32 @@ func FetchPostsWithLikes(db *sql.DB) ([]Post, error) {
 			Likes:          int(row["likes"].(int64)),
 			Dislikes:       int(row["dislikes"].(int64)),
 			Created_at:     row["created_at"].(time.Time),
+			IsUpdated:      row["isUpdated"].(bool),
 		}
 		posts = append(posts, post)
 	}
 
 	return posts, nil
 
+}
+
+func UpdatePost(db *sql.DB, params map[string]interface{}) error {
+	postID, ok1 := params["post_uuid"].(string)
+	updatedMessage, ok2 := params["content"].(string)
+
+	if !ok1 || !ok2 {
+		return fmt.Errorf("invalid parameters")
+	}
+
+	updatePostQuery := `
+		UPDATE posts 
+		SET content = ?, isUpdated = ? 
+		WHERE post_uuid = ?`
+
+	_, err := server.RunQuery(updatePostQuery, updatedMessage, 1, postID)
+	if err != nil {
+		return fmt.Errorf("failed to update post: %v", err)
+	}
+
+	return nil
 }

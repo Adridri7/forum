@@ -204,6 +204,8 @@ export function createCommentInput() {
 }
 
 export async function createComment(post_uuid, user_uuid) {
+    const userPost = document.getElementById('users-post');
+    const firstMessageItem = document.querySelector('.user-post .message-item');
     const form = document.getElementById("create-comment-form");
     const formData = new FormData(form);
 

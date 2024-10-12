@@ -292,7 +292,6 @@ body {
     align-items: center;
     gap: 40px;
     /* Espacement entre les boutons */
-    margin-top: 10px;
 }
 
 .reaction-btn button {
@@ -829,4 +828,20 @@ body {
     max-height: 450px;
     border-radius: 10px;
     object-fit: cover;
+}
+
+.input-edit-message {
+    background: none;
+    background-color: var(--background-color);
+    outline: none;
+    border: none;
+    border-radius: 16px;
+    font-size: 16px;
+    padding: 10px;
+}
+
+.edit-span {
+
+    font-size: 12px;
+    color: var(--second-text-color);
 }

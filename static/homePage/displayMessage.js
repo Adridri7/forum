@@ -1,6 +1,8 @@
-import { deletePost } from "./app.js";
+import { UserInfo } from "./app.js";
+import { deleteComment, deletePost, updateComment, updatePost } from "./messageAction.js";
 
 export function DisplayMessages(post, isComment = false) {
+    console.log("data dans post", post);
     const svgLike = `<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentcolor"><path d="M720-120H280v-520l280-280 50 50q7 7 11.5 19t4.5 23v14l-44 174h258q32 0 56 24t24 56v80q0 7-2 15t-4 15L794-168q-9 20-30 34t-44 14Zm-360-80h360l120-280v-80H480l54-220-174 174v406Zm0-406v406-406Zm-80-34v80H160v360h120v80H80v-520h200Z"/></svg>`
     const svgDislike = `<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentcolor"><path d="M240-840h440v520L400-40l-50-50q-7-7-11.5-19t-4.5-23v-14l44-174H120q-32 0-56-24t-24-56v-80q0-7 2-15t4-15l120-282q9-20 30-34t44-14Zm360 80H240L120-480v80h360l-54 220 174-174v-406Zm0 406v-406 406Zm80 34v-80h120v-360H680v-80h200v520H680Z"/></svg>`;
     const displayTimeStamp = post.created_at ? new Date(post.created_at).toLocaleString() : new Date().toLocaleString();
@@ -58,7 +60,7 @@ export function DisplayMessages(post, isComment = false) {
     const menuPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
     menuPath.setAttribute('d', 'M240-400q-33 0-56.5-23.5T160-480q0-33 23.5-56.5T240-560q33 0 56.5 23.5T320-480q0 33-23.5 56.5T240-400Zm240 0q-33 0-56.5-23.5T400-480q0-33 23.5-56.5T480-560q33 0 56.5 23.5T560-480q0 33-23.5 56.5T480-400Zm240 0q-33 0-56.5-23.5T640-480q0-33 23.5-56.5T720-560q33 0 56.5 23.5T800-480q0 33-23.5 56.5T720-400Z');
     menuSvg.appendChild(menuPath);
-    menuButton.appendChild(menuSvg);
+
 
     menuButton.addEventListener('click', function (event) {
         toggleMenu(event, post.post_uuid);
@@ -70,25 +72,86 @@ export function DisplayMessages(post, isComment = false) {
     menu.style.display = 'none'; // caché par défaut
     menu.setAttribute('data-post-uuid', post.post_uuid); // Ajouter un attribut data pour identifier le menu
 
-    const deleteMenuItem = document.createElement('li');
-    deleteMenuItem.classList.add('menu-item');
-    deleteMenuItem.textContent = 'Delete';
-    deleteMenuItem.addEventListener('click', () => {
-        deletePost(post.post_uuid); // Appelle la fonction de suppression
-        menu.style.display = 'none'; // Fermer le menu après la suppression
-    });
+    if (UserInfo && UserInfo.user_uuid) {
+        if (UserInfo.user_uuid === post.user_uuid) {
+            console.log("id de User info : ", UserInfo.user_uuid);
+            console.log("id de post : ", post.user_uuid);
 
-    menu.appendChild(deleteMenuItem);
+            const deleteMenuItem = document.createElement('li');
+            deleteMenuItem.classList.add('menu-item');
+            deleteMenuItem.textContent = 'Delete';
+            deleteMenuItem.addEventListener('click', () => {
+                if (isComment) {
+                    deleteComment(post.post_uuid, post.comment_id);
+                } else {
+                    deletePost(post.post_uuid);
+                }
+                menu.style.display = 'none'; // Fermer le menu après la suppression
+            });
+
+            const editButton = document.createElement('li');
+            editButton.classList.add('menu-item');
+            editButton.textContent = 'Edit';
+            editButton.addEventListener('click', () => {
+                // Remplacer le contenu par la barre d'input
+                messageContent.style.display = 'none';
+                editMessageInput.style.display = 'block';
+                editMessageInput.focus();
+                editMessageInput.value = messageContent.textContent;
+
+                // Gérer la sauvegarde des modifications
+                editMessageInput.addEventListener('blur', async () => {
+                    const updatedContent = editMessageInput.value;
+                    if (isComment) {
+                        await updateComment(post.comment_id, updatedContent)
+                    } else {
+                        await updatePost(post.post_uuid, updatedContent);
+                    }
+                    messageContent.textContent = updatedContent;
+                    messageContent.style.display = 'block';
+                    editMessageInput.style.display = 'none';
+                });
+
+                editMessageInput.addEventListener('keydown', (event) => {
+                    if (event.key === 'Enter') {
+                        editMessageInput.blur(); // Déclenche l'événement de flou pour sauvegarder
+                    } else if (event.key === 'Escape') {
+                        messageContent.style.display = 'block';
+                        editMessageInput.style.display = 'none';
+                        editMessageInput.value = '';
+                    }
+                });
+            });
+
+            menu.appendChild(editButton);
+            menu.appendChild(deleteMenuItem);
+        }
+    }
+
     messageHeader.appendChild(userNameSpan);
     messageHeader.appendChild(roleDiv);
     messageHeader.appendChild(timeStampSpan);
     messageHeader.appendChild(menuButton);
-    messageHeader.appendChild(menu); // Ajout du menu à l'en-tête
+    if (menu.children.length > 0) {
+        menuButton.appendChild(menuSvg);
+        messageHeader.appendChild(menu);
+    }
 
     // Créer le contenu du message
     const messageContent = document.createElement('div');
     messageContent.classList.add('message-content');
     messageContent.textContent = post.content;
+
+    const edit = document.createElement('span');
+    edit.classList.add('edit-span');
+    edit.textContent = '(edited)';
+
+    // Créer la barre d'input pour update un message
+    const editMessageInput = document.createElement('input');
+    editMessageInput.classList.add('input-edit-message');
+    editMessageInput.type = 'text';
+    editMessageInput.value = post.content;
+    editMessageInput.style.display = 'none';
 
     // Créer les boutons de réaction
     const reactionBtnContainer = document.createElement('div');
@@ -166,6 +229,11 @@ export function DisplayMessages(post, isComment = false) {
     // Ajout des éléments au conteneur principal
     messageContainer.appendChild(messageHeader);
     messageContainer.appendChild(messageContent);
+    messageContainer.appendChild(editMessageInput);
+
+    if (post.isUpdated || post.update_at !== "0001-01-01T00:00:00Z") {
+        messageContainer.appendChild(edit);
+    }
 
     if (post.post_image && post.post_image !== "") {
         const imageMessage = document.createElement('img');

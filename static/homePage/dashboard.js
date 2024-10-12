@@ -1,6 +1,7 @@
-import { deletePost, fetchUserInfo, UserInfo } from "./app.js";
+import { fetchUserInfo, UserInfo } from "./app.js";
 import { initEventListeners } from "./comment.js";
 import { toggleMenu } from "./displayMessage.js";
+import { deletePost, updatePost } from "./messageAction.js";
 import { resetUsersPost } from "./utils.js";
 
 const commentSection = document.getElementById('personnal-comment');
@@ -83,25 +84,81 @@ export function DisplayPersonnalMessages(post, isComment = false) {
     menu.style.display = 'none';
     menu.setAttribute('data-post-uuid', post.post_uuid);
 
-    const deleteMenuItem = document.createElement('li');
-    deleteMenuItem.classList.add('menu-item');
-    deleteMenuItem.textContent = 'Delete';
-    deleteMenuItem.addEventListener('click', () => {
-        deletePost(post.post_uuid); // Appelle la fonction de suppression
-        menu.style.display = 'none'; // Fermer le menu après la suppression
-    });
 
-    menu.appendChild(deleteMenuItem);
+    if (UserInfo && UserInfo.user_uuid) {
+        if (UserInfo.user_uuid === post.user_uuid) {
+
+            const deleteMenuItem = document.createElement('li');
+            deleteMenuItem.classList.add('menu-item');
+            deleteMenuItem.textContent = 'Delete';
+            deleteMenuItem.addEventListener('click', () => {
+                deletePost(post.post_uuid); // Appelle la fonction de suppression
+                menu.style.display = 'none'; // Fermer le menu après la suppression
+            });
+
+            const editButton = document.createElement('li');
+            editButton.classList.add('menu-item');
+            editButton.textContent = 'Edit';
+            editButton.addEventListener('click', () => {
+                // Remplacer le contenu par la barre d'input
+                messageContent.style.display = 'none';
+                editMessageInput.style.display = 'block';
+                editMessageInput.focus();
+                editMessageInput.value = messageContent.textContent;
+
+                // Gérer la sauvegarde des modifications
+                editMessageInput.addEventListener('blur', async () => {
+                    const updatedContent = editMessageInput.value;
+                    await updatePost(post.post_uuid, updatedContent);
+                    messageContent.textContent = updatedContent;
+                    messageContent.style.display = 'block';
+                    editMessageInput.style.display = 'none';
+                });
+
+                editMessageInput.addEventListener('keydown', (event) => {
+                    if (event.key === 'Enter') {
+                        editMessageInput.blur(); // Déclenche l'événement de flou pour sauvegarder
+                    } else if (event.key === 'Escape') {
+                        messageContent.style.display = 'block';
+                        editMessageInput.style.display = 'none';
+                        editMessageInput.value = '';
+                    }
+                });
+            });
+
+            menu.appendChild(editButton);
+            menu.appendChild(deleteMenuItem);
+        }
+    }
+
+
     messageHeader.appendChild(userNameSpan);
     messageHeader.appendChild(roleDiv);
     messageHeader.appendChild(timeStampSpan);
     messageHeader.appendChild(menuButton);
     messageHeader.appendChild(menu);
 
+    if (menu.children.length > 0) {
+        menuButton.appendChild(menuSvg);
+        messageHeader.appendChild(menu);
+    }
+
+
     // Créer le contenu du message
     const messageContent = document.createElement('div');
     messageContent.classList.add('message-content');
     messageContent.textContent = post.content;
+
+    const edit = document.createElement('span');
+    edit.classList.add('edit-span');
+    edit.textContent = '(edited)';
+
+    // Créer la barre d'input pour update un message
+    const editMessageInput = document.createElement('input');
+    editMessageInput.classList.add('input-edit-message');
+    editMessageInput.type = 'text';
+    editMessageInput.value = post.content;
+    editMessageInput.style.display = 'none';
 
     // Créer les boutons de réaction
     const reactionBtnContainer = document.createElement('div');
@@ -185,6 +242,12 @@ export function DisplayPersonnalMessages(post, isComment = false) {
     // Ajout des éléments au conteneur principal
     messageContainer.appendChild(messageHeader);
     messageContainer.appendChild(messageContent);
+    messageContainer.appendChild(editMessageInput);
+
+    if (post.isUpdated) {
+        messageContainer.appendChild(edit);
+    }
+
     messageContainer.appendChild(reactionBtnContainer);
     messageItem.appendChild(profileContainer);
     messageItem.appendChild(messageContainer);
