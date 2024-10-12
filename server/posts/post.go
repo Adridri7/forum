@@ -489,3 +489,36 @@ func UpdatePost(db *sql.DB, params map[string]interface{}) error {
 
 	return nil
 }
+
+func FetchDetailsPost(db *sql.DB, postId string) ([]Post, error) {
+	fetchUserPostsQuery := `
+	SELECT p.*, u.username, u.profile_picture
+	FROM posts p
+	JOIN users u ON p.user_uuid = u.user_uuid
+	WHERE p.post_uuid = ?  -- Filtrer par postId
+	ORDER BY p.created_at DESC`
+
+	rows, err := server.RunQuery(fetchUserPostsQuery, postId)
+	if err != nil {
+		return nil, fmt.Errorf("database query failed: %v", err)
+	}
+
+	var posts []Post
+	for _, row := range rows {
+		post := Post{
+			Post_uuid:      row["post_uuid"].(string),
+			User_uuid:      row["user_uuid"].(string),
+			Username:       row["username"].(string),
+			ProfilePicture: row["profile_picture"].(string),
+			Content:        row["content"].(string),
+			Category:       strings.Split(row["categories"].(string), ","),
+			Likes:          int(row["likes"].(int64)),
+			Dislikes:       int(row["dislikes"].(int64)),
+			Created_at:     row["created_at"].(time.Time),
+			IsUpdated:      row["isUpdated"].(bool),
+		}
+		posts = append(posts, post)
+	}
+
+	return posts, nil
+}

@@ -29,7 +29,7 @@ func FetchResponseUserHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Récupérer les posts de l'utilisateur
-	commentData, err := comments.FetchUserResponse(server.Db, user_UUID)
+	response, err := comments.FetchUserReactions(server.Db, user_UUID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -38,7 +38,7 @@ func FetchResponseUserHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	// Encoder les données des posts en JSON et les écrire dans la réponse
-	if err := json.NewEncoder(w).Encode(commentData); err != nil {
+	if err := json.NewEncoder(w).Encode(response); err != nil {
 		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
 		return
 	}

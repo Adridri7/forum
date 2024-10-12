@@ -48,6 +48,7 @@ func main() {
 	mux.HandleFunc("/api/post/fetchPostByUser", post.FetchUserPostHandler)
 	mux.HandleFunc("/api/post/fetchMostLikedPost", post.FetchPostMostLikedPostHandler)
 	mux.HandleFunc("/api/post/UpdatePost", post.UpdatePostHandler)
+	mux.HandleFunc("/api/post/getPostDetails", post.PostDetails)
 
 	mux.HandleFunc("/api/post/createComment", comments.CreateCommentHandler)
 	mux.HandleFunc("/api/post/fetchComment", comments.FetchCommentHandler)

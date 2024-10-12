@@ -22,6 +22,25 @@ type Comment struct {
 	Updated_at     time.Time `json:"update_at"`
 }
 
+type Post struct {
+	Post_uuid      string    `json:"post_uuid"`
+	User_uuid      string    `json:"user_uuid"`
+	Username       string    `json:"username"`
+	ProfilePicture string    `json:"profile_picture"`
+	Content        string    `json:"content"`
+	Category       []string  `json:"categories"`
+	Likes          int64     `json:"likes"`
+	Dislikes       int64     `json:"dislikes"`
+	Created_at     time.Time `json:"created_at"`
+	Post_image     string    `json:"post_image"`
+	IsUpdated      bool      `json:"isUpdated"`
+}
+
+type Response struct {
+	Comments []Comment `json:"comments"`
+	Posts    []Post    `json:"posts"`
+}
+
 // CreateComment crée un nouveau commentaire et l'insère dans la base de données
 func CreateComment(db *sql.DB, params map[string]interface{}) (*Comment, error) {
 
@@ -233,7 +252,9 @@ func FetchUserComments(db *sql.DB, user_uuid string) ([]Comment, error) {
 			ProfilePicture: row["profile_picture"].(string),
 			Likes:          (row["likes"].(int64)),
 			Dislikes:       (row["dislikes"].(int64)),
-			Updated_at:     row["update_at"].(time.Time),
+		}
+		if updatedAt, ok := row["updated_at"].(time.Time); ok {
+			comment.Updated_at = updatedAt
 		}
 		comments = append(comments, comment)
 	}
@@ -241,37 +262,80 @@ func FetchUserComments(db *sql.DB, user_uuid string) ([]Comment, error) {
 	return comments, nil
 }
 
-func FetchUserResponse(db *sql.DB, user_uuid string) ([]Comment, error) {
-	// fetchUserCommentReactionsQuery := `
-	// SELECT c.comment_id, c.content, c.post_uuid, u.user_uuid, u.username, u.profile_picture, c.created_at, c.likes, c.dislikes
-	// FROM comment_reactions cr
-	// JOIN comments c ON cr.comment_id = c.comment_id
-	// JOIN users u ON c.user_uuid = u.user_uuid
-	// WHERE cr.user_uuid = ?  -- Filtrer par user_uuid de la réaction
-	// AND cr.action = 'like'  -- Ne prendre en compte que les likes
-	// ORDER BY c.created_at DESC`
-
+func FetchUserReactions(db *sql.DB, user_uuid string) (Response, error) {
+	// Requête pour récupérer les likes sur les posts
 	fetchUserLikePost := `
-    SELECT p.post_uuid, p.content, u.user_uuid, u.username, u.profile_picture, p.created_at, p.likes, p.dislikes
+    SELECT p.post_uuid, p.content, u.user_uuid, u.username, u.profile_picture, p.created_at, p.likes, p.dislikes, p.post_image
     FROM post_reactions pr
     JOIN posts p ON pr.post_uuid = p.post_uuid
     JOIN users u ON p.user_uuid = u.user_uuid
     WHERE pr.user_uuid = ?  -- Filtrer par user_uuid de la réaction
     ORDER BY p.created_at DESC`
-	// AND pr.action = 'like'  -- Ne prendre en compte que les likes
 
-	// Exécuter la requête
-	rows, err := server.RunQuery(fetchUserLikePost, user_uuid)
+	// Requête pour récupérer les likes sur les commentaires
+	fetchUserCommentReactionsQuery := `
+    SELECT c.comment_id, c.content, c.post_uuid, u.user_uuid, u.username, u.profile_picture, c.created_at, c.likes, c.dislikes
+    FROM comment_reactions cr
+    JOIN comments c ON cr.comment_id = c.comment_id
+    JOIN users u ON c.user_uuid = u.user_uuid
+    WHERE cr.user_uuid = ?  -- Filtrer par user_uuid de la réaction
+    AND cr.action = 'like'  -- Ne prendre en compte que les likes
+    ORDER BY c.created_at DESC`
+
+	// Exécuter les requêtes
+	postRows, err := server.RunQuery(fetchUserLikePost, user_uuid)
 	if err != nil {
-		return nil, fmt.Errorf("database query failed: %v", err)
+		return Response{Comments: nil, Posts: nil}, fmt.Errorf("database query failed for posts: %v", err)
+	}
+
+	commentRows, err := server.RunQuery(fetchUserCommentReactionsQuery, user_uuid)
+	if err != nil {
+		return Response{Comments: nil, Posts: nil}, fmt.Errorf("database query failed for comments: %v", err)
 	}
 
 	var comments []Comment
-	// Parcourir les résultats et remplir la structure Comment
-	for _, row := range rows {
-		comment := Comment{}
+	var posts []Post
 
-		// Extraire et vérifier chaque champ avec gestion d'erreurs potentielles
+	// Parcourir les résultats des posts
+	for _, row := range postRows {
+		post := Post{}
+		// Extraire et vérifier chaque champ
+		if postUUID, ok := row["post_uuid"].(string); ok {
+			post.Post_uuid = postUUID
+		}
+		if userUUID, ok := row["user_uuid"].(string); ok {
+			post.User_uuid = userUUID
+		}
+		if content, ok := row["content"].(string); ok {
+			post.Content = content
+		}
+		if createdAt, ok := row["created_at"].(time.Time); ok {
+			post.Created_at = createdAt
+		}
+		if username, ok := row["username"].(string); ok {
+			post.Username = username
+		}
+		if profilePicture, ok := row["profile_picture"].(string); ok {
+			post.ProfilePicture = profilePicture
+		}
+		if likes, ok := row["likes"].(int64); ok {
+			post.Likes = likes
+		}
+		if dislikes, ok := row["dislikes"].(int64); ok {
+			post.Dislikes = dislikes
+		}
+
+		if post_image, ok := row["post_image"].(string); ok {
+			post.Post_image = post_image
+		}
+
+		posts = append(posts, post)
+	}
+
+	// Parcourir les résultats des commentaires
+	for _, row := range commentRows {
+		comment := Comment{}
+		// Extraire et vérifier chaque champ
 		if commentID, ok := row["comment_id"].(string); ok {
 			comment.Comment_id = commentID
 		}
@@ -300,14 +364,15 @@ func FetchUserResponse(db *sql.DB, user_uuid string) ([]Comment, error) {
 			comment.Dislikes = dislikes
 		}
 
-		if updated_at, ok := row["updated_at"].(time.Time); ok {
-			comment.Updated_at = updated_at
-		}
-
 		comments = append(comments, comment)
 	}
 
-	return comments, nil
+	response := Response{
+		Comments: comments,
+		Posts:    posts,
+	}
+
+	return response, nil
 }
 
 func UpdateComment(db *sql.DB, params map[string]interface{}) error {
