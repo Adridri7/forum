@@ -7,7 +7,6 @@ export async function fetchAllUsers() {
         const users = await response.json();
 
         displayUsers(users);
-        console.log(users);
     } catch (error) {
         console.error(error);
     }

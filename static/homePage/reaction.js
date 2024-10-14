@@ -4,6 +4,7 @@ export async function toggleReaction(event, postUuid) {
     const action = button.classList.contains('like-btn') ? 'like' : 'dislike';
 
     try {
+        console.log("action fait", action)
         const response = await fetch('/api/like-dislike', {
             method: 'POST',
             headers: {

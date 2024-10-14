@@ -5,6 +5,7 @@ import (
 	"forum/server/api/categories"
 	comments "forum/server/api/comment"
 	authentification "forum/server/api/login"
+	"forum/server/api/notifications"
 	"forum/server/api/post"
 	"forum/server/api/providers"
 	users "forum/server/api/user"
@@ -50,6 +51,9 @@ func main() {
 	mux.HandleFunc("/api/post/UpdatePost", post.UpdatePostHandler)
 	mux.HandleFunc("/api/post/getPostDetails", post.PostDetails)
 
+	mux.HandleFunc("/api/post/notifications", notifications.FetchUnreadNotificationsHandler)
+	mux.HandleFunc("/api/post/notificationsRead", notifications.MarkNotificationsAsReadHandler)
+
 	mux.HandleFunc("/api/post/createComment", comments.CreateCommentHandler)
 	mux.HandleFunc("/api/post/fetchComment", comments.FetchCommentHandler)
 	mux.HandleFunc("/api/post/fetchAllComments", comments.FetchAllCommentsHandler)
@@ -58,6 +62,7 @@ func main() {
 	mux.HandleFunc("/api/post/fetchCommentByUser", comments.FetchUserCommentsHandler)
 	mux.HandleFunc("/api/post/fetchResponseUser", comments.FetchResponseUserHandler)
 	mux.HandleFunc("/api/post/UpdateComment", comments.UpdateCommentHandler)
+	mux.HandleFunc("/api/post/getCommentDetails", comments.CommentDetail)
 
 	mux.HandleFunc("/api/login", authentification.LoginHandler)
 	mux.HandleFunc("/api/registration", authentification.RegisterHandler)

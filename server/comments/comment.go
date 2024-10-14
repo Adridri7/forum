@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"forum/server"
+	"forum/server/api/notifications"
 	posts "forum/server/utils"
 	"time"
 )
@@ -74,6 +75,45 @@ func CreateComment(db *sql.DB, params map[string]interface{}) (*Comment, error) 
 		User_uuid:  user_UUID,
 		Content:    content,
 		Created_at: creationDate,
+	}
+
+	userIDQuery := `
+	SELECT user_uuid FROM posts WHERE post_uuid = ?;
+	`
+	row, err := server.RunQuery(userIDQuery, post_UUID)
+	if err != nil {
+		return nil, fmt.Errorf("erreur lors de la mise à jour du compte des réactions: %v", err)
+	}
+
+	if len(row) == 0 {
+		return nil, fmt.Errorf("aucun résultat trouvé pour l'UUID de l'utilisateur")
+	}
+
+	userId := ""
+
+	if userIDValue, ok := row[0]["user_uuid"].(string); ok {
+		userId = userIDValue
+	} else {
+		return nil, fmt.Errorf("erreur de conversion: user_uuid n'est pas une chaîne")
+	}
+
+	usernameQuery := `
+	SELECT username FROM users
+	WHERE user_uuid = ?`
+
+	rows, err := server.RunQuery(usernameQuery, userId)
+	if err != nil {
+		return nil, fmt.Errorf("database query failed: %v", err)
+	}
+
+	var username string
+
+	for _, row := range rows {
+		username = row["username"].(string)
+	}
+
+	if err = notifications.InsertNotification(db, user_UUID, "comment", "post", post_UUID, username); err != nil {
+		return nil, fmt.Errorf("erreur lors de la création d'une notification: %v", err)
 	}
 
 	return newComment, nil
@@ -279,10 +319,9 @@ func FetchUserReactions(db *sql.DB, user_uuid string) (Response, error) {
     JOIN comments c ON cr.comment_id = c.comment_id
     JOIN users u ON c.user_uuid = u.user_uuid
     WHERE cr.user_uuid = ?  -- Filtrer par user_uuid de la réaction
-    AND cr.action = 'like'  -- Ne prendre en compte que les likes
+	AND cr.action IN ('like', 'dislike')
     ORDER BY c.created_at DESC`
 
-	// Exécuter les requêtes
 	postRows, err := server.RunQuery(fetchUserLikePost, user_uuid)
 	if err != nil {
 		return Response{Comments: nil, Posts: nil}, fmt.Errorf("database query failed for posts: %v", err)
@@ -296,10 +335,8 @@ func FetchUserReactions(db *sql.DB, user_uuid string) (Response, error) {
 	var comments []Comment
 	var posts []Post
 
-	// Parcourir les résultats des posts
 	for _, row := range postRows {
 		post := Post{}
-		// Extraire et vérifier chaque champ
 		if postUUID, ok := row["post_uuid"].(string); ok {
 			post.Post_uuid = postUUID
 		}
@@ -332,10 +369,8 @@ func FetchUserReactions(db *sql.DB, user_uuid string) (Response, error) {
 		posts = append(posts, post)
 	}
 
-	// Parcourir les résultats des commentaires
 	for _, row := range commentRows {
 		comment := Comment{}
-		// Extraire et vérifier chaque champ
 		if commentID, ok := row["comment_id"].(string); ok {
 			comment.Comment_id = commentID
 		}
@@ -394,4 +429,55 @@ func UpdateComment(db *sql.DB, params map[string]interface{}) error {
 	}
 
 	return nil
+}
+
+func FetchDetailsComment(db *sql.DB, comment_id string) ([]Comment, error) {
+	fetchUserPostsQuery := `
+	SELECT c.*, u.username, u.profile_picture
+	FROM comments c
+	JOIN users u ON c.user_uuid = u.user_uuid
+	WHERE c.comment_id = ?  -- Filtrer par commentId
+	ORDER BY c.created_at DESC;`
+
+	rows, err := server.RunQuery(fetchUserPostsQuery, comment_id)
+	if err != nil {
+		return nil, fmt.Errorf("database query failed: %v", err)
+	}
+
+	var comments []Comment
+
+	for _, row := range rows {
+		comment := Comment{}
+		if commentID, ok := row["comment_id"].(string); ok {
+			comment.Comment_id = commentID
+		}
+		if postUUID, ok := row["post_uuid"].(string); ok {
+			comment.Post_uuid = postUUID
+		}
+		if userUUID, ok := row["user_uuid"].(string); ok {
+			comment.User_uuid = userUUID
+		}
+		if content, ok := row["content"].(string); ok {
+			comment.Content = content
+		}
+		if createdAt, ok := row["created_at"].(time.Time); ok {
+			comment.Created_at = createdAt
+		}
+		if username, ok := row["username"].(string); ok {
+			comment.Username = username
+		}
+		if profilePicture, ok := row["profile_picture"].(string); ok {
+			comment.ProfilePicture = profilePicture
+		}
+		if likes, ok := row["likes"].(int64); ok {
+			comment.Likes = likes
+		}
+		if dislikes, ok := row["dislikes"].(int64); ok {
+			comment.Dislikes = dislikes
+		}
+
+		comments = append(comments, comment)
+	}
+
+	return comments, nil
 }

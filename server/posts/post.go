@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"forum/server"
 	authentification "forum/server/api/login"
+	"forum/server/api/notifications"
 	posts "forum/server/utils"
 	"net/http"
 	"strings"
@@ -510,6 +511,7 @@ func FetchDetailsPost(db *sql.DB, postId string) ([]Post, error) {
 			User_uuid:      row["user_uuid"].(string),
 			Username:       row["username"].(string),
 			ProfilePicture: row["profile_picture"].(string),
+			Post_image:     notifications.GetStringFromRow(row["post_image"]),
 			Content:        row["content"].(string),
 			Category:       strings.Split(row["categories"].(string), ","),
 			Likes:          int(row["likes"].(int64)),

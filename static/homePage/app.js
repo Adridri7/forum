@@ -9,13 +9,13 @@ import { toggleCommentReaction, toggleReaction } from "./reaction.js";
 import { FetchMostLikedPosts } from "./postMostLiked.js";
 import { FetchMostUseCategories } from "./tendance.js";
 import { fetchPersonnalComment, fetchPersonnalPosts, fetchPersonnalResponse } from "./dashboard.js";
+import { fetchNotifications } from "./notifs.js";
 
 document.addEventListener('DOMContentLoaded', () => {
     fetchUserInfo();
 })
 export let UserInfo = null
 export async function fetchUserInfo() {
-    console.log("appel pour avoir les infos du user");
     try {
         const response = await fetch("http://localhost:8080/api/getSession");
         if (!response.ok) {
@@ -25,7 +25,6 @@ export async function fetchUserInfo() {
 
         const data = await response.json();
 
-        console.log("info du user recu depuis l'api", data);
 
         UserInfo = data;
     } catch (error) {
@@ -100,7 +99,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const loginButton = document.getElementById('login-btn');
     const profilMenu = document.querySelector('.profil-menu');
-    console.log("ici", UserInfo)
 
 
     // Vérifiez si les informations utilisateur sont valides
@@ -182,7 +180,6 @@ export async function fetchPosts() {
         if (posts.length === 0) {
             messagesList.innerHTML = '<p>No posts available.</p>';
         } else {
-            console.log(posts);
             posts.sort((b, a) => new Date(b.created_at) - new Date(a.created_at));
             posts.forEach(post => {
                 DisplayMessages(post);
@@ -193,11 +190,11 @@ export async function fetchPosts() {
         console.error(error);
     }
     initEventListeners();
+    fetchNotifications();
 }
 
 
 export function Reaction(event) {
-    console.log("ça passe dans react ?");
     const likeButton = event.target.closest('.like-btn');
     const dislikeButton = event.target.closest('.dislike-btn');
 

@@ -2,7 +2,6 @@ package post
 
 import (
 	"encoding/json"
-	"fmt"
 	"forum/server"
 	"forum/server/posts"
 	"net/http"
@@ -31,12 +30,6 @@ func PostDetails(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
-	}
-
-	fmt.Println("params :", params)
-
-	for _, post := range postData {
-		fmt.Println(post.Username, post.Content)
 	}
 
 	w.Header().Set("Content-Type", "application/json")

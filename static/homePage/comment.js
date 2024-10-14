@@ -1,6 +1,7 @@
 import { fetchPosts, fetchUserInfo, UserInfo } from "./app.js";
 import { toggleMenu } from "./displayMessage.js";
 import { fetchCategories } from "./fetchcategories.js";
+import { fetchNotifications } from "./notifs.js";
 import { FetchMostLikedPosts } from "./postMostLiked.js";
 import { fetchAllcomments } from "./showComment.js";
 import { getPPFromID } from "./utils.js";
@@ -9,7 +10,8 @@ const AppState = {
     HOME: 'home',
     POST: 'post',
     SEARCH: 'search',
-    TREND: "trending"
+    TREND: "trending",
+    NOTIFS: "notification",
 };
 
 
@@ -25,7 +27,7 @@ export function handleCommentClick() {
     }
 }
 
-
+let currentState
 export function updateAppState(newState, pushState = true) {
     const title = document.getElementById('title');
 
@@ -46,6 +48,10 @@ export function updateAppState(newState, pushState = true) {
             title.textContent = 'Trending';
             FetchMostLikedPosts();
             break
+        case AppState.NOTIFS:
+            title.textContent = "Notifications";
+            fetchNotifications(true);
+            break
         default:
             // Si l'état n'est pas reconnu, retour à l'accueil
             newState.type = AppState.HOME;
@@ -65,6 +71,9 @@ export function updateAppState(newState, pushState = true) {
                 break;
             case AppState.TREND:
                 url = '#trending'
+                break
+            case AppState.NOTIFS:
+                url = "notifications"
                 break
             default:
                 url = '#home';
@@ -285,4 +294,9 @@ document.getElementById('search-link').addEventListener('click', function (e) {
 document.getElementById('trend-link').addEventListener('click', function (e) {
     e.preventDefault();
     updateAppState({ type: AppState.TREND })
+})
+
+document.getElementById('notifications-link').addEventListener('click', function (e) {
+    e.preventDefault();
+    updateAppState({ type: AppState.NOTIFS })
 })

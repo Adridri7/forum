@@ -14,7 +14,6 @@ reactionSection.addEventListener('click', fetchPersonnalResponse);
 
 
 export function DisplayPersonnalMessages(post, isComment = false) {
-    console.log("ce que contient post :", post)
 
     const svgLike = `<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentcolor"><path d="M720-120H280v-520l280-280 50 50q7 7 11.5 19t4.5 23v14l-44 174h258q32 0 56 24t24 56v80q0 7-2 15t-4 15L794-168q-9 20-30 34t-44 14Zm-360-80h360l120-280v-80H480l54-220-174 174v406Zm0-406v406-406Zm-80-34v80H160v360h120v80H80v-520h200Z"/></svg>`
     const svgDislike = `<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentcolor"><path d="M240-840h440v520L400-40l-50-50q-7-7-11.5-19t-4.5-23v-14l44-174H120q-32 0-56-24t-24-56v-80q0-7 2-15t4-15l120-282q9-20 30-34t44-14Zm360 80H240L120-480v80h360l-54 220 174-174v-406Zm0 406v-406 406Zm80 34v-80h120v-360H680v-80h200v520H680Z"/></svg>`;
@@ -373,26 +372,21 @@ export async function fetchPersonnalResponse() {
 
         const { posts, comments } = await response.json();
         messagesList.innerHTML = '';
-        console.log("posts : ", posts);
-        console.log("comments : ", comments);
 
-        if (posts.length === 0) {
-            messagesList.innerHTML = '<p>No posts available.</p>';
-        } else {
+
+        // Gestion des posts
+        if (Array.isArray(posts) && posts.length > 0) {
             posts.sort((b, a) => new Date(b.created_at) - new Date(a.created_at));
             posts.forEach(async (post) => {
-                console.log("id envoyé : ", post.post_uuid);
                 const details = await fetchPostDetails(post.post_uuid);
-                console.log("details", details[0]);
-                console.log("posts-content :", details);
 
-                DisplayPersonnalMessages(post, true);
+                DisplayPersonnalMessages(post, false);
 
                 const commentElement = document.createElement('div');
                 commentElement.innerHTML = `
                     <div>
                         <br/>
-                        <strong>React on :</strong> "${details[0].content}" by <strong>${details[0].username}</strong>
+                        <strong>React to post :</strong> "${details[0].content}" by <strong>${details[0].username}</strong>
                     </div>
                 `;
 
@@ -405,15 +399,51 @@ export async function fetchPersonnalResponse() {
                     }
                 }
             });
+        } else {
+            messagesList.innerHTML = '<p>No posts available.</p>';
         }
+
+        // Gestion des commentaires
+        if (Array.isArray(comments) && comments.length > 0) {
+            console.log("ça passe ici ?");
+            comments.sort((b, a) => new Date(b.created_at) - new Date(a.created_at));
+            comments.forEach(async (comment) => {
+                console.log("id envoyé : ", comment.comment_id);
+                const details = await fetchCommentDetails(comment.comment_id);
+                console.log("details", details);
+                console.log("posts-content :", details);
+
+                DisplayPersonnalMessages(comment, true);
+
+                const commentElement = document.createElement('div');
+                commentElement.innerHTML = `
+                    <div>
+                        <br/>
+                        <strong>React to comment :</strong> "${details[0].content}" by <strong>${details[0].username}</strong>
+                    </div>
+                `;
+
+                const targetMessageItem = document.querySelector(`[post_uuid="${comment.comment_id || comment.post_uuid}"]`);
+
+                if (targetMessageItem) {
+                    const messageContent = targetMessageItem.querySelector('.message-content');
+                    if (messageContent) {
+                        messageContent.appendChild(commentElement);
+                    }
+                }
+            });
+        } else {
+            messagesList.innerHTML += '<p>No comments available.</p>';
+        }
+
     } catch (error) {
-        messagesList.innerHTML = '<p>Error loading posts.</p>';
+        messagesList.innerHTML = '<p>Error loading posts and comments.</p>';
         console.error(error);
     }
     initEventListeners();
 }
 
-async function fetchPostDetails(postUuid) {
+export async function fetchPostDetails(postUuid) {
     const response = await fetch("/api/post/getPostDetails", {
         method: "POST",
         headers: {
@@ -435,6 +465,34 @@ async function fetchPostDetails(postUuid) {
     }
 
     const postDetails = await response.json();
+    console.log("réponse reçu", postDetails)
+
+    return postDetails;
+}
+
+export async function fetchCommentDetails(comment_id) {
+    const response = await fetch("/api/post/getCommentDetails", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ comment_id: comment_id })
+    });
+
+    let errorMessage = "Error fetching post details";
+
+    if (!response.ok) {
+        try {
+            const errorData = await response.json();
+            errorMessage = errorData.message || errorMessage;
+        } catch (err) {
+            console.error("Failed to parse error response:", err);
+        }
+        throw new Error(errorMessage);
+    }
+
+    const postDetails = await response.json();
+    console.log("réponse reçu (comment)", postDetails)
 
     return postDetails;
 }
