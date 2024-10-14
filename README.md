@@ -220,7 +220,7 @@ func main() {
 		IdleTimeout:       3 * time.Minute,
 	}
 
-	log.Println("Server started on http://localhost:8080")
+	log.Println("Server started on https://localhost:8080")
 
 	err := server.ListenAndServe()
 	if err != nil {

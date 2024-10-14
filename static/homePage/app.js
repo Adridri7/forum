@@ -17,7 +17,7 @@ export let UserInfo = null
 export async function fetchUserInfo() {
     console.log("appel pour avoir les infos du user");
     try {
-        const response = await fetch("http://localhost:8080/api/getSession");
+        const response = await fetch("https://localhost:8080/api/getSession");
         if (!response.ok) {
             document.cookie = "session_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
             throw new Error("Error retrieving user data");
@@ -171,7 +171,7 @@ export async function fetchPosts() {
     const messagesList = document.getElementById('users-post');
     messagesList.innerHTML = '<p>Loading...</p>';
     try {
-        const response = await fetch("http://localhost:8080/api/post/fetchAllPost");
+        const response = await fetch("https://localhost:8080/api/post/fetchAllPost");
         if (!response.ok) {
             throw new Error("Error retrieving posts");
         }
@@ -199,7 +199,7 @@ export async function deletePost(post_uuid) {
     if (!confirmDelete) return;
 
     try {
-        const response = await fetch("http://localhost:8080/api/post/deletePost", {
+        const response = await fetch("https://localhost:8080/api/post/deletePost", {
             method: "DELETE",
             headers: {
                 "Content-Type": "application/json",

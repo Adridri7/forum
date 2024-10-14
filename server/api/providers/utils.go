@@ -12,19 +12,19 @@ import (
 const (
 	OAuthState = "pseudo-random" // À sécuriser avec un état aléatoire en production
 
-	redirectDiscordURL    = "http://localhost:8080/api/discord_callback"
+	redirectDiscordURL    = "https://localhost:8080/api/discord_callback"
 	oauthDiscordURL       = "https://discord.com/oauth2/authorize"
 	tokenDiscordURL       = "https://discord.com/api/v10/oauth2/token"
 	tokenRevokeDiscordURL = "https://discord.com/api/v10/oauth2/token/revoke"
 	userInfoDiscordURL    = "https://discord.com/api/v10/users/@me"
 	getPPDiscordURL       = "https://cdn.discordapp.com/avatars/"
 
-	redirectGithubURL = "http://localhost:8080/api/github_callback"
+	redirectGithubURL = "https://localhost:8080/api/github_callback"
 	oauthGithubURL    = "https://github.com/login/oauth/authorize"
 	tokenGithubURL    = "https://github.com/login/oauth/access_token"
 	userInfoGithubURL = "https://api.github.com/user"
 
-	redirectGoogleURL = "http://localhost:8080/api/google_callback"
+	redirectGoogleURL = "https://localhost:8080/api/google_callback"
 	oauthGoogleURL    = "https://accounts.google.com/o/oauth2/auth"
 	tokenGoogleURL    = "https://oauth2.googleapis.com/token"
 	userInfoGoogleURL = "https://www.googleapis.com/oauth2/v2/userinfo"

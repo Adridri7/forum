@@ -84,7 +84,7 @@
             const data = {};
             formData.forEach((value, key) => (data[key] = value));
 
-            const response = await fetch("http://localhost:8080/api/post/createPost", {
+            const response = await fetch("https://localhost:8080/api/post/createPost", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -110,7 +110,7 @@
             console.log("Données envoyées:", data);
 
             try {
-                const response = await fetch("http://localhost:8080/api/comment/createComment", {
+                const response = await fetch("https://localhost:8080/api/comment/createComment", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"

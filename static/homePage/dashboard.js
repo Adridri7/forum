@@ -199,7 +199,7 @@ export async function fetchPersonnalPosts() {
     const messagesList = document.getElementById('users-personnal-post');
     messagesList.innerHTML = '<p>Loading...</p>';
     try {
-        const response = await fetch("http://localhost:8080/api/post/fetchPostByUser", {
+        const response = await fetch("https://localhost:8080/api/post/fetchPostByUser", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -234,7 +234,7 @@ export async function fetchPersonnalComment() {
     await fetchUserInfo();
     messagesList.innerHTML = '<p>Loading...</p>';
     try {
-        const response = await fetch("http://localhost:8080/api/post/fetchCommentByUser", {
+        const response = await fetch("https://localhost:8080/api/post/fetchCommentByUser", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -269,7 +269,7 @@ export async function fetchPersonnalResponse() {
     await fetchUserInfo();
     messagesList.innerHTML = '<p>Loading...</p>';
     try {
-        const response = await fetch("http://localhost:8080/api/post/fetchResponseUser", {
+        const response = await fetch("https://localhost:8080/api/post/fetchResponseUser", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"

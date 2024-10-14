@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/tls"
 	"fmt"
 	"forum/server/api/categories"
 	comments "forum/server/api/comment"
@@ -18,7 +19,7 @@ import (
 
 func main() {
 	// HTTPS
-	/*cert, err := tls.LoadX509KeyPair("server.crt", "server.key")
+	cert, err := tls.LoadX509KeyPair("server.crt", "server.key")
 	if err != nil {
 		log.Fatalf("Error loading certificate: %v", err)
 	}
@@ -26,15 +27,14 @@ func main() {
 	// Configuration des cipher suites
 	tlsConfig := &tls.Config{
 		Certificates: []tls.Certificate{cert},
-		MinVersion:   tls.VersionTLS13, // Utilise TLS 1.3 comme version minimum
+		MinVersion:   tls.VersionTLS13,
 		CipherSuites: []uint16{
 			tls.TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,
 			tls.TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,
 			tls.TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,
 			tls.TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,
-			// Ajoute d'autres cipher suites selon tes besoins
 		},
-	}*/
+	}
 
 	mux := http.NewServeMux()
 
@@ -93,7 +93,7 @@ func main() {
 		ReadHeaderTimeout: 30 * time.Second,
 		WriteTimeout:      45 * time.Second,
 		IdleTimeout:       3 * time.Minute,
-		//TLSConfig:         tlsConfig,
+		TLSConfig:         tlsConfig,
 	}
 
 	// Lance une goroutine pour réinitialiser les compteurs périodiquement
@@ -104,11 +104,11 @@ func main() {
 		}
 	}()
 
-	log.Println("Server started on http://localhost:8080")
+	log.Println("Server started on https://localhost:8080")
 
 	// HTTPS
-	//err = server.ListenAndServeTLS("", "") // "" car les certificats sont chargés via TLSConfig
-	err := server.ListenAndServe()
+	err = server.ListenAndServeTLS("", "") // "" car les certificats sont chargés via TLSConfig
+	//err := server.ListenAndServe()
 	if err != nil {
 		log.Fatalf("failed to start server: %s", err)
 	}

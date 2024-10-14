@@ -25,7 +25,7 @@ export async function createPost(event) {
     };
 
     try {
-        const response = await fetch("http://localhost:8080/api/post/createPost", {
+        const response = await fetch("https://localhost:8080/api/post/createPost", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
