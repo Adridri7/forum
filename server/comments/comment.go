@@ -78,9 +78,9 @@ func CreateComment(db *sql.DB, params map[string]interface{}) (*Comment, error) 
 	}
 
 	userIDQuery := `
-	SELECT user_uuid FROM posts WHERE post_uuid = ?;
+	SELECT user_uuid FROM comments WHERE comment_id = ?;
 	`
-	row, err := server.RunQuery(userIDQuery, post_UUID)
+	row, err := server.RunQuery(userIDQuery, comment_UUID)
 	if err != nil {
 		return nil, fmt.Errorf("erreur lors de la mise à jour du compte des réactions: %v", err)
 	}
@@ -101,18 +101,32 @@ func CreateComment(db *sql.DB, params map[string]interface{}) (*Comment, error) 
 	SELECT username FROM users
 	WHERE user_uuid = ?`
 
+	userPostIdQuery := `
+	SELECT user_uuid FROM posts
+	WHERE post_uuid = ?
+	`
+
+	var username, userID string
+
 	rows, err := server.RunQuery(usernameQuery, userId)
 	if err != nil {
 		return nil, fmt.Errorf("database query failed: %v", err)
 	}
 
-	var username string
+	resp, err := server.RunQuery(userPostIdQuery, post_UUID)
+	if err != nil {
+		return nil, fmt.Errorf("database query failed: %v", err)
+	}
+
+	for _, res := range resp {
+		userID = res["user_uuid"].(string)
+	}
 
 	for _, row := range rows {
 		username = row["username"].(string)
 	}
 
-	if err = notifications.InsertNotification(db, user_UUID, "comment", "post", post_UUID, username); err != nil {
+	if err = notifications.InsertNotification(db, userID, "comment", "post", post_UUID, username); err != nil {
 		return nil, fmt.Errorf("erreur lors de la création d'une notification: %v", err)
 	}
 

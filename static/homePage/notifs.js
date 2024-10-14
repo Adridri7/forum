@@ -27,10 +27,19 @@ export async function fetchNotifications(isNotif = false) {
 }
 
 async function displayNotifications(notifications) {
-    let response
-    console.log("dans display :", notifications);
+    console.log(notifications)
+    let response;
     const notificationList = document.getElementById('users-post');
     notificationList.innerHTML = '';
+
+    if (!notifications || notifications.length == 0) {
+        // Create a message element
+        const noNotificationsMessage = document.createElement('div');
+        noNotificationsMessage.textContent = "There are no notifications.";
+        noNotificationsMessage.classList.add('no-notifications-message');
+        notificationList.appendChild(noNotificationsMessage);
+        return;
+    }
 
     for (const notification of notifications) {
         if (notification.target_type === "post") {
@@ -43,27 +52,28 @@ async function displayNotifications(notifications) {
         }
 
         const commentElement = document.createElement('div');
-        commentElement.innerHTML = `
-                    <div class="notif-item">
-                        ${notification.username} : "${notification.action}" your  ${notification.target_type} :
+
+        const targetMessageItems = document.querySelectorAll(`[post_uuid="${response[0].comment_id || response[0].post_uuid}"]`);
+
+        targetMessageItems.forEach(targetMessageItem => {
+            const messageContent = targetMessageItem.querySelector('.message-content');
+            if (messageContent) {
+                const existingNotif = messageContent.querySelector(`[data-uuid="${notification.notification_id}"]`);
+                if (!existingNotif) {
+                    commentElement.innerHTML = `
+                    <div class="notif-item" data-uuid="${notification.notification_id}">
+                        ${notification.username} : "${notification.action}" your ${notification.target_type} :
                     </div>
                 `;
-        const targetMessageItem = document.querySelector(`[post_uuid="${response[0].comment_id || response[0].post_uuid}"]`);
-        console.log("target", targetMessageItem);
-
-        if (targetMessageItem) {
-            const messageContent = targetMessageItem.querySelector('.message-content');
-            console.log(messageContent)
-            if (messageContent) {
-                messageContent.prepend(commentElement);
+                    messageContent.prepend(commentElement);
+                }
             }
-        }
+        });
     }
     MarkNotifsAsRead();
 }
 
 async function MarkNotifsAsRead() {
-    console.log("l'id du user :", UserInfo.user_uuid)
     const response = await fetch('/api/post/notificationsRead', {
         method: 'POST',
         headers: {

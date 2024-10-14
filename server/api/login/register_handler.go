@@ -115,8 +115,6 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Printf("New user registered: %s -> %s (%s)\n", newUser.UUID, newUser.Username, newUser.Email)
-
 	sessionID, _ := generator.GenerateUUID() // Génère un UUID unique
 	http.SetCookie(w, &http.Cookie{
 		Name:   "session_token",

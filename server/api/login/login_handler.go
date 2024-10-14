@@ -73,8 +73,6 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		usr = usrFound
 	}
 
-	fmt.Printf("User logged in: %s -> %s (%s)\n", usr.UUID, usr.Username, usr.Email)
-
 	sessionID, _ := utils.GenerateUUID() // Génère un UUID unique
 	http.SetCookie(w, &http.Cookie{
 		Name:   "session_token",
