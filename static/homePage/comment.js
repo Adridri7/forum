@@ -73,7 +73,7 @@ export function updateAppState(newState, pushState = true) {
                 url = '#trending'
                 break
             case AppState.NOTIFS:
-                url = "notifications"
+                url = "#notifications"
                 break
             default:
                 url = '#home';
@@ -117,6 +117,8 @@ window.addEventListener('popstate', function (event) {
             updateAppState({ type: AppState.SEARCH }, false);
         } else if (hash === '#trend') {
             updateAppState({ type: AppState.TREND }, false)
+        } else if (hash === "#notifications") {
+            updateAppState({ type: AppState.NOTIFS }, false)
         } else {
             updateAppState({ type: AppState.HOME }, false);
         }
@@ -235,7 +237,7 @@ export async function createComment(post_uuid, user_uuid) {
 
         if (response.ok) {
             alert("Commentaire ajouté avec succès!");
-            fetchAllcomments(post_uuid);
+            // fetchAllcomments(post_uuid);
         } else {
             const error = await response.json();
             alert("Erreur lors de l'ajout du commentaire: " + error.message);
@@ -298,5 +300,9 @@ document.getElementById('trend-link').addEventListener('click', function (e) {
 
 document.getElementById('notifications-link').addEventListener('click', function (e) {
     e.preventDefault();
+    if (!UserInfo) {
+        alert("You must be logged to see notifications.");
+        return
+    };
     updateAppState({ type: AppState.NOTIFS })
 })

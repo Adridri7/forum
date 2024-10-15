@@ -155,9 +155,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Ajouter à nouveau le bouton à la place de la div
         profilMenu.appendChild(newLoginButton);
     }
-
-    console.log("Le bouton 'Login' est visible.");
-});;
+});
 
 // Événement pour le menu
 toggleButton.addEventListener('click', () => {

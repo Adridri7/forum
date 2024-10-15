@@ -27,7 +27,6 @@ export async function fetchNotifications(isNotif = false) {
 }
 
 async function displayNotifications(notifications) {
-    console.log(notifications)
     let response;
     const notificationList = document.getElementById('users-post');
     notificationList.innerHTML = '';
