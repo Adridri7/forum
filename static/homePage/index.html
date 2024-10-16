@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/static/homePage/style.css">
+    <link rel="stylesheet" href="/static/homePage/responsive.css">
+    <link rel="stylesheet" href="/static/homePage/dashboard.css">
+    <title>Forum</title>
+</head>
+
+<body>
+    <div id="container">
+        <nav id="sidebar">
+            <ul>
+                <li class="logo-name">
+                    <span class="name">Forum</span>
+                    <button id="toggle-menu-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon"
+                            viewBox="0 0 448 512"><!--!Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.-->
+                            <path
+                                d="M0 96C0 78.3 14.3 64 32 64l384 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L32 128C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32l384 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L32 288c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32L32 448c-17.7 0-32-14.3-32-32s14.3-32 32-32l384 0c17.7 0 32 14.3 32 32z" />
+                        </svg>
+                    </button>
+                </li>
+
+                <li class="active">
+                    <a href="#home" id="home-link">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon"
+                            viewBox="0 0 576 512"><!--!Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.-->
+                            <path
+                                d="M575.8 255.5c0 18-15 32.1-32 32.1l-32 0 .7 160.2c0 2.7-.2 5.4-.5 8.1l0 16.2c0 22.1-17.9 40-40 40l-16 0c-1.1 0-2.2 0-3.3-.1c-1.4 .1-2.8 .1-4.2 .1L416 512l-24 0c-22.1 0-40-17.9-40-40l0-24 0-64c0-17.7-14.3-32-32-32l-64 0c-17.7 0-32 14.3-32 32l0 64 0 24c0 22.1-17.9 40-40 40l-24 0-31.9 0c-1.5 0-3-.1-4.5-.2c-1.2 .1-2.4 .2-3.6 .2l-16 0c-22.1 0-40-17.9-40-40l0-112c0-.9 0-1.9 .1-2.8l0-69.7-32 0c-18 0-32-14-32-32.1c0-9 3-17 10-24L266.4 8c7-7 15-8 22-8s15 2 21 7L564.8 231.5c8 7 12 15 11 24z" />
+                        </svg>
+                        <span>Home</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="#Dashborad" id="dashboard-link">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" class="icon"
+                            fill="currentcolor">
+                            <path
+                                d="M520-600v-240h320v240H520ZM120-440v-400h320v400H120Zm400 320v-400h320v400H520Zm-400 0v-240h320v240H120Zm80-400h160v-240H200v240Zm400 320h160v-240H600v240Zm0-480h160v-80H600v80ZM200-200h160v-80H200v80Zm160-320Zm240-160Zm0 240ZM360-280Z" />
+                        </svg>
+                        <span>Dashboard</span>
+
+                    </a>
+                </li>
+                <li>
+                    <a href="#Trending" id="trend-link">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" class="icon" fill="#e8eaed">
+                            <path
+                                d="M240-400q0 52 21 98.5t60 81.5q-1-5-1-9v-9q0-32 12-60t35-51l113-111 113 111q23 23 35 51t12 60v9q0 4-1 9 39-35 60-81.5t21-98.5q0-50-18.5-94.5T648-574q-20 13-42 19.5t-45 6.5q-62 0-107.5-41T401-690q-39 33-69 68.5t-50.5 72Q261-513 250.5-475T240-400Zm240 52-57 56q-11 11-17 25t-6 29q0 32 23.5 55t56.5 23q33 0 56.5-23t23.5-55q0-16-6-29.5T537-292l-57-56Zm0-492v132q0 34 23.5 57t57.5 23q18 0 33.5-7.5T622-658l18-22q74 42 117 117t43 163q0 134-93 227T480-80q-134 0-227-93t-93-227q0-129 86.5-245T480-840Z" />
+                        </svg>
+                        <span>Trending</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#Search" id="search-link">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" class="icon"
+                            fill="currentcolor">
+                            <path
+                                d="M784-120 532-372q-30 24-69 38t-83 14q-109 0-184.5-75.5T120-580q0-109 75.5-184.5T380-840q109 0 184.5 75.5T640-580q0 44-14 83t-38 69l252 252-56 56ZM380-400q75 0 127.5-52.5T560-580q0-75-52.5-127.5T380-760q-75 0-127.5 52.5T200-580q0 75 52.5 127.5T380-400Z" />
+                        </svg>
+                        <span>Search</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#Notifications" id="notifications-link" class="notification-container">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 -960 960 960" id="notifs-svg">
+                            <path
+                                d="M160-200v-80h80v-280q0-83 50-147.5T420-792v-28q0-25 17.5-42.5T480-880q25 0 42.5 17.5T540-820v28q80 20 130 84.5T720-560v280h80v80H160Zm320-300Zm0 420q-33 0-56.5-23.5T400-160h160q0 33-23.5 56.5T480-80ZM320-280h320v-280q0-66-47-113t-113-47q-66 0-113 47t-47 113v280Z" />
+                        </svg>
+                        <span>Notifications</span>
+                        <div id="notification-dot"></div>
+                    </a>
+                </li>
+                <li>
+                    <a href="#Moderation" id="moderation-link" class="moderation-container">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" class="icon"
+                            fill="currentcolor">
+                            <path
+                                d="M680-280q25 0 42.5-17.5T740-340q0-25-17.5-42.5T680-400q-25 0-42.5 17.5T620-340q0 25 17.5 42.5T680-280Zm0 120q31 0 57-14.5t42-38.5q-22-13-47-20t-52-7q-27 0-52 7t-47 20q16 24 42 38.5t57 14.5ZM480-80q-139-35-229.5-159.5T160-516v-244l320-120 320 120v227q-19-8-39-14.5t-41-9.5v-147l-240-90-240 90v188q0 47 12.5 94t35 89.5Q310-290 342-254t71 60q11 32 29 61t41 52q-1 0-1.5.5t-1.5.5Zm200 0q-83 0-141.5-58.5T480-280q0-83 58.5-141.5T680-480q83 0 141.5 58.5T880-280q0 83-58.5 141.5T680-80ZM480-494Z" />
+                        </svg>
+                        <span>Moderation</span>
+                    </a>
+                </li>
+                <div id="user-list-containers">
+                    <h3>Membres</h3>
+                    <ul id="user-list"></ul>
+                </div>
+
+            </ul>
+        </nav>
+        <section id="home-section" class="section">
+            <div class="chat-box">
+                <header id="header">
+                    <h2 id="title">General</h2>
+                    <div class="profil-menu">
+                        <button id="dark-mode-toggle" class="dark-mode-toggle">Dark Mode</button>
+                        <button id="login-btn" class="login-btn">Log in</button>
+                    </div>
+                </header>
+
+
+                <div class="chat-center">
+
+                    <ul id="users-post">
+
+                        <!-- ici va se trouver les posts -->
+                    </ul>
+                    <div id="most-liked-posts" class="posts-container"></div>
+                    <div id="tendances" class="posts-container"></div>
+                    <div class="modal-post" id="modal-post">
+                    </div>
+                    <button id="add-button">+</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="dashboard-section" class="section" style="display: none;">
+            <header class="dashboard-header">
+                <div class="profile-image">
+                    <img src="" alt="profile-picture" id="profile-picture">
+                </div>
+                <!-- <div class="profil-menu">
+                    <button id="dark-mode-toggle" class="dark-mode-toggle">Dark Mode</button>
+                </div> -->
+            </header>
+
+            <nav id="nav-bar">
+                <ul>
+                    <li id="personnal-post" class="active">Post</li>
+                    <li id="personnal-comment">Comment</li>
+                    <li id="personnal-reaction">Reaction</li>
+                </ul>
+            </nav>
+
+            <div id="dashboard-center-box">
+                <div class="dashboard-chat-center">
+
+                    <ul id="users-personnal-post">
+
+                        <!-- ici va se trouver les posts -->
+                    </ul>
+                </div>
+        </section>
+        <script type="module" src="/static/homePage/app.js"></script>
+</body>
+
+</html>
