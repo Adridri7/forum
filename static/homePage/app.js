@@ -163,8 +163,7 @@ toggleButton.addEventListener('click', () => {
 });
 
 export async function fetchPosts() {
-    resetUsersPost();
-    const messagesList = document.getElementById('users-post');
+    const messagesList = document.querySelector(`.users-post[data-section="home"]`);
     messagesList.innerHTML = '<p>Loading...</p>';
     try {
         const response = await fetch("http://localhost:8080/api/post/fetchAllPost");
@@ -180,7 +179,7 @@ export async function fetchPosts() {
         } else {
             posts.sort((b, a) => new Date(b.created_at) - new Date(a.created_at));
             posts.forEach(post => {
-                DisplayMessages(post);
+                DisplayMessages(post, "home");
             });
         }
     } catch (error) {
@@ -245,23 +244,49 @@ document.addEventListener('DOMContentLoaded', () => {
 const homeLink = document.getElementById('home-link');
 const dashboardLink = document.getElementById('dashboard-link');
 const searchLink = document.getElementById('search-link');
-
-searchLink.addEventListener('click', fetchCategories);
+const notificationsLink = document.getElementById('notifications-link');
+const trendLink = document.getElementById('trend-link');
 
 // Sélectionne les sections
 const homeSection = document.getElementById('home-section');
 const dashboardSection = document.getElementById('dashboard-section');
+const searchSection = document.getElementById('search-section');
+const notificationsSection = document.getElementById('notifications-section');
+const trendingSection = document.getElementById('trending-section');
 
 // Fonction pour masquer toutes les sections
 function hideAllSections() {
     homeSection.style.display = 'none';
     dashboardSection.style.display = 'none';
+    searchSection.style.display = 'none';
+    notificationsSection.style.display = 'none';
+    trendingSection.style.display = 'none';
 }
 
 // Ajoute des événements pour chaque lien
 homeLink.addEventListener('click', () => {
     hideAllSections();
     homeSection.style.display = 'block';
+});
+
+searchLink.addEventListener('click', () => {
+    hideAllSections();
+    searchSection.style.display = 'block';
+});
+
+notificationsLink.addEventListener('click', () => {
+    if (!UserInfo) {
+        alert("You must be logged in to see notifications.");
+        return;
+    }
+
+    hideAllSections();
+    notificationsSection.style.display = 'block'
+});
+
+trendLink.addEventListener('click', () => {
+    hideAllSections();
+    trendingSection.style.display = 'block'
 });
 
 dashboardLink.addEventListener('click', () => {

@@ -5,7 +5,7 @@ import { getPPFromID } from "./utils.js";
 
 const addButton = document.getElementById('add-button');
 const modalPost = document.getElementById('modal-post');
-const userPost = document.getElementById('users-post');
+const userPost = document.querySelector(`.users-post[data-section="home"]`);
 const loginBtn = document.getElementById('login-btn');
 
 let isModal = false;

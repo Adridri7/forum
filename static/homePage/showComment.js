@@ -19,7 +19,7 @@ export async function fetchAllcomments(postUuid) {
         comments.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
         comments.forEach(comment => {
-            DisplayMessages(comment, true);
+            DisplayMessages(comment, "home", true);
         });
 
         initEventListeners();

@@ -76,8 +76,8 @@ export async function getPPFromID(id) {
 //     return true;
 // }
 
-export function resetUsersPost() {
-    const usersPost = document.getElementById('users-post');
+export function resetUsersPost(section) {
+    const usersPost = document.querySelector(`.users-post[data-section="${section}"]`);
 
     // Vide le contenu de users-post
     usersPost.innerHTML = '';

@@ -19,9 +19,10 @@ export async function fetchCategories() {
 
 // Fonction pour afficher les catégories dans la liste
 function displayCategories(categories) {
-    const usersPost = document.getElementById('users-post');
-
+    console.log("cat :", categories)
+    const usersPost = document.querySelector(`.users-post[data-section="search"]`);
     usersPost.innerHTML = '';
+    console.log("ah", usersPost)
 
     const updateUsersPostStyle = () => {
         usersPost.style.display = 'grid';
@@ -34,6 +35,7 @@ function displayCategories(categories) {
         usersPost.style.rowGap = '10px';
         usersPost.style.columnGap = '10px';
         usersPost.style.border = 'none';
+        usersPost.style.flexGrow = '0'
     };
 
     updateUsersPostStyle();
@@ -59,8 +61,7 @@ function displayCategories(categories) {
 }
 
 export async function fetchPostsByCategory(category) {
-    resetUsersPost();
-
+    resetUsersPost("search");
     try {
         const response = await fetch(`/api/post/fetchPostsByCategories`, {
             method: "POST",
@@ -75,13 +76,14 @@ export async function fetchPostsByCategory(category) {
         }
 
         const posts = await response.json();
-        const postsContainer = document.getElementById('users-post');
+        const postsContainer = document.querySelector(`.users-post[data-section="search"]`);
 
         if (postsContainer) {
             postsContainer.innerHTML = '';
+            console.log("single cat :", posts)
 
             posts.forEach(post => {
-                DisplayMessages(post);
+                DisplayMessages(post, "search");
             });
             initEventListeners();
         } else {

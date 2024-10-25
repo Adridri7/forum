@@ -20,8 +20,8 @@ export async function FetchMostLikedPostss() {
 }
 
 export async function FetchMostLikedPosts() {
-    resetUsersPost();
-    const usersPost = document.getElementById('users-post');
+    const userPost = document.querySelector(`.users-post[data-section="trending"]`)
+    userPost.style.flexGrow = '0';
     try {
         const response = await fetch('/api/post/fetchMostLikedPost');
 
@@ -32,12 +32,8 @@ export async function FetchMostLikedPosts() {
 
         const mostLikedPosts = await response.json();
 
-        usersPost.innerHTML = '';
-
-        // Affiche les posts dans la liste
-
         mostLikedPosts.forEach(posts => {
-            DisplayMessages(posts);
+            DisplayMessages(posts, "trending");
         });
     } catch (error) {
         console.error('Erreur lors de la récupération des posts :', error.message);

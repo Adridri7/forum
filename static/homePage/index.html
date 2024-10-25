@@ -109,7 +109,7 @@
 
                 <div class="chat-center">
 
-                    <ul id="users-post">
+                    <ul class="users-post" data-section="home">
 
                         <!-- ici va se trouver les posts -->
                     </ul>
@@ -148,6 +148,78 @@
                         <!-- ici va se trouver les posts -->
                     </ul>
                 </div>
+        </section>
+
+        <section id="search-section" class="section" style="display: none;">
+            <header id="header">
+                <h2 id="title">Search</h2>
+                <div class="profil-menu">
+                    <button id="dark-mode-toggle" class="dark-mode-toggle">Dark Mode</button>
+                    <button id="login-btn" class="login-btn">Log in</button>
+                </div>
+            </header>
+
+            <div class="chat-center">
+
+                <ul class="users-post" data-section="search">
+
+                    <!-- ici va se trouver les posts -->
+                </ul>
+                <div id="most-liked-posts" class="posts-container"></div>
+                <div id="tendances" class="posts-container"></div>
+                <div class="modal-post" id="modal-post">
+                </div>
+                <button id="add-button">+</button>
+            </div>
+
+        </section>
+
+        <section id="notifications-section" class="section" style="display: none;">
+            <header id="header">
+                <h2 id="title">General</h2>
+                <div class="profil-menu">
+                    <button id="dark-mode-toggle" class="dark-mode-toggle">Dark Mode</button>
+                    <button id="login-btn" class="login-btn">Log in</button>
+                </div>
+            </header>
+
+            <div class="chat-center">
+
+                <ul class="users-post" data-section="notifications">
+
+                    <!-- ici va se trouver les posts -->
+                </ul>
+                <div id="most-liked-posts" class="posts-container"></div>
+                <div id="tendances" class="posts-container"></div>
+                <div class="modal-post" id="modal-post">
+                </div>
+                <button id="add-button">+</button>
+            </div>
+
+        </section>
+
+        <section id="trending-section" class="section" style="display: none;">
+            <header id="header">
+                <h2 id="title">Trending</h2>
+                <div class="profil-menu">
+                    <button id="dark-mode-toggle" class="dark-mode-toggle">Dark Mode</button>
+                    <button id="login-btn" class="login-btn">Log in</button>
+                </div>
+            </header>
+
+            <div class="chat-center">
+
+                <ul class="users-post" data-section="trending">
+
+                    <!-- ici va se trouver les posts -->
+                </ul>
+                <div id="most-liked-posts" class="posts-container"></div>
+                <div id="tendances" class="posts-container"></div>
+                <div class="modal-post" id="modal-post">
+                </div>
+                <button id="add-button">+</button>
+            </div>
+
         </section>
         <script type="module" src="/static/homePage/app.js"></script>
 </body>

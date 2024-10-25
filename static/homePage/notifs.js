@@ -18,7 +18,7 @@ export async function fetchNotifications(isNotif = false) {
         const notifications = await response.json();
         if (isNotif) {
             displayNotifications(notifications);
-        } else if (notifications.length > 0) {
+        } else if (notifications && notifications.length > 0) {
             notifDot.style.display = 'block';
         }
     } else {
@@ -28,8 +28,9 @@ export async function fetchNotifications(isNotif = false) {
 
 async function displayNotifications(notifications) {
     let response;
-    const notificationList = document.getElementById('users-post');
+    const notificationList = document.querySelector(`.users-post[data-section="notifications"]`);
     notificationList.innerHTML = '';
+    notificationList.style.flexGrow = "0";
 
     if (!notifications || notifications.length == 0) {
         // Create a message element
@@ -44,10 +45,10 @@ async function displayNotifications(notifications) {
         if (notification.target_type === "post") {
             response = await fetchPostDetails(notification.reference_id);
             console.log(response);
-            DisplayMessages(response[0], false, true);
+            DisplayMessages(response[0], "notifications", false, true);
         } else {
             response = await fetchCommentDetails(notification.reference_id);
-            DisplayMessages(response[0], true, true);
+            DisplayMessages(response[0], "notifications", true, true);
         }
 
         const commentElement = document.createElement('div');

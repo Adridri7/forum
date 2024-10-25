@@ -16,47 +16,48 @@ const AppState = {
 
 
 // Fonction pour gérer le clic sur le bouton de commentaire
-export function handleCommentClick() {
+export function handleCommentClick(section) {
     const postId = this.closest('.message-item')?.getAttribute('post_uuid');
 
     if (postId) {
         updateAppState({
             type: AppState.POST,
-            data: { postId: postId, previousHTML: document.getElementById('users-post').innerHTML }
+            data: {
+                postId: postId,
+                section: section
+            }
         });
     }
 }
 
-let currentState
 export function updateAppState(newState, pushState = true) {
     const title = document.getElementById('title');
 
     switch (newState.type) {
         case AppState.HOME:
             title.textContent = 'General';
-            fetchPosts();
+            fetchPosts().then(initEventListeners); // Appelle initEventListeners après fetchPosts
             break;
         case AppState.POST:
             title.textContent = 'Post';
-            displaySinglePost(newState.data.postId);
+            displaySinglePost(newState.data.postId, newState.data.section);
             break;
         case AppState.SEARCH:
             title.textContent = 'Search';
-            fetchCategories();
+            fetchCategories().then(initEventListeners); // Appelle initEventListeners après fetchCategories
             break;
         case AppState.TREND:
             title.textContent = 'Trending';
-            FetchMostLikedPosts();
-            break
+            FetchMostLikedPosts().then(initEventListeners); // Init si FetchMostLikedPosts retourne une Promise
+            break;
         case AppState.NOTIFS:
             title.textContent = "Notifications";
-            fetchNotifications(true);
-            break
+            fetchNotifications(true).then(initEventListeners);
+            break;
         default:
-            // Si l'état n'est pas reconnu, retour à l'accueil
             newState.type = AppState.HOME;
             title.textContent = 'General';
-            fetchPosts();
+            fetchPosts().then(initEventListeners);
             break;
     }
 
@@ -70,36 +71,34 @@ export function updateAppState(newState, pushState = true) {
                 url = '#search';
                 break;
             case AppState.TREND:
-                url = '#trending'
-                break
+                url = '#trending';
+                break;
             case AppState.NOTIFS:
-                url = "#notifications"
-                break
+                url = "#notifications";
+                break;
             default:
                 url = '#home';
         }
         history.pushState(newState, '', url);
     }
 
-    currentState = newState;
-    initEventListeners();
 }
 
 
-export function displaySinglePost(postId) {
-    const userPostsContainer = document.getElementById('users-post');
-    const postElement = userPostsContainer.querySelector(`.message-item[post_uuid="${postId}"]`);
+export function displaySinglePost(postId, section) {
+    const userPostsContainer = document.querySelector(`.users-post[data-section="${section}"]`);
+    const postElement = userPostsContainer?.querySelector(`.message-item[post_uuid="${postId}"]`);
 
-    if (postElement) {
+    if (userPostsContainer && postElement) {
         userPostsContainer.innerHTML = '';
         userPostsContainer.appendChild(postElement);
 
-        const commentSection = createCommentInput();
+        const commentSection = createCommentInput(section);
         userPostsContainer.appendChild(commentSection);
 
         fetchAllcomments(postId);
     } else {
-        console.error(`Post with id ${postId} not found`);
+        console.error(`Post with id ${postId} not found in section "${section}"`);
     }
 }
 
@@ -125,7 +124,7 @@ window.addEventListener('popstate', function (event) {
     }
 });
 
-export function createCommentInput() {
+export function createCommentInput(section) {
     fetchUserInfo();
 
     const commentInputContainer = document.createElement('div');
@@ -189,8 +188,8 @@ export function createCommentInput() {
     form.appendChild(commentInput);
     form.appendChild(submitButton);
 
-    const usersPostContainer = document.getElementById('users-post');
-    const firstPostItem = usersPostContainer.querySelector('.message-item');
+    const usersPostContainer = document.querySelector(`.users-post[data-section="${section}"]`);
+    const firstPostItem = usersPostContainer?.querySelector('.message-item');
 
     let postUuid = null;
     if (firstPostItem) {
@@ -250,20 +249,18 @@ export async function createComment(post_uuid, user_uuid) {
 
 // Fonction pour initialiser les événements des boutons
 export function initEventListeners() {
-    // Sélectionne tous les boutons de commentaire
     const commentButtons = document.querySelectorAll('.comment-btn');
 
-    // Réinitialise les événements pour chaque bouton de commentaire
     commentButtons.forEach(button => {
-        button.removeEventListener('click', handleCommentClick);
-        button.addEventListener('click', handleCommentClick);
+        const section = button.closest('.users-post')?.getAttribute('data-section');
+        if (section) {
+            button.removeEventListener('click', handleCommentClick.bind(button, section));
+            button.addEventListener('click', handleCommentClick.bind(button, section));
+        }
     });
 
-
-    // Sélectionne tous les boutons de menu (dans chaque message-item)
+    // Initialisation des boutons de menu
     const menuButtons = document.querySelectorAll('.menu-btn');
-
-    // Réinitialise les événements pour chaque bouton de menuÒ
     menuButtons.forEach(button => {
         button.removeEventListener('click', handleMenuClick);
         button.addEventListener('click', handleMenuClick);
@@ -296,13 +293,12 @@ document.getElementById('search-link').addEventListener('click', function (e) {
 document.getElementById('trend-link').addEventListener('click', function (e) {
     e.preventDefault();
     updateAppState({ type: AppState.TREND })
-})
+});
 
 document.getElementById('notifications-link').addEventListener('click', function (e) {
     e.preventDefault();
     if (!UserInfo) {
-        alert("You must be logged to see notifications.");
-        return
-    };
+        return;
+    }
     updateAppState({ type: AppState.NOTIFS })
-})
+});

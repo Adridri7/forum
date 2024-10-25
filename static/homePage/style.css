@@ -213,7 +213,7 @@ body {
     display: none;
 }
 
-#users-post {
+.users-post {
     position: relative;
     background-color: transparent;
     scrollbar-width: none;
@@ -230,7 +230,7 @@ body {
     border-top-right-radius: 15px;
 }
 
-#users-post>li:last-child:nth-child(odd) {
+.users-post>li:last-child:nth-child(odd) {
     grid-column: span 2;
     /* Aide à visualiser */
     box-sizing: border-box;
@@ -557,9 +557,9 @@ body {
 .chat-center {
     display: flex;
     overflow-y: hidden;
-    justify-content: flex-start;
+    align-items: center;
+    justify-content: center;
     margin: 0 auto;
-    /* Centrer la totalité de .chat-center */
 }
 
 .tendances {
