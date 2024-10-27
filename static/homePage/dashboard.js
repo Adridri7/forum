@@ -264,7 +264,6 @@ export function DisplayPersonnalMessages(post, isComment = false) {
 }
 
 export async function fetchPersonnalPosts() {
-    resetUsersPost();
     const messagesList = document.getElementById('users-personnal-post');
     messagesList.innerHTML = '<p>Loading...</p>';
     try {
@@ -298,7 +297,6 @@ export async function fetchPersonnalPosts() {
 }
 
 export async function fetchPersonnalComment() {
-    resetUsersPost();
     const messagesList = document.getElementById('users-personnal-post');
     await fetchUserInfo();
     messagesList.innerHTML = '<p>Loading...</p>';
@@ -354,7 +352,6 @@ export async function fetchPersonnalComment() {
 }
 
 export async function fetchPersonnalResponse() {
-    resetUsersPost();
     const messagesList = document.getElementById('users-personnal-post');
     await fetchUserInfo();
     messagesList.innerHTML = '<p>Loading...</p>';

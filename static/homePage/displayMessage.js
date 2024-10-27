@@ -1,5 +1,6 @@
 import { UserInfo } from "./app.js";
 import { deleteComment, deletePost, updateComment, updatePost } from "./messageAction.js";
+import { promoteUser } from "./role.js";
 
 export function DisplayMessages(post, section, isComment = false, isNotif = false) {
     const svgLike = `<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentcolor"><path d="M720-120H280v-520l280-280 50 50q7 7 11.5 19t4.5 23v14l-44 174h258q32 0 56 24t24 56v80q0 7-2 15t-4 15L794-168q-9 20-30 34t-44 14Zm-360-80h360l120-280v-80H480l54-220-174 174v406Zm0-406v406-406Zm-80-34v80H160v360h120v80H80v-520h200Z"/></svg>`
@@ -42,6 +43,12 @@ export function DisplayMessages(post, section, isComment = false, isNotif = fals
     const roleDiv = document.createElement('div');
     roleDiv.classList.add('user-role');
     roleDiv.innerHTML = svgCertificate;
+    const svgElement = roleDiv.querySelector('.certificate path'); // Sélectionner le chemin du SVG
+    if (post.role === "modo") {
+        svgElement.setAttribute('fill', '#3c85de');
+    } else if (post.role === "admin") {
+        svgElement.setAttribute('fill', '#B3001B');
+    }
 
     const timeStampSpan = document.createElement('span');
     timeStampSpan.classList.add('timestamp');
@@ -71,21 +78,21 @@ export function DisplayMessages(post, section, isComment = false, isNotif = fals
     menu.style.display = 'none'; // caché par défaut
     menu.setAttribute('data-post-uuid', post.post_uuid); // Ajouter un attribut data pour identifier le menu
 
-    if (UserInfo && UserInfo.user_uuid) {
+    if (UserInfo && (UserInfo.user_uuid || UserInfo.role === "admin" || UserInfo.role === "modo")) {
+        const deleteMenuItem = document.createElement('li');
+        deleteMenuItem.classList.add('menu-item');
+        deleteMenuItem.textContent = 'Delete';
+        deleteMenuItem.addEventListener('click', () => {
+            if (isComment) {
+                deleteComment(post.post_uuid, post.comment_id);
+            } else {
+                deletePost(post.post_uuid);
+            }
+            menu.style.display = 'none'; // Fermer le menu après la suppression
+        });
+
+        // Si l'utilisateur est le créateur du post, ajouter un bouton d'édition
         if (UserInfo.user_uuid === post.user_uuid) {
-
-            const deleteMenuItem = document.createElement('li');
-            deleteMenuItem.classList.add('menu-item');
-            deleteMenuItem.textContent = 'Delete';
-            deleteMenuItem.addEventListener('click', () => {
-                if (isComment) {
-                    deleteComment(post.post_uuid, post.comment_id);
-                } else {
-                    deletePost(post.post_uuid);
-                }
-                menu.style.display = 'none'; // Fermer le menu après la suppression
-            });
-
             const editButton = document.createElement('li');
             editButton.classList.add('menu-item');
             editButton.textContent = 'Edit';
@@ -97,10 +104,12 @@ export function DisplayMessages(post, section, isComment = false, isNotif = fals
                 editMessageInput.value = messageContent.textContent;
 
                 // Gérer la sauvegarde des modifications
+                const originalMessage = messageContent.textContent;
                 editMessageInput.addEventListener('blur', async () => {
                     const updatedContent = editMessageInput.value;
+                    originalMessage = updatedContent;
                     if (isComment) {
-                        await updateComment(post.comment_id, updatedContent)
+                        await updateComment(post.comment_id, updatedContent);
                     } else {
                         await updatePost(post.post_uuid, updatedContent);
                     }
@@ -109,20 +118,41 @@ export function DisplayMessages(post, section, isComment = false, isNotif = fals
                     editMessageInput.style.display = 'none';
                 });
 
+                // Gérer les touches Entrée et Échappement
                 editMessageInput.addEventListener('keydown', (event) => {
                     if (event.key === 'Enter') {
                         editMessageInput.blur(); // Déclenche l'événement de flou pour sauvegarder
                     } else if (event.key === 'Escape') {
                         messageContent.style.display = 'block';
                         editMessageInput.style.display = 'none';
-                        editMessageInput.value = '';
+                        editMessageInput.value = originalMessage;
                     }
                 });
             });
-
             menu.appendChild(editButton);
-            menu.appendChild(deleteMenuItem);
         }
+
+        // Bouton de promotion
+        if (post.role !== "modo" && post.role !== "admin" && post.role !== UserInfo.role) {
+            const promoteButton = document.createElement('li');
+            promoteButton.classList.add('menu-item');
+            promoteButton.textContent = 'Promote';
+            promoteButton.addEventListener('click', () => promoteUser(post.user_uuid, "promote"));
+            menu.appendChild(promoteButton);
+        }
+
+
+
+        if (post.role !== "user" && post.role !== UserInfo.role) {
+            const demoteButton = document.createElement('li');
+            demoteButton.classList.add('menu-item');
+            demoteButton.textContent = 'Demote';
+            demoteButton.addEventListener('click', () => promoteUser(post.user_uuid, "demote"));
+            menu.appendChild(demoteButton)
+        }
+
+
+        menu.appendChild(deleteMenuItem);
     }
 
     messageHeader.appendChild(userNameSpan);
@@ -250,9 +280,9 @@ export function DisplayMessages(post, section, isComment = false, isNotif = fals
     messagesList.scrollTop = messagesList.scrollHeight;
 }
 
-export function toggleMenu(event, post) {
+export function toggleMenu(event, post_uuid) {
     event.stopPropagation();
-    const menu = event.currentTarget.nextElementSibling;
+    const menu = document.querySelector(`.menu[data-post-uuid="${post_uuid}"]`);
 
     // Fermer tous les autres menus
     const allMenus = document.querySelectorAll('.menu');
@@ -262,10 +292,13 @@ export function toggleMenu(event, post) {
         }
     });
 
-    // Toggle le menu actuel
-    menu.style.display = 'block'
-}
+    // Positionner le menu à l'endroit du curseur
+    menu.style.top = `${event.clientY}px`;
+    menu.style.left = `${event.clientX}px`;
 
+    // Toggle le menu actuel
+    menu.style.display = 'block';
+}
 document.addEventListener('click', (event) => {
     if (!event.target.closest('.menu-btn')) {
         const allMenus = document.querySelectorAll('.menu');

@@ -78,6 +78,7 @@ export async function getPPFromID(id) {
 
 export function resetUsersPost(section) {
     const usersPost = document.querySelector(`.users-post[data-section="${section}"]`);
+    console.log(usersPost)
 
     // Vide le contenu de users-post
     usersPost.innerHTML = '';

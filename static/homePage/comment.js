@@ -1,4 +1,4 @@
-import { fetchPosts, fetchUserInfo, UserInfo } from "./app.js";
+import { fetchPosts, fetchUserInfo, headerBar, UserInfo } from "./app.js";
 import { toggleMenu } from "./displayMessage.js";
 import { fetchCategories } from "./fetchcategories.js";
 import { fetchNotifications } from "./notifs.js";
@@ -32,6 +32,7 @@ export function handleCommentClick(section) {
 
 export function updateAppState(newState, pushState = true) {
     const title = document.getElementById('title');
+    headerBar();
 
     switch (newState.type) {
         case AppState.HOME:

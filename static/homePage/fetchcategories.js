@@ -80,7 +80,6 @@ export async function fetchPostsByCategory(category) {
 
         if (postsContainer) {
             postsContainer.innerHTML = '';
-            console.log("single cat :", posts)
 
             posts.forEach(post => {
                 DisplayMessages(post, "search");

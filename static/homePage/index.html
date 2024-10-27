@@ -79,6 +79,17 @@
                         <div id="notification-dot"></div>
                     </a>
                 </li>
+
+                <li>
+                    <a href="#Request" id="request-link" class="request-container">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 -960 960 960"
+                            fill="currentcolor">
+                            <path
+                                d="m344-60-76-128-144-32 14-148-98-112 98-112-14-148 144-32 76-128 136 58 136-58 76 128 144 32-14 148 98 112-98 112 14 148-144 32-76 128-136-58-136 58Zm34-102 102-44 104 44 56-96 110-26-10-112 74-84-74-86 10-112-110-24-58-96-102 44-104-44-56 96-110 24 10 112-74 86 74 84-10 114 110 24 58 96Zm102-318Zm-42 142 226-226-56-58-170 170-86-84-56 56 142 142Z" />
+                        </svg>
+                        <span>Request</span>
+                    </a>
+                </li>
                 <li>
                     <a href="#Moderation" id="moderation-link" class="moderation-container">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" class="icon"
@@ -117,7 +128,7 @@
                     <div id="tendances" class="posts-container"></div>
                     <div class="modal-post" id="modal-post">
                     </div>
-                    <button id="add-button">+</button>
+                    <button id="add-button" class="add-button">+</button>
                 </div>
             </div>
         </section>
@@ -155,7 +166,6 @@
                 <h2 id="title">Search</h2>
                 <div class="profil-menu">
                     <button id="dark-mode-toggle" class="dark-mode-toggle">Dark Mode</button>
-                    <button id="login-btn" class="login-btn">Log in</button>
                 </div>
             </header>
 
@@ -165,21 +175,15 @@
 
                     <!-- ici va se trouver les posts -->
                 </ul>
-                <div id="most-liked-posts" class="posts-container"></div>
-                <div id="tendances" class="posts-container"></div>
-                <div class="modal-post" id="modal-post">
-                </div>
-                <button id="add-button">+</button>
             </div>
 
         </section>
 
         <section id="notifications-section" class="section" style="display: none;">
             <header id="header">
-                <h2 id="title">General</h2>
+                <h2 id="title">Notifications</h2>
                 <div class="profil-menu">
                     <button id="dark-mode-toggle" class="dark-mode-toggle">Dark Mode</button>
-                    <button id="login-btn" class="login-btn">Log in</button>
                 </div>
             </header>
 
@@ -189,11 +193,6 @@
 
                     <!-- ici va se trouver les posts -->
                 </ul>
-                <div id="most-liked-posts" class="posts-container"></div>
-                <div id="tendances" class="posts-container"></div>
-                <div class="modal-post" id="modal-post">
-                </div>
-                <button id="add-button">+</button>
             </div>
 
         </section>
@@ -203,7 +202,6 @@
                 <h2 id="title">Trending</h2>
                 <div class="profil-menu">
                     <button id="dark-mode-toggle" class="dark-mode-toggle">Dark Mode</button>
-                    <button id="login-btn" class="login-btn">Log in</button>
                 </div>
             </header>
 
@@ -211,13 +209,24 @@
 
                 <ul class="users-post" data-section="trending">
 
-                    <!-- ici va se trouver les posts -->
                 </ul>
-                <div id="most-liked-posts" class="posts-container"></div>
-                <div id="tendances" class="posts-container"></div>
-                <div class="modal-post" id="modal-post">
+            </div>
+
+        </section>
+
+        <section id="request-section" class="section" style="display: none;">
+            <header id="header">
+                <h2 id="title">Request</h2>
+                <div class="profil-menu">
+                    <button id="dark-mode-toggle" class="dark-mode-toggle">Dark Mode</button>
                 </div>
-                <button id="add-button">+</button>
+            </header>
+
+            <div class="chat-center">
+
+                <ul class="users-post" data-section="trending">
+
+                </ul>
             </div>
 
         </section>

@@ -27,18 +27,16 @@ export async function fetchUserInfo() {
 
 
         UserInfo = data;
+
     } catch (error) {
         console.error(error);
     }
 }
 
-
-
 // Sélectionnez les éléments
 const toggleButton = document.getElementById('toggle-menu-btn');
 const sidebar = document.getElementById('sidebar');
 const addButton = document.getElementById('add-button');
-const trend = document.getElementById('trend-link');
 
 const darkModeToggles = document.querySelectorAll('.dark-mode-toggle');
 
@@ -94,8 +92,9 @@ darkModeToggles.forEach(button => {
 });
 
 
-document.addEventListener('DOMContentLoaded', async () => {
-    await fetchUserInfo();  // Assure-toi que les infos sont récupérées avant de continuer
+export async function headerBar() {
+
+    await fetchUserInfo();
 
     const loginButton = document.getElementById('login-btn');
     const profilMenu = document.querySelector('.profil-menu');
@@ -155,7 +154,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Ajouter à nouveau le bouton à la place de la div
         profilMenu.appendChild(newLoginButton);
     }
-});
+};
 
 // Événement pour le menu
 toggleButton.addEventListener('click', () => {
@@ -223,6 +222,7 @@ export function CommentReaction(event) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    headerBar();
     fetchPosts();  // Charge les posts à l'accueil
     addButton.addEventListener('click', NewPost);
     fetchAllUsers();

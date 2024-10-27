@@ -67,6 +67,7 @@ func main() {
 	mux.HandleFunc("/api/login", authentification.LoginHandler)
 	mux.HandleFunc("/api/registration", authentification.RegisterHandler)
 	mux.HandleFunc("/api/getSession", authentification.GetSession)
+	mux.HandleFunc("/api/post/updateUserRole", users.UpdateUserRoleHandler)
 
 	mux.HandleFunc("/api/post/fetchAllCategories", categories.FetchAllCategoriesHandler)
 	mux.HandleFunc("/api/post/fetchTendance", categories.FetchTendanceCategoriesHandler)
