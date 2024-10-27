@@ -97,7 +97,6 @@ func HandleGithubCallback(w http.ResponseWriter, r *http.Request) {
 		usr.Username = githUsr.Username
 		usr.Email = githUsr.Email
 		usr.EncryptedPassword = ""
-		usr.Role = "user"
 		usr.ProfilePicture = githUsr.AvatarURL
 
 		if err = dbUser.RegisterUser(usr.ToMap()); err != nil {
@@ -113,7 +112,6 @@ func HandleGithubCallback(w http.ResponseWriter, r *http.Request) {
 			"email":           usr.Email,
 			"password":        "",
 			"profile_picture": usr.ProfilePicture,
-			"role":            "user",
 			"username":        usr.Username,
 			"user_uuid":       usr.UUID,
 		}); err != nil {

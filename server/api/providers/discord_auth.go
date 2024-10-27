@@ -94,7 +94,6 @@ func HandleDiscordCallback(w http.ResponseWriter, r *http.Request) {
 		usr.Username = discordUsr.GlobalName
 		usr.Email = discordUsr.Email
 		usr.EncryptedPassword = ""
-		usr.Role = "user"
 		usr.ProfilePicture = fmt.Sprintf("%s%s/%s.png", getPPDiscordURL, discordUsr.ID, discordUsr.AvatarID)
 
 		if err = dbUser.RegisterUser(usr.ToMap()); err != nil {
@@ -110,7 +109,6 @@ func HandleDiscordCallback(w http.ResponseWriter, r *http.Request) {
 			"email":           usr.Email,
 			"password":        "",
 			"profile_picture": usr.ProfilePicture,
-			"role":            "user",
 			"username":        usr.Username,
 			"user_uuid":       usr.UUID,
 		}); err != nil {

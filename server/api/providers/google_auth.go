@@ -104,7 +104,6 @@ func HandleGoogleCallback(w http.ResponseWriter, r *http.Request) {
 
 		usr.Email = googUsr.Email
 		usr.EncryptedPassword = ""
-		usr.Role = "user"
 
 		if err = dbUser.RegisterUser(usr.ToMap()); err != nil {
 			http.Error(w, "{\"Error\": \"Fatal error add\"}", http.StatusInternalServerError)
@@ -128,7 +127,6 @@ func HandleGoogleCallback(w http.ResponseWriter, r *http.Request) {
 			"email":           usr.Email,
 			"password":        "",
 			"profile_picture": usr.ProfilePicture,
-			"role":            "user",
 			"username":        usr.Username,
 			"user_uuid":       usr.UUID,
 		}); err != nil {
