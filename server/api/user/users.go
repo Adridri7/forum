@@ -185,10 +185,10 @@ func RegisterUser(params map[string]interface{}) error {
 		profile_picture = RandomProfilPicture()
 	}
 
-	registerUserQuery := `INSERT INTO users (user_uuid, username, email, password, role, created_at, profile_picture )  VALUES (?, ?, ?, ?, ?, ?, ?)`
+	registerUserQuery := `INSERT INTO users (user_uuid, username, email, password, created_at, profile_picture )  VALUES (?, ?, ?, ?, ?, ?)`
 	var err error
 
-	_, err = server.RunQuery(registerUserQuery, params["user_uuid"], params["username"], params["email"], params["password"], params["role"], params["created_at"], profile_picture)
+	_, err = server.RunQuery(registerUserQuery, params["user_uuid"], params["username"], params["email"], params["password"], params["created_at"], profile_picture)
 
 	if err != nil {
 		return err
@@ -209,8 +209,8 @@ func (u *User) UpdateUser(params map[string]interface{}) error {
 		}
 	}
 
-	updateUserQuery := `UPDATE users SET username = ?, email = ?, password = ?, role = ?, profile_picture = ? WHERE user_uuid = ?`
-	_, err := server.RunQuery(updateUserQuery, params["username"], params["email"], params["password"], params["role"], params["profile_picture"], params["user_uuid"])
+	updateUserQuery := `UPDATE users SET username = ?, email = ?, password = ?, profile_picture = ? WHERE user_uuid = ?`
+	_, err := server.RunQuery(updateUserQuery, params["username"], params["email"], params["password"], params["profile_picture"], params["user_uuid"])
 
 	if err != nil {
 		return err
@@ -248,4 +248,50 @@ func FetchAllUsers(db *sql.DB) ([]User, error) {
 	}
 
 	return users, nil
+}
+
+func UpdateUserRole(user_UUID, action string) error {
+	getUserRole := `SELECT role FROM users WHERE user_uuid = ?`
+	results, err := server.RunQuery(getUserRole, user_UUID)
+	if err != nil {
+		return fmt.Errorf("error fetching user role: %v", err)
+	}
+
+	if len(results) == 0 {
+		return fmt.Errorf("no user found with the specified UUID")
+	}
+
+	// Récupère le rôle actuel de l'utilisateur
+	roleValue, ok := results[0]["role"].(string)
+	if !ok {
+		return fmt.Errorf("invalid role type for user")
+	}
+
+	// Détermine le nouveau rôle en fonction de l'action et du rôle actuel
+	var newRole string
+	if action == "promote" {
+		if roleValue == "user" {
+			newRole = "modo"
+		} else if roleValue == "modo" {
+			newRole = "admin"
+		}
+	} else if action == "demote" && roleValue == "modo" {
+		newRole = "user"
+	}
+
+	if newRole == "" {
+		return nil
+	}
+
+	updateUserRole := `
+    UPDATE users 
+    SET role = ?
+    WHERE user_uuid = ?`
+
+	_, err = server.RunQuery(updateUserRole, newRole, user_UUID)
+	if err != nil {
+		return fmt.Errorf("failed to update role: %v", err)
+	}
+
+	return nil
 }

@@ -25,6 +25,7 @@ type Post struct {
 	Created_at     time.Time `json:"created_at"`
 	Post_image     string    `json:"post_image"`
 	IsUpdated      bool      `json:"isUpdated"`
+	Role           string    `json:"role"`
 }
 
 func CreatePost(db *sql.DB, r *http.Request, params map[string]interface{}) (*Post, error) {
@@ -86,14 +87,14 @@ func FetchPost(db *sql.DB, params map[string]interface{}) ([]Post, error) {
 
 	if post_UUID, ok := params["post_uuid"].(string); ok {
 		fetchPostquery = `
-			SELECT p.*, u.username, u.profile_picture 
+			SELECT p.*, u.username, u.profile_picture, u.role
 			FROM posts p
 			JOIN users u ON p.user_uuid = u.user_uuid
 			WHERE p.post_uuid = ?`
 		param = post_UUID
 	} else if user_UUID, ok := params["user_uuid"].(string); ok {
 		fetchPostquery = `
-		SELECT p.*, u.username, u.profile_picture 
+		SELECT p.*, u.username, u.profile_picture, u.role 
 		FROM posts p
 		JOIN users u ON p.user_uuid = u.user_uuid
 		WHERE p.post_uuid = ?`
@@ -122,6 +123,7 @@ func FetchPost(db *sql.DB, params map[string]interface{}) ([]Post, error) {
 			Dislikes:       int(row["dislikes"].(int64)),
 			Created_at:     row["created_at"].(time.Time),
 			IsUpdated:      row["isUpdated"].(bool),
+			Role:           row["role"].(string),
 		}
 
 		if val, ok := row["post_uuid"].(string); ok {
@@ -140,7 +142,7 @@ func FetchPost(db *sql.DB, params map[string]interface{}) ([]Post, error) {
 
 func FetchAllPosts(db *sql.DB) ([]Post, error) {
 	fetchAllPostsQuery := `
-        SELECT p.*, u.username, u.profile_picture 
+        SELECT p.*, u.username, u.profile_picture, u.role
         FROM posts p
         JOIN users u ON p.user_uuid = u.user_uuid
         ORDER BY p.created_at DESC`
@@ -163,6 +165,7 @@ func FetchAllPosts(db *sql.DB) ([]Post, error) {
 			Dislikes:       int(row["dislikes"].(int64)),
 			Created_at:     row["created_at"].(time.Time),
 			IsUpdated:      row["isUpdated"].(bool),
+			Role:           row["role"].(string),
 		}
 
 		if data, ok := row["post_image"]; ok && data != nil {
