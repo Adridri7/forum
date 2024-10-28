@@ -221,7 +221,7 @@ func (u *User) UpdateUser(params map[string]interface{}) error {
 
 // FetchAllComments récupère tous les commentaires de la base de données
 func FetchAllUsers(db *sql.DB) ([]User, error) {
-	results, err := server.RunQuery("SELECT user_uuid, username, profile_picture, created_at FROM users")
+	results, err := server.RunQuery("SELECT * FROM users")
 	if err != nil {
 		return nil, err
 	}
@@ -243,6 +243,10 @@ func FetchAllUsers(db *sql.DB) ([]User, error) {
 		}
 		if profilePicture, ok := row["profile_picture"].(string); ok {
 			user.ProfilePicture = profilePicture
+		}
+
+		if role, ok := row["role"].(string); ok {
+			user.Role = role
 		}
 		users = append(users, user)
 	}

@@ -76,6 +76,7 @@ body {
 #sidebar ul {
     flex-grow: 0;
     list-style: none;
+    text-wrap: nowrap;
 }
 
 #sidebar .icon {
@@ -884,4 +885,175 @@ body {
 
 .no-notifications-message {
     font-size: 28px;
+}
+
+.chat-center[data-section="request"] {
+    flex-direction: column;
+    height: 100vh;
+}
+
+.request-title {
+    margin-top: -200px;
+    margin-bottom: 40px;
+    font-size: 34px;
+}
+
+.send-request {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+.send-request>input {
+    background-color: var(--border-color);
+    border: none;
+    color: var(--second-text-color);
+    outline: none;
+    height: 55px;
+    width: 650px;
+    box-sizing: border-box;
+    padding-left: 15px;
+    border-radius: 12px;
+    line-height: 55px;
+}
+
+.send-request>input::placeholder {
+    color: var(--second-text-color);
+}
+
+.send-request>button {
+    height: 50px;
+    width: 120px;
+    border-radius: 8px;
+    border: none;
+    background-color: var(--primary-color);
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color .15s ease;
+}
+
+.send-request>button:hover {
+    background-color: var(--accent-color);
+}
+
+
+/* <======= Request Message =======> */
+
+.chat-center[data-section="moderation"] {
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.users-request {
+    margin: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+
+}
+
+h3 {
+    margin-bottom: 10px;
+}
+
+ul {
+    list-style: none;
+}
+
+.container {
+    display: flex;
+    background-color: var(--background-message-color);
+    box-sizing: border-box;
+    padding: 30px 20px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    width: 400px;
+}
+
+.header-message {
+    display: flex;
+    gap: 15px;
+}
+
+.profile-picture-request img {
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    object-fit: cover;
+    align-self: center;
+}
+
+.reaction-btn-request button {
+    background: none;
+    border: none;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform .15s ease;
+    cursor: pointer;
+}
+
+.reaction-btn-request button:hover {
+    transform: scale(108%);
+}
+
+.reaction-btn-request button:last-child {
+    margin-top: 1.5px;
+}
+
+
+.reaction-btn-request {
+    display: inline-flex;
+    align-items: center;
+    gap: 20px;
+    margin-top: 10px;
+}
+
+.users {
+    list-style: none;
+    margin: 30px 60px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    overflow-y: auto;
+    max-height: 80vh;
+    width: 200px;
+    scrollbar-width: none;
+}
+
+#members-list,
+#admin-list,
+#modo-list {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.members {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    height: 40px;
+    padding: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color .15s ease, color .15s ease;
+}
+
+.members:hover {
+    background-color: var(--hover-color);
+}
+
+.members:hover .username {
+    color: var(--primary-color);
+}
+
+.members img {
+    height: 48px;
+    width: 48px;
+    border-radius: 50%;
+    object-fit: cover;
 }

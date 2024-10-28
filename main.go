@@ -8,6 +8,7 @@ import (
 	"forum/server/api/notifications"
 	"forum/server/api/post"
 	"forum/server/api/providers"
+	"forum/server/api/requests"
 	users "forum/server/api/user"
 	"forum/server/middleware"
 	"html/template"
@@ -81,6 +82,10 @@ func main() {
 	mux.HandleFunc("/api/discord_login", providers.HandleDiscordLogin)
 	mux.HandleFunc("/api/discord_callback", providers.HandleDiscordCallback)
 	mux.HandleFunc("/api/users/fetchAllUsers", users.FetchAllUsersHandler)
+
+	mux.HandleFunc("/api/requests/createRequest", requests.CreateRequestHandler)
+	mux.HandleFunc("/api/requests/fetchRequest", requests.FetchAdminRequestHandler)
+	mux.HandleFunc("/api/requests/isreadRequest", requests.MarkRequestsAsReadHandler)
 
 	mux.HandleFunc("/logout", users.LogoutHandler)
 	mux.HandleFunc("/api/post/fetchPostsByCategories", categories.FetchPostByCategoriesHandler)

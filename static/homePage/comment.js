@@ -3,6 +3,7 @@ import { toggleMenu } from "./displayMessage.js";
 import { fetchCategories } from "./fetchcategories.js";
 import { fetchNotifications } from "./notifs.js";
 import { FetchMostLikedPosts } from "./postMostLiked.js";
+import { FetchAdminRequest } from "./API_request.js";
 import { fetchAllcomments } from "./showComment.js";
 import { getPPFromID } from "./utils.js";
 
@@ -12,6 +13,8 @@ const AppState = {
     SEARCH: 'search',
     TREND: "trending",
     NOTIFS: "notification",
+    REQUEST: "request",
+    MODERATION: "moderation"
 };
 
 
@@ -32,8 +35,6 @@ export function handleCommentClick(section) {
 
 export function updateAppState(newState, pushState = true) {
     const title = document.getElementById('title');
-    headerBar();
-
     switch (newState.type) {
         case AppState.HOME:
             title.textContent = 'General';
@@ -55,10 +56,17 @@ export function updateAppState(newState, pushState = true) {
             title.textContent = "Notifications";
             fetchNotifications(true).then(initEventListeners);
             break;
+        case AppState.REQUEST:
+            title.textContent = "Request";
+            break
+        case AppState.MODERATION:
+            title.textContent = "Moderation";
+            FetchAdminRequest();
         default:
             newState.type = AppState.HOME;
             title.textContent = 'General';
             fetchPosts().then(initEventListeners);
+            headerBar();
             break;
     }
 
@@ -302,4 +310,14 @@ document.getElementById('notifications-link').addEventListener('click', function
         return;
     }
     updateAppState({ type: AppState.NOTIFS })
+});
+
+document.getElementById('request-link').addEventListener('click', function (e) {
+    e.preventDefault();
+    updateAppState({ type: AppState.REQUEST })
+});
+
+document.getElementById('moderation-link').addEventListener('click', function (e) {
+    e.preventDefault();
+    updateAppState({ type: AppState.MODERATION })
 });

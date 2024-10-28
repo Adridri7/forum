@@ -1,15 +1,13 @@
 import { DisplayMessages } from "./displayMessage.js";
 import { initEventListeners } from "./comment.js";
-import { fetchCategories } from "./fetchcategories.js";
 import { getPPFromID, resetUsersPost } from "./utils.js";
 import { NewPost } from "./newPost.js";
 import { handleLogout } from "./logout.js";
-import { fetchAllUsers } from "./displayUser.js";
 import { toggleCommentReaction, toggleReaction } from "./reaction.js";
-import { FetchMostLikedPosts } from "./postMostLiked.js";
 import { FetchMostUseCategories } from "./tendance.js";
 import { fetchPersonnalComment, fetchPersonnalPosts, fetchPersonnalResponse } from "./dashboard.js";
 import { fetchNotifications } from "./notifs.js";
+import { CreateRequest } from "./API_request.js";
 
 document.addEventListener('DOMContentLoaded', () => {
     fetchUserInfo();
@@ -101,6 +99,7 @@ export async function headerBar() {
 
 
     // Vérifiez si les informations utilisateur sont valides
+    console.log(UserInfo)
     if (UserInfo) {
         // Créer la div qui remplacera le bouton "Login"
         const profileDiv = document.createElement('div');
@@ -225,9 +224,7 @@ document.addEventListener('DOMContentLoaded', () => {
     headerBar();
     fetchPosts();  // Charge les posts à l'accueil
     addButton.addEventListener('click', NewPost);
-    fetchAllUsers();
     FetchMostUseCategories();
-
     // Gérer uniquement les événements sur les boutons de post
     document.body.addEventListener('click', (event) => {
         const isPostReaction = event.target.closest('.like-btn') || event.target.closest('.dislike-btn');
@@ -246,6 +243,8 @@ const dashboardLink = document.getElementById('dashboard-link');
 const searchLink = document.getElementById('search-link');
 const notificationsLink = document.getElementById('notifications-link');
 const trendLink = document.getElementById('trend-link');
+const requestLink = document.getElementById('request-link');
+const moderationLink = document.getElementById('moderation-link');
 
 // Sélectionne les sections
 const homeSection = document.getElementById('home-section');
@@ -253,6 +252,8 @@ const dashboardSection = document.getElementById('dashboard-section');
 const searchSection = document.getElementById('search-section');
 const notificationsSection = document.getElementById('notifications-section');
 const trendingSection = document.getElementById('trending-section');
+const requestSection = document.getElementById('request-section');
+const moderationSection = document.getElementById('moderation-section');
 
 // Fonction pour masquer toutes les sections
 function hideAllSections() {
@@ -261,6 +262,8 @@ function hideAllSections() {
     searchSection.style.display = 'none';
     notificationsSection.style.display = 'none';
     trendingSection.style.display = 'none';
+    requestSection.style.display = 'none'
+    moderationSection.style.display = 'none'
 }
 
 // Ajoute des événements pour chaque lien
@@ -289,8 +292,30 @@ trendLink.addEventListener('click', () => {
     trendingSection.style.display = 'block'
 });
 
+requestLink.addEventListener('click', () => {
+    hideAllSections();
+    requestSection.style.display = 'block'
+    const inputField = document.getElementById('request-input');
+    inputField.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+            CreateRequest(UserInfo.user_uuid, event.target.value);
+            event.target.value = '';
+        }
+    });
+
+    const sendButton = document.getElementById('request-btn');
+    sendButton.addEventListener('click', () => {
+        CreateRequest(UserInfo.user_uuid, inputField.value);
+        inputField.value = '';
+    });
+});
+
+moderationLink.addEventListener('click', () => {
+    hideAllSections();
+    moderationSection.style.display = 'block';
+})
+
 dashboardLink.addEventListener('click', () => {
-    const personnalPost = document.getElementById('personnal-post');
 
     if (!UserInfo) {
         alert("You must be logged in to access the dashboard.");
