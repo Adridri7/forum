@@ -6,6 +6,9 @@ import { DisplayMessages } from "./displayMessage.js";
 const notifDot = document.getElementById('notification-dot');
 
 export async function fetchNotifications(isNotif = false) {
+    if (!UserInfo) {
+        return
+    }
     const response = await fetch('/api/post/notifications', {
         method: 'POST',
         headers: {

@@ -224,7 +224,6 @@ export function DisplayReport(report, request, historyRequestContainer = false) 
 
     const messageContainer = document.createElement('div');
     messageContainer.className = 'message-container';
-    console.log("requete avant de set attribut", request)
     messageContainer.setAttribute('request-uuid', request.request_uuid)
 
     const headerMessage = document.createElement('div');
@@ -281,7 +280,6 @@ export function DisplayReport(report, request, historyRequestContainer = false) 
 
     // Crée le span pour le message
     const messageReport = document.createElement('span');
-    console.log("Request content :", request, request.content)
     messageReport.innerHTML = `<strong style="color: #3c85de;">${request.username}</strong> report the following message for : "${request.content}"`;
 
 

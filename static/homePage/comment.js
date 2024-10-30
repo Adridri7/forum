@@ -1,4 +1,4 @@
-import { fetchPosts, fetchUserInfo, headerBar, UserInfo } from "./app.js";
+import { fetchPosts, fetchUserInfo, UserInfo } from "./app.js";
 import { toggleMenu } from "./displayMessage.js";
 import { fetchCategories } from "./fetchcategories.js";
 import { fetchNotifications } from "./notifs.js";
@@ -67,7 +67,6 @@ export function updateAppState(newState, pushState = true) {
             newState.type = AppState.HOME;
             title.textContent = 'General';
             fetchPosts().then(initEventListeners);
-            headerBar();
             break;
     }
 

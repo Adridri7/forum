@@ -14,6 +14,18 @@ document.addEventListener('DOMContentLoaded', () => {
 })
 export let UserInfo = null
 export async function fetchUserInfo() {
+
+    // Vérifie si le cookie 'session_token' existe
+    const cookies = document.cookie.split('; ').reduce((acc, cookie) => {
+        const [name, value] = cookie.split('=');
+        acc[name] = value;
+        return acc;
+    }, {});
+
+    if (!cookies['session_token']) {
+        return;
+    }
+
     try {
         const response = await fetch("http://localhost:8080/api/getSession");
         if (!response.ok) {
@@ -22,8 +34,6 @@ export async function fetchUserInfo() {
         }
 
         const data = await response.json();
-
-
         UserInfo = data;
 
     } catch (error) {
@@ -90,16 +100,13 @@ darkModeToggles.forEach(button => {
 });
 
 
-export async function headerBar() {
-
+document.addEventListener('DOMContentLoaded', async () => {
     await fetchUserInfo();
 
     const loginButton = document.getElementById('login-btn');
     const profilMenu = document.querySelector('.profil-menu');
 
-
     // Vérifiez si les informations utilisateur sont valides
-    console.log(UserInfo)
     if (UserInfo) {
         // Créer la div qui remplacera le bouton "Login"
         const profileDiv = document.createElement('div');
@@ -140,6 +147,13 @@ export async function headerBar() {
 
         // Remplacer le bouton "Login" par la div
         profilMenu.replaceChild(profileDiv, loginButton);
+
+
+        // const moderationLink = document.getElementById('moderation-link')
+
+        // if (UserInfo.role !== "admin" && UserInfo.role !== "GOAT") {
+        //     moderationLink.remove();
+        // }
         return; // Sortir de la fonction si l'utilisateur est connecté
     }
 
@@ -164,7 +178,10 @@ export async function headerBar() {
         // Ajouter à nouveau le bouton à la place de la div
         profilMenu.appendChild(newLoginButton);
     }
-};
+
+});
+
+
 
 // Événement pour le menu
 toggleButton.addEventListener('click', () => {
@@ -232,7 +249,6 @@ export function CommentReaction(event) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    headerBar();
     fetchPosts();  // Charge les posts à l'accueil
     addButton.addEventListener('click', NewPost);
     FetchMostUseCategories();

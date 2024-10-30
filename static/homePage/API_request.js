@@ -6,7 +6,6 @@ import { DisplayReport, DisplayRequest, initRequestEventListeners } from "./requ
 let post_uuid_report = null
 
 export async function CreateRequest(user_uuid, content) {
-    console.log("content de la request", content, "Et id du post :", post_uuid_report)
     const data = {
         user_uuid: user_uuid,
         content: content,
@@ -51,7 +50,6 @@ export async function FetchAdminRequest() {
         }
 
         const datas = await response.json();
-        console.log("yes :", datas)
         for (const data of datas) {
             if (data.post_content !== "") {
                 const post = await FetchSinglePosts(data.post_uuid);
@@ -136,7 +134,6 @@ export function ReportMessage(post_uuid) {
 }
 
 export function handleKeyDown(event) {
-    console.log("Suivi de Keydown l'id du post :", post_uuid_report)
     if (event.key === 'Enter') {
         event.stopPropagation();
         // Vérifie si la valeur n'est pas vide avant d'envoyer la requête
@@ -148,7 +145,6 @@ export function handleKeyDown(event) {
 }
 
 export function handleSendClick(event) {
-    console.log("Suivi de HandleClick l'id du post :", post_uuid_report)
 
     event.stopPropagation();
     const inputField = document.getElementById('request-input');
@@ -175,7 +171,6 @@ export function initReportEventListeners() {
 }
 
 async function FetchSinglePosts(post_uuid) {
-    console.log(post_uuid)
     try {
         const response = await fetch('/api/post/getPostDetails', {
             method: "POST",
@@ -220,7 +215,6 @@ export async function FetchHistoryRequest() {
         }
 
         const datas = await response.json();
-        console.log("data recu : ", datas)
 
         for (const data of datas) {
             if (data.post_content !== "") {
