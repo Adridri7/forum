@@ -1,3 +1,4 @@
+import { ReportMessage } from "./API_request.js";
 import { UserInfo } from "./app.js";
 import { deleteComment, deletePost, updateComment, updatePost } from "./messageAction.js";
 import { promoteUser } from "./role.js";
@@ -48,6 +49,8 @@ export function DisplayMessages(post, section, isComment = false, isNotif = fals
         svgElement.setAttribute('fill', '#3c85de');
     } else if (post.role === "admin") {
         svgElement.setAttribute('fill', '#B3001B');
+    } else if (post.role === "GOAT") {
+        svgElement.setAttribute('fill', '#EEC643')
     }
 
     const timeStampSpan = document.createElement('span');
@@ -78,7 +81,7 @@ export function DisplayMessages(post, section, isComment = false, isNotif = fals
     menu.style.display = 'none'; // caché par défaut
     menu.setAttribute('data-post-uuid', post.post_uuid); // Ajouter un attribut data pour identifier le menu
 
-    if (UserInfo && (UserInfo.user_uuid || UserInfo.role === "admin" || UserInfo.role === "modo")) {
+    if (UserInfo && (UserInfo.user_uuid || UserInfo.role === "admin" || UserInfo.role === "GOAT" || UserInfo.role === "modo")) {
         const deleteMenuItem = document.createElement('li');
         deleteMenuItem.classList.add('menu-item');
         deleteMenuItem.textContent = 'Delete';
@@ -133,7 +136,7 @@ export function DisplayMessages(post, section, isComment = false, isNotif = fals
         }
 
         // Bouton de promotion
-        if (post.role !== "modo" && post.role !== "admin" && post.role !== UserInfo.role) {
+        if (post.role != "GOAT" && post.role !== "admin" && post.role !== UserInfo.role) {
             const promoteButton = document.createElement('li');
             promoteButton.classList.add('menu-item');
             promoteButton.textContent = 'Promote';
@@ -143,13 +146,22 @@ export function DisplayMessages(post, section, isComment = false, isNotif = fals
 
 
 
-        if (post.role !== "user" && post.role !== UserInfo.role) {
+        if (post.role !== "user" && post.role !== "GOAT" && post.role !== UserInfo.role) {
             const demoteButton = document.createElement('li');
             demoteButton.classList.add('menu-item');
             demoteButton.textContent = 'Demote';
             demoteButton.addEventListener('click', () => promoteUser(post.user_uuid, "demote"));
             menu.appendChild(demoteButton)
         }
+
+        const report = document.createElement('li');
+        report.className = 'menu-item';
+        report.textContent = 'Report';
+        report.addEventListener('click', (event) => {
+            event.stopPropagation();
+            ReportMessage(post.post_uuid);
+        });
+        menu.appendChild(report);
 
 
         menu.appendChild(deleteMenuItem);

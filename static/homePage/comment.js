@@ -3,7 +3,7 @@ import { toggleMenu } from "./displayMessage.js";
 import { fetchCategories } from "./fetchcategories.js";
 import { fetchNotifications } from "./notifs.js";
 import { FetchMostLikedPosts } from "./postMostLiked.js";
-import { FetchAdminRequest } from "./API_request.js";
+import { FetchAdminRequest, FetchHistoryRequest } from "./API_request.js";
 import { fetchAllcomments } from "./showComment.js";
 import { getPPFromID } from "./utils.js";
 
@@ -58,6 +58,7 @@ export function updateAppState(newState, pushState = true) {
             break;
         case AppState.REQUEST:
             title.textContent = "Request";
+            FetchHistoryRequest();
             break
         case AppState.MODERATION:
             title.textContent = "Moderation";

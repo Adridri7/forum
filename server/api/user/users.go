@@ -281,6 +281,8 @@ func UpdateUserRole(user_UUID, action string) error {
 		}
 	} else if action == "demote" && roleValue == "modo" {
 		newRole = "user"
+	} else if action == "demote" && roleValue == "admin" {
+		newRole = "modo"
 	}
 
 	if newRole == "" {

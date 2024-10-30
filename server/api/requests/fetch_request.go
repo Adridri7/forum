@@ -20,7 +20,7 @@ func FetchAdminRequestHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Error getting role from cookie", http.StatusInternalServerError)
 	}
 
-	if role != "admin" {
+	if role != "admin" && role != "GOAT" {
 		http.Error(w, "Not allowed to get request", http.StatusUnauthorized)
 		return
 	}

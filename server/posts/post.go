@@ -82,29 +82,11 @@ func CreatePost(db *sql.DB, r *http.Request, params map[string]interface{}) (*Po
 }
 
 func FetchPost(db *sql.DB, params map[string]interface{}) ([]Post, error) {
-	var fetchPostquery string
-	var param string
+	post_uuid := params["post_uuid"].(string)
 
-	if post_UUID, ok := params["post_uuid"].(string); ok {
-		fetchPostquery = `
-			SELECT p.*, u.username, u.profile_picture, u.role
-			FROM posts p
-			JOIN users u ON p.user_uuid = u.user_uuid
-			WHERE p.post_uuid = ?`
-		param = post_UUID
-	} else if user_UUID, ok := params["user_uuid"].(string); ok {
-		fetchPostquery = `
-		SELECT p.*, u.username, u.profile_picture, u.role 
-		FROM posts p
-		JOIN users u ON p.user_uuid = u.user_uuid
-		WHERE p.post_uuid = ?`
-		//	WHERE p.user_uuid = ?`
-		param = user_UUID
-	} else {
-		return nil, errors.New("informations manquantes")
-	}
+	query := `SELECT * FROM posts where post_uuid = ?`
 
-	rows, err := server.RunQuery(fetchPostquery, param)
+	rows, err := server.RunQuery(query, post_uuid)
 	if err != nil {
 		return nil, fmt.Errorf("erreur lors de la récupération du formulaire: %v", err)
 	}

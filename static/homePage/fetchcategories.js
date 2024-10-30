@@ -19,10 +19,8 @@ export async function fetchCategories() {
 
 // Fonction pour afficher les catégories dans la liste
 function displayCategories(categories) {
-    console.log("cat :", categories)
     const usersPost = document.querySelector(`.users-post[data-section="search"]`);
     usersPost.innerHTML = '';
-    console.log("ah", usersPost)
 
     const updateUsersPostStyle = () => {
         usersPost.style.display = 'grid';

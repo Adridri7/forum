@@ -12,6 +12,7 @@ export async function fetchAllUsers() {
         clearList(admin);
         clearList(modo);
         clearList(user);
+        clearList(goat)
 
         users.forEach((userData) => {
             try {
@@ -29,11 +30,12 @@ export async function fetchAllUsers() {
 const admin = document.getElementById('admin-list');
 const modo = document.getElementById('modo-list');
 const user = document.getElementById('members-list');
+const goat = document.getElementById('GOAT-list');
 
 // Fonction pour vider les enfants sauf le h3
-function clearList(list) {
+export function clearList(list) {
     Array.from(list.children).forEach(child => {
-        if (child.tagName !== 'H3') {
+        if (child.tagName !== 'H3' && child.tagName !== 'H1') {
             list.removeChild(child);
         }
     });

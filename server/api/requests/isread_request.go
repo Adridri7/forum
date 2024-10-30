@@ -2,6 +2,7 @@ package requests
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"forum/server"
 	"net/http"
@@ -17,11 +18,26 @@ type AdminRequest struct {
 }
 
 func MarkRequestsAsReadHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
+	var params map[string]interface{}
+
+	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
-	if err := MarkRequestsAsRead(server.Db); err != nil {
+
+	err := json.NewDecoder(r.Body).Decode(&params)
+	if err != nil {
+		http.Error(w, "Invalid request payload", http.StatusBadRequest)
+		return
+	}
+
+	request_uuid, ok := params["request_uuid"].(string)
+	if request_uuid == "" || !ok {
+		http.Error(w, "missing argument in request payload", http.StatusBadRequest)
+		return
+	}
+
+	if err := MarkRequestsAsRead(server.Db, request_uuid); err != nil {
 		http.Error(w, "Failed to mark requests as read", http.StatusInternalServerError)
 		return
 	}
@@ -61,13 +77,13 @@ func GetStringFromRow(value interface{}) string {
 	return value.(string)
 }
 
-func MarkRequestsAsRead(db *sql.DB) error {
+func MarkRequestsAsRead(db *sql.DB, request_uuid string) error {
 	query := `
     UPDATE admin_requests
     SET isRead = TRUE
-    WHERE isRead = False`
+    WHERE isRead = False AND request_uuid = ?`
 
-	_, err := server.RunQuery(query)
+	_, err := server.RunQuery(query, request_uuid)
 	if err != nil {
 		return fmt.Errorf("database query failed: %v", err)
 	}

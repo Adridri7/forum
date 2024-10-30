@@ -8,22 +8,17 @@ import (
 )
 
 func FetchPostHandler(w http.ResponseWriter, r *http.Request) {
-
-	if r.Method != http.MethodGet {
+	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
-	queryParams := r.URL.Query()
-	userUUID := queryParams.Get("user_uuid")
-	postUUID := queryParams.Get("post_uuid")
+	var params map[string]interface{}
 
-	params := map[string]interface{}{}
-
-	if userUUID != "" {
-		params["user_uuid"] = userUUID
-	} else if postUUID != "" {
-		params["post_uuid"] = postUUID
+	err := json.NewDecoder(r.Body).Decode(&params)
+	if err != nil {
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		return
 	}
 
 	postData, err := posts.FetchPost(server.Db, params)

@@ -86,6 +86,8 @@ func main() {
 	mux.HandleFunc("/api/requests/createRequest", requests.CreateRequestHandler)
 	mux.HandleFunc("/api/requests/fetchRequest", requests.FetchAdminRequestHandler)
 	mux.HandleFunc("/api/requests/isreadRequest", requests.MarkRequestsAsReadHandler)
+	mux.HandleFunc("/api/requests/action", requests.HandleActionRequestAPI)
+	mux.HandleFunc("/api/requests/historyRequest", requests.HistoryRequestHandler)
 
 	mux.HandleFunc("/logout", users.LogoutHandler)
 	mux.HandleFunc("/api/post/fetchPostsByCategories", categories.FetchPostByCategoriesHandler)

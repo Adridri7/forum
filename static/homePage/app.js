@@ -7,7 +7,7 @@ import { toggleCommentReaction, toggleReaction } from "./reaction.js";
 import { FetchMostUseCategories } from "./tendance.js";
 import { fetchPersonnalComment, fetchPersonnalPosts, fetchPersonnalResponse } from "./dashboard.js";
 import { fetchNotifications } from "./notifs.js";
-import { CreateRequest } from "./API_request.js";
+import { initReportEventListeners } from "./API_request.js";
 
 document.addEventListener('DOMContentLoaded', () => {
     fetchUserInfo();
@@ -143,6 +143,17 @@ export async function headerBar() {
         return; // Sortir de la fonction si l'utilisateur est connecté
     }
 
+    const elementsToHide = [
+        document.getElementById('notifications-link'),
+        document.getElementById('request-link'),
+        document.getElementById('moderation-link')
+    ];
+
+    // Remove each element
+    elementsToHide.forEach(element => {
+        if (element) element.remove();
+    });
+
     // Si le bouton "Login" n'est pas déjà dans le menu
     if (!profilMenu.contains(loginButton)) {
         // Créer un nouveau bouton "Login" si nécessaire
@@ -256,7 +267,7 @@ const requestSection = document.getElementById('request-section');
 const moderationSection = document.getElementById('moderation-section');
 
 // Fonction pour masquer toutes les sections
-function hideAllSections() {
+export function hideAllSections() {
     homeSection.style.display = 'none';
     dashboardSection.style.display = 'none';
     searchSection.style.display = 'none';
@@ -295,25 +306,14 @@ trendLink.addEventListener('click', () => {
 requestLink.addEventListener('click', () => {
     hideAllSections();
     requestSection.style.display = 'block'
-    const inputField = document.getElementById('request-input');
-    inputField.addEventListener('keydown', (event) => {
-        if (event.key === 'Enter') {
-            CreateRequest(UserInfo.user_uuid, event.target.value);
-            event.target.value = '';
-        }
-    });
 
-    const sendButton = document.getElementById('request-btn');
-    sendButton.addEventListener('click', () => {
-        CreateRequest(UserInfo.user_uuid, inputField.value);
-        inputField.value = '';
-    });
+    initReportEventListeners();
 });
 
 moderationLink.addEventListener('click', () => {
     hideAllSections();
     moderationSection.style.display = 'block';
-})
+});
 
 dashboardLink.addEventListener('click', () => {
 
