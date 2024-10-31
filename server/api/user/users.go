@@ -185,10 +185,10 @@ func RegisterUser(params map[string]interface{}) error {
 		profile_picture = RandomProfilPicture()
 	}
 
-	registerUserQuery := `INSERT INTO users (user_uuid, username, email, password, created_at, profile_picture )  VALUES (?, ?, ?, ?, ?, ?)`
+	registerUserQuery := `INSERT INTO users (user_uuid, username, email, password, created_at, profile_picture, role )  VALUES (?, ?, ?, ?, ?, ?, ?)`
 	var err error
 
-	_, err = server.RunQuery(registerUserQuery, params["user_uuid"], params["username"], params["email"], params["password"], params["created_at"], profile_picture)
+	_, err = server.RunQuery(registerUserQuery, params["user_uuid"], params["username"], params["email"], params["password"], params["created_at"], profile_picture, params["role"])
 
 	if err != nil {
 		return err

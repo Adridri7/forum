@@ -71,7 +71,6 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		UsernameFound, _ := dbUser.IsUsernameTaken(newUser.Username)
-		fmt.Println(UsernameFound)
 		if UsernameFound {
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusConflict) // Utilisation de 409 Conflict

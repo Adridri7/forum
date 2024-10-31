@@ -149,11 +149,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         profilMenu.replaceChild(profileDiv, loginButton);
 
 
-        // const moderationLink = document.getElementById('moderation-link')
+        const moderationLink = document.getElementById('moderation-link')
 
-        // if (UserInfo.role !== "admin" && UserInfo.role !== "GOAT") {
-        //     moderationLink.remove();
-        // }
+        if (UserInfo.role !== "admin" && UserInfo.role !== "GOAT") {
+            moderationLink.remove();
+        }
         return; // Sortir de la fonction si l'utilisateur est connecté
     }
 
