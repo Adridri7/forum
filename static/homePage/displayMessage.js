@@ -70,16 +70,12 @@ export function DisplayMessages(post, section, isComment = false, isNotif = fals
     menuPath.setAttribute('d', 'M240-400q-33 0-56.5-23.5T160-480q0-33 23.5-56.5T240-560q33 0 56.5 23.5T320-480q0 33-23.5 56.5T240-400Zm240 0q-33 0-56.5-23.5T400-480q0-33 23.5-56.5T480-560q33 0 56.5 23.5T560-480q0 33-23.5 56.5T480-400Zm240 0q-33 0-56.5-23.5T640-480q0-33 23.5-56.5T720-560q33 0 56.5 23.5T800-480q0 33-23.5 56.5T720-400Z');
     menuSvg.appendChild(menuPath);
 
-
-    menuButton.addEventListener('click', function (event) {
-        toggleMenu(event, post.post_uuid);
-    });
-
     // Créer le menu dans messageItem
     const menu = document.createElement('ul');
     menu.classList.add('menu');
     menu.style.display = 'none'; // caché par défaut
-    menu.setAttribute('data-post-uuid', post.post_uuid); // Ajouter un attribut data pour identifier le menu
+    const postUuid = isComment ? post.comment_id : post.post_uuid;
+    menu.setAttribute('data-post-uuid', postUuid);
 
     if (UserInfo && (UserInfo.user_uuid || UserInfo.role === "admin" || UserInfo.role === "GOAT" || UserInfo.role === "modo")) {
         const deleteMenuItem = document.createElement('li');
@@ -311,6 +307,7 @@ export function toggleMenu(event, post_uuid) {
     // Toggle le menu actuel
     menu.style.display = 'block';
 }
+
 document.addEventListener('click', (event) => {
     if (!event.target.closest('.menu-btn')) {
         const allMenus = document.querySelectorAll('.menu');

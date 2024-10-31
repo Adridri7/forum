@@ -21,6 +21,7 @@ type Comment struct {
 	Likes          int64     `json:"likes"`
 	Dislikes       int64     `json:"dislikes"`
 	Updated_at     time.Time `json:"update_at"`
+	Role           string    `json:"role"`
 }
 
 type Post struct {
@@ -35,6 +36,7 @@ type Post struct {
 	Created_at     time.Time `json:"created_at"`
 	Post_image     string    `json:"post_image"`
 	IsUpdated      bool      `json:"isUpdated"`
+	Role           string    `json:"role"`
 }
 
 type Response struct {
@@ -170,6 +172,10 @@ func FetchAllComments(db *sql.DB) ([]Comment, error) {
 		if updated_at, ok := row["updated_at"].(time.Time); ok {
 			comment.Updated_at = updated_at
 		}
+
+		if role, ok := row["role"].(string); ok {
+			comment.Role = role
+		}
 		comments = append(comments, comment)
 	}
 
@@ -191,7 +197,7 @@ func FetchComment(db *sql.DB, params map[string]interface{}) ([]Comment, error) 
 	if post_UUIDOK {
 
 		fetchCommentquery = `
-    SELECT c.comment_id, c.content, c.post_uuid, u.user_uuid, u.username, u.profile_picture, c.created_at, likes, dislikes, c.updated_at
+    SELECT c.comment_id, c.content, c.post_uuid, u.user_uuid, u.role, u.username, u.profile_picture, c.created_at, likes, dislikes, c.updated_at
     FROM comments AS c
     JOIN users AS u ON c.user_uuid = u.user_uuid
     WHERE c.post_uuid = ?`
@@ -254,6 +260,10 @@ func FetchComment(db *sql.DB, params map[string]interface{}) ([]Comment, error) 
 		if updated_at, ok := row["updated_at"].(time.Time); ok {
 			comment.Updated_at = updated_at
 		}
+
+		if role, ok := row["role"].(string); ok {
+			comment.Role = role
+		}
 		comments = append(comments, comment)
 	}
 
@@ -281,7 +291,7 @@ func DeleteComment(db *sql.DB, params map[string]interface{}) error {
 func FetchUserComments(db *sql.DB, user_uuid string) ([]Comment, error) {
 	// Préparer la requête SQL pour récupérer les commentaires de l'utilisateur spécifié
 	fetchUserCommentsQuery := `
-        SELECT c.comment_id, c.content, c.post_uuid, u.user_uuid, u.username, u.profile_picture, c.created_at, c.likes, c.dislikes
+        SELECT c.comment_id, c.content, c.post_uuid, u.user_uuid, u.role, u.username, u.profile_picture, c.created_at, c.likes, c.dislikes
         FROM comments c
         JOIN users u ON c.user_uuid = u.user_uuid
         WHERE c.user_uuid = ?  -- Filtrer par user_uuid
@@ -306,6 +316,7 @@ func FetchUserComments(db *sql.DB, user_uuid string) ([]Comment, error) {
 			ProfilePicture: row["profile_picture"].(string),
 			Likes:          (row["likes"].(int64)),
 			Dislikes:       (row["dislikes"].(int64)),
+			Role:           row["role"].(string),
 		}
 		if updatedAt, ok := row["updated_at"].(time.Time); ok {
 			comment.Updated_at = updatedAt
@@ -319,7 +330,7 @@ func FetchUserComments(db *sql.DB, user_uuid string) ([]Comment, error) {
 func FetchUserReactions(db *sql.DB, user_uuid string) (Response, error) {
 	// Requête pour récupérer les likes sur les posts
 	fetchUserLikePost := `
-    SELECT p.post_uuid, p.content, u.user_uuid, u.username, u.profile_picture, p.created_at, p.likes, p.dislikes, p.post_image
+    SELECT p.post_uuid, p.content, u.user_uuid, u.username, u.role, u.profile_picture, p.created_at, p.likes, p.dislikes, p.post_image
     FROM post_reactions pr
     JOIN posts p ON pr.post_uuid = p.post_uuid
     JOIN users u ON p.user_uuid = u.user_uuid
@@ -328,7 +339,7 @@ func FetchUserReactions(db *sql.DB, user_uuid string) (Response, error) {
 
 	// Requête pour récupérer les likes sur les commentaires
 	fetchUserCommentReactionsQuery := `
-    SELECT c.comment_id, c.content, c.post_uuid, u.user_uuid, u.username, u.profile_picture, c.created_at, c.likes, c.dislikes
+    SELECT c.comment_id, c.content, c.post_uuid, u.user_uuid, u.role, u.username, u.profile_picture, c.created_at, c.likes, c.dislikes
     FROM comment_reactions cr
     JOIN comments c ON cr.comment_id = c.comment_id
     JOIN users u ON c.user_uuid = u.user_uuid
@@ -380,6 +391,10 @@ func FetchUserReactions(db *sql.DB, user_uuid string) (Response, error) {
 			post.Post_image = post_image
 		}
 
+		if role, ok := row["role"].(string); ok {
+			post.Role = role
+		}
+
 		posts = append(posts, post)
 	}
 
@@ -411,6 +426,10 @@ func FetchUserReactions(db *sql.DB, user_uuid string) (Response, error) {
 		}
 		if dislikes, ok := row["dislikes"].(int64); ok {
 			comment.Dislikes = dislikes
+		}
+
+		if role, ok := row["role"].(string); ok {
+			comment.Role = role
 		}
 
 		comments = append(comments, comment)
@@ -447,7 +466,7 @@ func UpdateComment(db *sql.DB, params map[string]interface{}) error {
 
 func FetchDetailsComment(db *sql.DB, comment_id string) ([]Comment, error) {
 	fetchUserPostsQuery := `
-	SELECT c.*, u.username, u.profile_picture
+	SELECT c.*, u.username, u.profile_picture, u.role
 	FROM comments c
 	JOIN users u ON c.user_uuid = u.user_uuid
 	WHERE c.comment_id = ?  -- Filtrer par commentId
@@ -488,6 +507,10 @@ func FetchDetailsComment(db *sql.DB, comment_id string) ([]Comment, error) {
 		}
 		if dislikes, ok := row["dislikes"].(int64); ok {
 			comment.Dislikes = dislikes
+		}
+
+		if role, ok := row["role"].(string); ok {
+			comment.Role = role
 		}
 
 		comments = append(comments, comment)

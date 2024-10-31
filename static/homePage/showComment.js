@@ -1,5 +1,4 @@
 import { DisplayMessages } from "./displayMessage.js";
-import { initEventListeners } from "./comment.js";
 
 export async function fetchAllcomments(postUuid) {
     try {
@@ -22,9 +21,10 @@ export async function fetchAllcomments(postUuid) {
             DisplayMessages(comment, "home", true);
         });
 
-        initEventListeners();
+        return Promise.resolve();
 
     } catch (error) {
         console.error(error);
+        return Promise.reject(error);
     }
 }

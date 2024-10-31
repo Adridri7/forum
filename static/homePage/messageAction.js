@@ -93,7 +93,6 @@ export async function deleteComment(post_uuid, comment_id) {
             alert(`Failed to Delete the post: ${error}`);
         }
 
-        fetchAllcomments(post_uuid);
     } catch (error) {
         console.error(error);
     }

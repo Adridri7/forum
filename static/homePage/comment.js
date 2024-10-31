@@ -17,12 +17,21 @@ const AppState = {
     MODERATION: "moderation"
 };
 
+// Map pour stocker les event listeners
+const commentListeners = new Map();
+const menuListeners = new Map();
 
 // Fonction pour gérer le clic sur le bouton de commentaire
 export function handleCommentClick(section) {
     const postId = this.closest('.message-item')?.getAttribute('post_uuid');
 
     if (postId) {
+        // Éviter les appels redondants si on est déjà sur le même post
+        const currentPostElement = document.querySelector('.message-item');
+        if (currentPostElement && currentPostElement.getAttribute('post_uuid') === postId) {
+            return; // Ne rien faire si on clique sur le même post
+        }
+
         updateAppState({
             type: AppState.POST,
             data: {
@@ -38,19 +47,23 @@ export function updateAppState(newState, pushState = true) {
     switch (newState.type) {
         case AppState.HOME:
             title.textContent = 'General';
-            fetchPosts().then(initEventListeners); // Appelle initEventListeners après fetchPosts
+            fetchPosts().then(initEventListeners);
             break;
         case AppState.POST:
             title.textContent = 'Post';
-            displaySinglePost(newState.data.postId, newState.data.section);
+            displaySinglePost(newState.data.postId, newState.data.section)
+                .then(initEventListeners)
+                .catch(error => {
+                    console.error('Error displaying post:', error);
+                });
             break;
         case AppState.SEARCH:
             title.textContent = 'Search';
-            fetchCategories().then(initEventListeners); // Appelle initEventListeners après fetchCategories
+            fetchCategories().then(initEventListeners);
             break;
         case AppState.TREND:
             title.textContent = 'Trending';
-            FetchMostLikedPosts().then(initEventListeners); // Init si FetchMostLikedPosts retourne une Promise
+            FetchMostLikedPosts().then(initEventListeners);
             break;
         case AppState.NOTIFS:
             title.textContent = "Notifications";
@@ -59,10 +72,11 @@ export function updateAppState(newState, pushState = true) {
         case AppState.REQUEST:
             title.textContent = "Request";
             FetchHistoryRequest();
-            break
+            break;
         case AppState.MODERATION:
             title.textContent = "Moderation";
             FetchAdminRequest();
+            break;
         default:
             newState.type = AppState.HOME;
             title.textContent = 'General';
@@ -85,53 +99,85 @@ export function updateAppState(newState, pushState = true) {
             case AppState.NOTIFS:
                 url = "#notifications";
                 break;
+            case AppState.MODERATION:
+                url = "#moderation";
+                break;
+            case AppState.REQUEST:
+                url = "#request";
+                break;
             default:
                 url = '#home';
+                break;
         }
         history.pushState(newState, '', url);
     }
-
 }
 
-
-export function displaySinglePost(postId, section) {
+export async function displaySinglePost(postId, section) {
     const userPostsContainer = document.querySelector(`.users-post[data-section="${section}"]`);
     const postElement = userPostsContainer?.querySelector(`.message-item[post_uuid="${postId}"]`);
 
     if (userPostsContainer && postElement) {
+        // Nettoyez d'abord le conteneur
         userPostsContainer.innerHTML = '';
-        userPostsContainer.appendChild(postElement);
 
+        // Créez une copie profonde du post pour éviter les problèmes de référence
+        const postClone = postElement.cloneNode(true);
+        userPostsContainer.appendChild(postClone);
+
+        // Créez et ajoutez la section de commentaires
         const commentSection = createCommentInput(section);
         userPostsContainer.appendChild(commentSection);
 
-        fetchAllcomments(postId);
+        try {
+            await fetchAllcomments(postId);
+            return Promise.resolve(); // Retourne une Promise résolue
+        } catch (error) {
+            console.error('Error fetching comments:', error);
+            return Promise.reject(error);
+        };
     } else {
         console.error(`Post with id ${postId} not found in section "${section}"`);
     }
 }
 
-
-window.addEventListener('popstate', function (event) {
-    if (event.state) {
-        updateAppState(event.state, false);
-    } else {
-        // Détermine l'état en fonction de l'URL actuelle
-        const hash = window.location.hash;
-        if (hash.startsWith('#post-')) {
-            const postId = hash.slice(6); // Retire '#post-' du début
-            updateAppState({ type: AppState.POST, data: { postId } }, false);
-        } else if (hash === '#search') {
-            updateAppState({ type: AppState.SEARCH }, false);
-        } else if (hash === '#trend') {
-            updateAppState({ type: AppState.TREND }, false)
-        } else if (hash === "#notifications") {
-            updateAppState({ type: AppState.NOTIFS }, false)
-        } else {
-            updateAppState({ type: AppState.HOME }, false);
+// Fonction pour initialiser les événements des boutons
+export function initEventListeners() {
+    // Nettoyer et réinitialiser les boutons de commentaire
+    const commentButtons = document.querySelectorAll('.comment-btn');
+    commentButtons.forEach(button => {
+        // Retirer l'ancien listener s'il existe
+        const oldListener = commentListeners.get(button);
+        if (oldListener) {
+            button.removeEventListener('click', oldListener);
+            commentListeners.delete(button);
         }
-    }
-});
+
+        // Ajouter le nouveau listener
+        const section = button.closest('.users-post')?.getAttribute('data-section');
+        if (section) {
+            const newListener = (e) => handleCommentClick.call(button, section);
+            commentListeners.set(button, newListener);
+            button.addEventListener('click', newListener);
+        }
+    });
+
+    // Nettoyer et réinitialiser les boutons de menu
+    const menuButtons = document.querySelectorAll('.menu-btn');
+    menuButtons.forEach(button => {
+        // Retirer l'ancien listener s'il existe
+        const oldListener = menuListeners.get(button);
+        if (oldListener) {
+            button.removeEventListener('click', oldListener);
+            menuListeners.delete(button);
+        }
+
+        // Ajouter le nouveau listener
+        const newListener = handleMenuClick;
+        menuListeners.set(button, newListener);
+        button.addEventListener('click', newListener);
+    });
+}
 
 export function createCommentInput(section) {
     fetchUserInfo();
@@ -166,7 +212,7 @@ export function createCommentInput(section) {
     submitButton.type = 'submit';
     submitButton.textContent = 'Post';
     submitButton.disabled = true;
-    submitButton.classList.add('button-disabled')
+    submitButton.classList.add('button-disabled');
 
     commentInput.addEventListener('input', () => {
         if (commentInput.value.trim() === '') {
@@ -178,20 +224,12 @@ export function createCommentInput(section) {
         }
     });
 
-    // Vérifiez si l'utilisateur est connecté
+    // Vérifier si l'utilisateur est connecté
     if (!UserInfo || !UserInfo.user_uuid) {
-        // Désactivez le champ d'entrée et le bouton si l'utilisateur n'est pas connecté
         commentInput.disabled = true;
         submitButton.disabled = true;
-
-        // Ajoutez un message d'information
-        const infoMessage = document.createElement('div');
-        infoMessage.classList.add('info-message');
         commentInput.placeholder = 'Please login to comment';
-        commentInputContainer.appendChild(infoMessage);
     }
-
-
 
     form.appendChild(profileImageContainer);
     form.appendChild(commentInput);
@@ -208,7 +246,6 @@ export function createCommentInput(section) {
     form.addEventListener('submit', async (event) => {
         event.preventDefault();
 
-
         if (postUuid) {
             await createComment(postUuid, UserInfo.user_uuid);
             commentInput.value = '';
@@ -223,8 +260,6 @@ export function createCommentInput(section) {
 }
 
 export async function createComment(post_uuid, user_uuid) {
-    const userPost = document.getElementById('users-post');
-    const firstMessageItem = document.querySelector('.user-post .message-item');
     const form = document.getElementById("create-comment-form");
     const formData = new FormData(form);
 
@@ -245,7 +280,6 @@ export async function createComment(post_uuid, user_uuid) {
 
         if (response.ok) {
             alert("Commentaire ajouté avec succès!");
-            // fetchAllcomments(post_uuid);
         } else {
             const error = await response.json();
             alert("Erreur lors de l'ajout du commentaire: " + error.message);
@@ -256,39 +290,40 @@ export async function createComment(post_uuid, user_uuid) {
     }
 }
 
-// Fonction pour initialiser les événements des boutons
-export function initEventListeners() {
-    const commentButtons = document.querySelectorAll('.comment-btn');
-
-    commentButtons.forEach(button => {
-        const section = button.closest('.users-post')?.getAttribute('data-section');
-        if (section) {
-            button.removeEventListener('click', handleCommentClick.bind(button, section));
-            button.addEventListener('click', handleCommentClick.bind(button, section));
-        }
-    });
-
-    // Initialisation des boutons de menu
-    const menuButtons = document.querySelectorAll('.menu-btn');
-    menuButtons.forEach(button => {
-        button.removeEventListener('click', handleMenuClick);
-        button.addEventListener('click', handleMenuClick);
-    });
-}
-
 export function handleMenuClick(event) {
     event.stopPropagation();
     const postElement = event.currentTarget.closest('.message-item');
     const postId = postElement.getAttribute('post_uuid');
-
     toggleMenu(event, postId);
 }
 
+// Event Listeners pour la navigation
+window.addEventListener('popstate', function (event) {
+    if (event.state) {
+        updateAppState(event.state, false);
+    } else {
+        const hash = window.location.hash;
+        if (hash.startsWith('#post-')) {
+            const postId = hash.slice(6);
+            updateAppState({ type: AppState.POST, data: { postId } }, false);
+        } else if (hash === '#search') {
+            updateAppState({ type: AppState.SEARCH }, false);
+        } else if (hash === '#trend') {
+            updateAppState({ type: AppState.TREND }, false);
+        } else if (hash === "#notifications") {
+            updateAppState({ type: AppState.NOTIFS }, false);
+        } else {
+            updateAppState({ type: AppState.HOME }, false);
+        }
+    }
+});
 
+// Initialisation des event listeners au chargement de la page
 document.addEventListener("DOMContentLoaded", () => {
     updateAppState({ type: AppState.HOME });
 });
 
+// Event listeners pour la navigation
 document.getElementById('home-link').addEventListener('click', function (e) {
     e.preventDefault();
     updateAppState({ type: AppState.HOME });
@@ -301,7 +336,7 @@ document.getElementById('search-link').addEventListener('click', function (e) {
 
 document.getElementById('trend-link').addEventListener('click', function (e) {
     e.preventDefault();
-    updateAppState({ type: AppState.TREND })
+    updateAppState({ type: AppState.TREND });
 });
 
 document.getElementById('notifications-link').addEventListener('click', function (e) {
@@ -309,15 +344,15 @@ document.getElementById('notifications-link').addEventListener('click', function
     if (!UserInfo) {
         return;
     }
-    updateAppState({ type: AppState.NOTIFS })
+    updateAppState({ type: AppState.NOTIFS });
 });
 
 document.getElementById('request-link').addEventListener('click', function (e) {
     e.preventDefault();
-    updateAppState({ type: AppState.REQUEST })
+    updateAppState({ type: AppState.REQUEST });
 });
 
 document.getElementById('moderation-link').addEventListener('click', function (e) {
     e.preventDefault();
-    updateAppState({ type: AppState.MODERATION })
+    updateAppState({ type: AppState.MODERATION });
 });

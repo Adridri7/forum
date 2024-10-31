@@ -322,6 +322,7 @@ body {
     word-break: break-word;
     max-height: 300px;
     overflow-y: auto;
+    scrollbar-width: none;
 }
 
 .reaction-btn {
