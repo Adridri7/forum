@@ -1,17 +1,14 @@
 import { DisplayMessages } from "./displayMessage.js";
 import { initEventListeners } from "./comment.js";
-import { getPPFromID, resetUsersPost } from "./utils.js";
+import { getPPFromID } from "./utils.js";
 import { NewPost } from "./newPost.js";
 import { handleLogout } from "./logout.js";
 import { toggleCommentReaction, toggleReaction } from "./reaction.js";
 import { FetchMostUseCategories } from "./tendance.js";
-import { fetchPersonnalComment, fetchPersonnalPosts, fetchPersonnalResponse } from "./dashboard.js";
 import { fetchNotifications } from "./notifs.js";
-import { initReportEventListeners } from "./API_request.js";
+import { initSectionEvents, showDashboard } from "./section.js";
 
-document.addEventListener('DOMContentLoaded', () => {
-    fetchUserInfo();
-})
+
 export let UserInfo = null
 export async function fetchUserInfo() {
 
@@ -248,10 +245,11 @@ export function CommentReaction(event) {
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    fetchPosts();  // Charge les posts à l'accueil
+document.addEventListener('DOMContentLoaded', async () => {
+    fetchPosts();
     addButton.addEventListener('click', NewPost);
     FetchMostUseCategories();
+
     // Gérer uniquement les événements sur les boutons de post
     document.body.addEventListener('click', (event) => {
         const isPostReaction = event.target.closest('.like-btn') || event.target.closest('.dislike-btn');
@@ -263,110 +261,8 @@ document.addEventListener('DOMContentLoaded', () => {
             CommentReaction(event);
         }
     });
-});
 
-const homeLink = document.getElementById('home-link');
-const dashboardLink = document.getElementById('dashboard-link');
-const searchLink = document.getElementById('search-link');
-const notificationsLink = document.getElementById('notifications-link');
-const trendLink = document.getElementById('trend-link');
-const requestLink = document.getElementById('request-link');
-const moderationLink = document.getElementById('moderation-link');
-
-// Sélectionne les sections
-const homeSection = document.getElementById('home-section');
-const dashboardSection = document.getElementById('dashboard-section');
-const searchSection = document.getElementById('search-section');
-const notificationsSection = document.getElementById('notifications-section');
-const trendingSection = document.getElementById('trending-section');
-const requestSection = document.getElementById('request-section');
-const moderationSection = document.getElementById('moderation-section');
-
-// Fonction pour masquer toutes les sections
-export function hideAllSections() {
-    homeSection.style.display = 'none';
-    dashboardSection.style.display = 'none';
-    searchSection.style.display = 'none';
-    notificationsSection.style.display = 'none';
-    trendingSection.style.display = 'none';
-    requestSection.style.display = 'none'
-    moderationSection.style.display = 'none'
-}
-
-// Ajoute des événements pour chaque lien
-homeLink.addEventListener('click', () => {
-    hideAllSections();
-    homeSection.style.display = 'block';
-});
-
-searchLink.addEventListener('click', () => {
-    hideAllSections();
-    searchSection.style.display = 'block';
-});
-
-notificationsLink.addEventListener('click', () => {
-    if (!UserInfo) {
-        alert("You must be logged in to see notifications.");
-        return;
-    }
-
-    hideAllSections();
-    notificationsSection.style.display = 'block'
-});
-
-trendLink.addEventListener('click', () => {
-    hideAllSections();
-    trendingSection.style.display = 'block'
-});
-
-requestLink.addEventListener('click', () => {
-    hideAllSections();
-    requestSection.style.display = 'block'
-
-    initReportEventListeners();
-});
-
-moderationLink.addEventListener('click', () => {
-    hideAllSections();
-    moderationSection.style.display = 'block';
-});
-
-dashboardLink.addEventListener('click', () => {
-
-    if (!UserInfo) {
-        alert("You must be logged in to access the dashboard.");
-        return;
-    }
-
-    hideAllSections();
-    dashboardSection.style.display = 'flex';
-    const currentActiveItem = document.querySelector('#nav-bar li.active');
-    if (currentActiveItem) {
-        const activeId = currentActiveItem.id;
-
-        // Fetch basé sur l'élément actif
-        switch (activeId) {
-            case 'personnal-post':
-                fetchPersonnalPosts();
-                break;
-            case 'personnal-comment':
-                fetchPersonnalComment();
-                break;
-            case 'personnal-reaction':
-                fetchPersonnalResponse();
-            default:
-                break;
-        }
-        const profilPicture = document.getElementById('profile-picture');
-        getPPFromID(UserInfo.user_uuid).then(img => { profilPicture.src = img });
-    }
-
-    const navItems = document.querySelectorAll('#nav-bar li');
-
-    navItems.forEach(item => {
-        item.addEventListener('click', () => {
-            navItems.forEach(nav => nav.classList.remove('active'));
-            item.classList.add('active');
-        });
-    });
+    await fetchUserInfo();
+    initSectionEvents(UserInfo);
+    document.getElementById('dashboard-link').addEventListener('click', () => showDashboard(UserInfo));
 });

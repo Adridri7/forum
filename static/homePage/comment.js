@@ -3,9 +3,10 @@ import { toggleMenu } from "./displayMessage.js";
 import { fetchCategories } from "./fetchcategories.js";
 import { fetchNotifications } from "./notifs.js";
 import { FetchMostLikedPosts } from "./postMostLiked.js";
-import { FetchAdminRequest, FetchHistoryRequest } from "./API_request.js";
+import { FetchAdminRequest, FetchHistoryRequest } from "./apiRequests.js";
 import { fetchAllcomments } from "./showComment.js";
 import { getPPFromID } from "./utils.js";
+import { createComment } from "./apiComments.js";
 
 const AppState = {
     HOME: 'home',
@@ -131,7 +132,7 @@ export async function displaySinglePost(postId, section) {
 
         try {
             await fetchAllcomments(postId);
-            return Promise.resolve(); // Retourne une Promise résolue
+            return Promise.resolve();
         } catch (error) {
             console.error('Error fetching comments:', error);
             return Promise.reject(error);
@@ -257,37 +258,6 @@ export function createCommentInput(section) {
 
     commentInputContainer.appendChild(form);
     return commentInputContainer;
-}
-
-export async function createComment(post_uuid, user_uuid) {
-    const form = document.getElementById("create-comment-form");
-    const formData = new FormData(form);
-
-    const data = {};
-    formData.forEach((value, key) => (data[key] = value));
-
-    data.post_uuid = post_uuid;
-    data.user_uuid = user_uuid;
-
-    try {
-        const response = await fetch("/api/post/createComment", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(data)
-        });
-
-        if (response.ok) {
-            alert("Commentaire ajouté avec succès!");
-        } else {
-            const error = await response.json();
-            alert("Erreur lors de l'ajout du commentaire: " + error.message);
-        }
-    } catch (error) {
-        console.error("Erreur lors de l'envoi du commentaire:", error);
-        alert("Une erreur s'est produite lors de l'envoi du commentaire. Veuillez réessayer.");
-    }
 }
 
 export function handleMenuClick(event) {

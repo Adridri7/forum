@@ -1,5 +1,5 @@
 import { UserInfo } from "./app.js";
-import { createPost } from "./createdPost.js";
+import { createPost } from "./apiCreatedPost.js";
 import { getPPFromID } from "./utils.js";
 
 

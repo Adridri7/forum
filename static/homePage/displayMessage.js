@@ -1,4 +1,4 @@
-import { ReportMessage } from "./API_request.js";
+import { ReportMessage } from "./requestHandlers.js";
 import { UserInfo } from "./app.js";
 import { deleteComment, deletePost, updateComment, updatePost } from "./messageAction.js";
 import { promoteUser } from "./role.js";

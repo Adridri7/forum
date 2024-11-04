@@ -333,8 +333,6 @@ export async function fetchPersonnalComment() {
                 `;
 
                 const targetMessageItem = document.querySelector(`[post_uuid="${post.comment_id}"]`);
-                console.log(targetMessageItem);
-                console.log(post);
 
                 if (targetMessageItem) {
                     const messageContent = targetMessageItem.querySelector('.message-content');
@@ -402,13 +400,9 @@ export async function fetchPersonnalResponse() {
 
         // Gestion des commentaires
         if (Array.isArray(comments) && comments.length > 0) {
-            console.log("ça passe ici ?");
             comments.sort((b, a) => new Date(b.created_at) - new Date(a.created_at));
             comments.forEach(async (comment) => {
-                console.log("id envoyé : ", comment.comment_id);
                 const details = await fetchCommentDetails(comment.comment_id);
-                console.log("details", details);
-                console.log("posts-content :", details);
 
                 DisplayPersonnalMessages(comment, true);
 
@@ -462,7 +456,6 @@ export async function fetchPostDetails(postUuid) {
     }
 
     const postDetails = await response.json();
-    console.log("réponse reçu", postDetails)
 
     return postDetails;
 }
@@ -489,7 +482,6 @@ export async function fetchCommentDetails(comment_id) {
     }
 
     const postDetails = await response.json();
-    console.log("réponse reçu (comment)", postDetails)
 
     return postDetails;
 }

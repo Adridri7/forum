@@ -248,7 +248,7 @@ body {
     overflow-x: hidden;
     max-height: 94vh;
     margin-right: 80px;
-    max-width: 45vw;
+    width: 45vw;
     border: 1px solid var(--border-color);
     border-top-left-radius: 15px;
     border-top-right-radius: 15px;
@@ -995,8 +995,7 @@ ul {
     flex-direction: column;
     gap: 15px;
     overflow-y: auto;
-    max-height: 10vh;
-    padding-bottom: 30vh;
+    max-height: 30vh;
     scrollbar-width: none;
 }
 
@@ -1051,6 +1050,8 @@ ul {
     max-height: 80vh;
     width: 200px;
     scrollbar-width: none;
+    overflow-x: hidden;
+    text-wrap: nowrap;
 }
 
 #members-list,
@@ -1065,7 +1066,7 @@ ul {
     display: flex;
     align-items: center;
     gap: 10px;
-    height: 40px;
+    height: 60px;
     padding: 10px;
     border-radius: 8px;
     cursor: pointer;

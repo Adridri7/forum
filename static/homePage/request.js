@@ -1,5 +1,5 @@
-import { toggleRequestReaction } from "./API_request.js";
 import { UserInfo } from "./app.js";
+import { toggleRequestReaction } from "./requestHandlers.js";
 import { promoteUser } from "./role.js";
 
 export function DisplayRequest(request, historyRequestContainer = false) {
@@ -188,7 +188,6 @@ export function initRequestEventListeners() {
             // Récupérer le conteneur parent qui a l'attribut request-uuid
             const messageContainer = container.closest('.message-container');
             const request_uuid = messageContainer.getAttribute('request-uuid');
-            console.log("ID :", request_uuid);
             toggleRequestReaction(event, request_uuid);
         });
     });
